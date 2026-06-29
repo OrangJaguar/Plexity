@@ -1,11 +1,11 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useToolsSettings } from '@/hooks/queries/useToolsSettings';
 import { useToolsWeather, useToolsStocks } from '@/hooks/queries/useToolsWeather';
 import { usePreferences } from '@/hooks/queries/usePreferences';
 import { useUpdatePreferences } from '@/hooks/mutations/usePreferencesMutations';
 import { computeFreeTimeMinutes, formatFreeTimeHours } from '@/lib/tools/free-time';
-import { getDebriefItemsForToday, formatDebriefItemTime, formatDebriefClipboard } from '@/lib/tools/debrief';
+import { getDebriefItemsForToday, formatDebriefItemTime } from '@/lib/tools/debrief';
 import { mergeWidgetLayout, getEnabledWidgets } from '@/lib/tools/widget-layout';
 import DashboardWidgetStrip from '@/components/tools/dashboard/DashboardWidgetStrip';
 
@@ -34,7 +34,6 @@ export default function DailyIntelligencePanel({
   onExpandedChange,
   onCompleteTask,
 }) {
-  const [copyLabel, setCopyLabel] = useState('Copy summary');
   const { settings } = useToolsSettings();
   const { data: preferences } = usePreferences();
   const updatePrefs = useUpdatePreferences();
@@ -52,18 +51,6 @@ export default function DailyIntelligencePanel({
   const dueTasks = (tasks || []).filter((t) => !t.completed && t.due).length;
   const freeMin = computeFreeTimeMinutes(now, schedule, events, tasks, settings);
   const priorityTasks = getPriorityTasks(tasks);
-
-  const handleCopy = async (e) => {
-    e.stopPropagation();
-    try {
-      await navigator.clipboard.writeText(formatDebriefClipboard(debriefItems, {
-        blockedMin: 0,
-        roughFree: freeMin,
-      }));
-      setCopyLabel('Copied!');
-      setTimeout(() => setCopyLabel('Copy summary'), 1400);
-    } catch { /* ignore */ }
-  };
 
   const handleHabitToggle = (habitId) => {
     const checks = { ...(settings.toolsHabitChecks || {}) };
@@ -139,16 +126,6 @@ export default function DailyIntelligencePanel({
                 ))}
               </div>
             )}
-          </div>
-
-          <div className="tools-intel-bottom">
-            <div className="tools-intel-section tools-intel-section--footer">
-              <h4>Free Time Estimate</h4>
-              <p className="tools-intel-freetime">{formatFreeTimeHours(freeMin)} available (after schedule, tasks, sleep & travel buffers)</p>
-            </div>
-            <div className="tools-intel-footer">
-              <button type="button" className="btn btn-sm" onClick={handleCopy}>{copyLabel}</button>
-            </div>
           </div>
         </div>
       )}
