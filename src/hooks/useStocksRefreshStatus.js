@@ -5,7 +5,7 @@ import { formatUpdatedAgo, getStocksRefreshIntervalMs } from '@/lib/tools/stocks
 /** Live "Updated Xs ago" label driven by stocks query cache freshness. */
 export function useStocksRefreshStatus() {
   const queryClient = useQueryClient();
-  const [, tick] = useState(0);
+  const [, setTick] = useState(0);
 
   useEffect(() => {
     const id = setInterval(() => setTick((n) => n + 1), 1000);

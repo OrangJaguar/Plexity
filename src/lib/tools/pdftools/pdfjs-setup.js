@@ -1,6 +1,8 @@
 import * as pdfjs from 'pdfjs-dist';
-import PdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?worker';
 
-pdfjs.GlobalWorkerOptions.workerPort = new PdfWorker();
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.mjs',
+  import.meta.url,
+).href;
 
 export default pdfjs;

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Copy, Download, Lock, Plus, Search, Shield, Star, Upload,
 } from 'lucide-react';

@@ -16,7 +16,7 @@ const SUMMARY_MODULES = [
 
 const CORE_MODULES = 'price,summaryDetail,defaultKeyStatistics,assetProfile,financialData,calendarEvents,earningsHistory,earnings,recommendationTrend';
 
-function useDevProxy() {
+function isDevProxy() {
   return import.meta.env.DEV;
 }
 
@@ -38,7 +38,7 @@ async function yahooFetchRemote(path, { method = 'GET', body } = {}) {
 }
 
 async function yahooGet(path) {
-  if (useDevProxy()) {
+  if (isDevProxy()) {
     const res = await fetch(`/yahoo-finance${path}`, { headers: { 'User-Agent': UA } });
     if (!res.ok) throw new Error(`Market data unavailable (${res.status})`);
     return res.json();
@@ -47,7 +47,7 @@ async function yahooGet(path) {
 }
 
 async function yahooPost(path, body) {
-  if (useDevProxy()) {
+  if (isDevProxy()) {
     const res = await fetch(`/yahoo-finance${path}`, {
       method: 'POST',
       headers: { 'User-Agent': UA, 'Content-Type': 'application/json' },
