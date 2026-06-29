@@ -29006,3 +29006,232 @@
       opacity: 1;
       background: hsl(var(--accent));
     }
+
+    /* ——— Marketing / landing ——— */
+    .tools-landing {
+      width: 100%;
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 1.25rem 3rem;
+    }
+
+    .tools-landing-hero {
+      padding: 2.5rem 0 3rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tools-landing-hero-inner {
+      max-width: 640px;
+    }
+
+    .tools-landing-logo {
+      margin-bottom: 1.25rem;
+    }
+
+    .tools-landing-eyebrow {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+    }
+
+    .tools-landing-hero h1 {
+      font-size: clamp(2rem, 5vw, 2.75rem);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      margin-bottom: 1rem;
+      color: var(--text-main);
+    }
+
+    .tools-landing-lead {
+      font-size: 1.05rem;
+      line-height: 1.6;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      max-width: 52ch;
+    }
+
+    .tools-landing-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+      align-items: center;
+      margin-bottom: 1.25rem;
+    }
+
+    .tools-landing-hint {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .tools-landing-hint kbd {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      padding: 0.1rem 0.35rem;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-main);
+    }
+
+    .tools-landing-section {
+      padding: 2.5rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tools-landing-section:last-of-type {
+      border-bottom: none;
+    }
+
+    .tools-landing-section-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .tools-landing-section-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text-main);
+    }
+
+    .tools-landing-link {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+
+    .tools-landing-link:hover {
+      color: var(--text-main);
+      text-decoration: underline;
+    }
+
+    .tools-landing-highlights {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+
+    .tools-landing-highlight {
+      padding: 1.15rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .tools-landing-highlight-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.25rem;
+      height: 2.25rem;
+      border-radius: var(--radius);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      margin-bottom: 0.75rem;
+      color: var(--text-main);
+    }
+
+    .tools-landing-highlight h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+      color: var(--text-main);
+    }
+
+    .tools-landing-highlight p {
+      font-size: 0.85rem;
+      line-height: 1.5;
+      color: var(--text-muted);
+    }
+
+    .tools-landing-tool-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .tools-landing-tool-card {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      padding: 1rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      text-decoration: none;
+      color: inherit;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .tools-landing-tool-card:hover {
+      border-color: var(--border-strong);
+      background: var(--surface-hover);
+    }
+
+    .tools-landing-tool-icon {
+      display: inline-flex;
+      color: var(--text-main);
+    }
+
+    .tools-landing-tool-label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .tools-landing-tool-desc {
+      font-size: 0.78rem;
+      line-height: 1.45;
+      color: var(--text-muted);
+    }
+
+    .tools-landing-cta {
+      padding: 2.5rem 0 1rem;
+    }
+
+    .tools-landing-cta-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.65rem;
+      padding: 1.75rem;
+      border-radius: calc(var(--radius) + 4px);
+      border: 1px solid var(--border);
+      background: linear-gradient(145deg, var(--surface) 0%, var(--bg) 100%);
+      color: var(--text-muted);
+    }
+
+    .tools-landing-cta-inner h2 {
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .tools-landing-cta-inner p {
+      font-size: 0.9rem;
+      line-height: 1.55;
+      max-width: 48ch;
+      margin-bottom: 0.5rem;
+    }
+
+    @media (max-width: 640px) {
+      .tools-landing-hero {
+        padding-top: 1.5rem;
+      }
+
+      .tools-landing-actions .btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }

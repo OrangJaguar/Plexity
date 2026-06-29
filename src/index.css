@@ -48,3 +48,15 @@
     --ring: 240 4.9% 83.9%;
   }
 }
+
+/* Keep Tailwind shadcn tokens aligned with app.css design system */
+html.light,
+html.dark {
+  color-scheme: light dark;
+}
+
+html.light body,
+html.dark body {
+  background-color: var(--bg);
+  color: var(--text-main);
+}
