@@ -18,13 +18,34 @@
     "userAgent": { "type": "string" },
     "createdAt": { "type": "number" },
     "updatedAt": { "type": "number" },
-    "adminNotes": { "type": "string" }
+    "adminNotes": {
+      "type": "string",
+      "rls": {
+        "read": { "user_condition": { "role": "admin" } },
+        "write": { "user_condition": { "role": "admin" } }
+      }
+    }
   },
   "required": ["requestId", "type", "status", "userEmail", "subject", "message"],
   "rls": {
-    "create": true,
-    "read": { "user_condition": { "role": "admin" } },
-    "update": { "user_condition": { "role": "admin" } },
-    "delete": { "user_condition": { "role": "admin" } }
+    "create": { "data.userEmail": "{{user.email}}" },
+    "read": {
+      "$or": [
+        { "data.userEmail": "{{user.email}}" },
+        { "user_condition": { "role": "admin" } }
+      ]
+    },
+    "update": {
+      "$or": [
+        { "data.userEmail": "{{user.email}}" },
+        { "user_condition": { "role": "admin" } }
+      ]
+    },
+    "delete": {
+      "$or": [
+        { "data.userEmail": "{{user.email}}" },
+        { "user_condition": { "role": "admin" } }
+      ]
+    }
   }
 }

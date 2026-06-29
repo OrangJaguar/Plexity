@@ -1,9 +1,8 @@
-const CHARSETS = {
-  lower: 'abcdefghijklmnopqrstuvwxyz',
-  upper: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-  digits: '0123456789',
-  symbols: '!@#$%^&*()-_=+[]{}:,.?',
-};
+import { buildPasswordCharsets } from '@/lib/tools/passwords/password-charset';
+import { securePick, secureRandomIndex, secureShuffle } from '@/lib/tools/passwords/password-random';
+import passphraseWords from '@/lib/tools/passwords/passphrase-words.json';
+
+const CHARSETS = buildPasswordCharsets();
 
 export function generatePassword({
   length = 20,
@@ -20,30 +19,23 @@ export function generatePassword({
   if (symbols) { pool += CHARSETS.symbols; required.push(CHARSETS.symbols); }
   if (!pool) pool = CHARSETS.lower + CHARSETS.upper + CHARSETS.digits;
 
-  const chars = [];
-  required.forEach((set) => {
-    chars.push(set[Math.floor(Math.random() * set.length)]);
-  });
+  const chars = required.map((set) => securePick(set));
   while (chars.length < length) {
-    chars.push(pool[Math.floor(Math.random() * pool.length)]);
+    chars.push(securePick(pool));
   }
-  for (let i = chars.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [chars[i], chars[j]] = [chars[j], chars[i]];
-  }
-  return chars.join('');
+  return secureShuffle(chars).join('');
 }
 
-const WORDS = [
-  'river', 'forest', 'silver', 'planet', 'crystal', 'harbor', 'meadow', 'signal',
-  'anchor', 'compass', 'orbit', 'summit', 'violet', 'granite', 'ember', 'lunar',
-];
-
 export function generatePassphrase({ words = 4, separator = '-' } = {}) {
+  const list = Array.isArray(passphraseWords) ? passphraseWords : [];
+  if (!list.length) {
+    throw new Error('Passphrase word list is unavailable');
+  }
+
   const picked = [];
   for (let i = 0; i < words; i += 1) {
-    picked.push(WORDS[Math.floor(Math.random() * WORDS.length)]);
+    picked.push(list[secureRandomIndex(list.length)]);
   }
-  const tail = Math.floor(10 + Math.random() * 89);
+  const tail = 10 + secureRandomIndex(90);
   return `${picked.join(separator)}${separator}${tail}`;
 }

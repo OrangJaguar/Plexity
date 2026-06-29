@@ -1,6 +1,6 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
+import { marketDataUserAgent } from "../_shared/marketDataUserAgent.ts";
 
-const UA = "Mozilla/5.0 (compatible; Veridian/1.0)";
 const YAHOO_HOSTS = ["https://query1.finance.yahoo.com", "https://query2.finance.yahoo.com"];
 
 let sessionCookie = "";
@@ -22,15 +22,16 @@ function collectCookies(res: Response): string {
 }
 
 async function refreshYahooSession() {
+  const userAgent = marketDataUserAgent();
   const fcRes = await fetch("https://fc.yahoo.com/", {
-    headers: { "User-Agent": UA },
+    headers: { "User-Agent": userAgent },
     redirect: "follow",
   });
   const fcCookies = collectCookies(fcRes);
   if (fcCookies) sessionCookie = fcCookies;
 
   const crumbRes = await fetch("https://query1.finance.yahoo.com/v1/test/getcrumb", {
-    headers: { "User-Agent": UA, Cookie: sessionCookie },
+    headers: { "User-Agent": userAgent, Cookie: sessionCookie },
   });
   if (!crumbRes.ok) throw new Error("Failed to obtain market data session");
   sessionCrumb = (await crumbRes.text()).trim();
@@ -55,7 +56,7 @@ async function yahooProxy(path: string, method = "GET", body?: unknown) {
     requestPath = `${requestPath}${sep}crumb=${encodeURIComponent(sessionCrumb)}`;
   }
 
-  const headers: Record<string, string> = { "User-Agent": UA };
+  const headers: Record<string, string> = { "User-Agent": marketDataUserAgent() };
   if (sessionCookie) headers.Cookie = sessionCookie;
   if (method !== "GET" && body != null) headers["Content-Type"] = "application/json";
 

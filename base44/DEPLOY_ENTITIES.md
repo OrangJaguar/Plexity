@@ -30,6 +30,17 @@ If you only see 8, you are missing entities that the app already uses in code. D
 | **submitFeedback** | Auth-gated feedback submission with rate limit and request ID generation |
 | **toolsMarketData** | Yahoo market data proxy |
 
+### ToolsFeedback RLS
+
+Deploy with entity-level RLS so users can read/update/delete their own rows (`userEmail` match) and admins have full access via `$or` + `user_condition`. Field `adminNotes` is admin-only (field-level RLS). Re-sync `base44/entities/ToolsFeedback.jsonc` after changes.
+
+### toolsMarketData environment (optional)
+
+| Variable | Purpose |
+|----------|---------|
+| `MARKET_DATA_USER_AGENT` | Full outbound User-Agent override |
+| `APP_NAME` / `APP_VERSION` / `APP_CONTACT_URL` | Composed fallback when override unset |
+
 ## Built-in (not in `base44/entities/`)
 
 | Table | Purpose |
