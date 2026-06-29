@@ -4,9 +4,10 @@ export const PINNED_TOOLS_STORAGE_KEY = 'veridian.pinnedToolIds';
 
 const VALID_IDS = new Set(TOOL_REGISTRY.map((t) => t.id));
 
-/** Default pinned subset: all tools except Grades */
+/** Default pinned subset: dashboard, tasks, calendar, focus, journal — in that order */
 export function getDefaultPinnedToolIds() {
-  return TOOL_REGISTRY.filter((t) => t.defaultPinned).map((t) => t.id);
+  const DEFAULT_ORDER = ['dashboard', 'tasks', 'calendar', 'focus', 'journal'];
+  return DEFAULT_ORDER.filter((id) => VALID_IDS.has(id));
 }
 
 /** @param {unknown} raw @returns {string[]|null} null when input is not an array */

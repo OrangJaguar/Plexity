@@ -15,7 +15,7 @@ export default function SignInPage() {
     setUser(user);
     touchLastActive().catch(() => {});
     const redirect = searchParams.get('redirect');
-    navigate(redirect && redirect.startsWith('/') ? redirect : '/tools/dashboard', { replace: true });
+    navigate(redirect && redirect.startsWith('/') ? redirect : '/dashboard', { replace: true });
   }
 
   return (

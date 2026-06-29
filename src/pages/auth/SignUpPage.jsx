@@ -11,7 +11,7 @@ export default function SignUpPage() {
   function handleSuccess(user) {
     setUser(user);
     touchLastActive().catch(() => {});
-    navigate('/tools/dashboard', { replace: true });
+    navigate('/dashboard', { replace: true });
   }
 
   return (

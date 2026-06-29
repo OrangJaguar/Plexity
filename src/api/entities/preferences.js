@@ -31,7 +31,7 @@ export async function updatePreferences(patch) {
     ...patch,
     userEmail: user.email,
     hintsShown: patch.hintsShown ?? [],
-    pinnedToolIds: patch.pinnedToolIds ?? getDefaultPinnedToolIds(),
+    pinnedToolIds: patch.pinnedToolIds ?? ['dashboard', 'tasks', 'calendar', 'focus', 'journal'],
     notificationPref: patch.notificationPref ?? 'off',
     defaultPrivacy: patch.defaultPrivacy ?? 'private',
     createdAt: patch.createdAt ?? Date.now(),
@@ -77,7 +77,7 @@ export async function createUserPreferencesOnSignup({ username, userEmail }) {
     createdAt: now,
     lastActiveAt: now,
     hintsShown: [],
-    pinnedToolIds: getDefaultPinnedToolIds(),
+    pinnedToolIds: ['dashboard', 'tasks', 'calendar', 'focus', 'journal'],
     notificationPref: 'off',
     defaultPrivacy: 'private',
   };

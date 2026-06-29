@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { TOOL_REGISTRY } from '@/lib/tools/registry';
+import { usePinnedTools } from '@/hooks/queries/usePinnedTools';
 
 const PILLARS = [
   {
@@ -49,10 +50,19 @@ const SYNC_CLOUD = [
 ];
 const SYNC_LOCAL = ['Password vault (encrypted on device)', 'PDF edits (in-browser only)'];
 
+function toFlatRoute(route) {
+  return route.startsWith('/tools/') ? route.slice(6) : route;
+}
+
 export default function ToolsLandingPage() {
   const { user, isLoading } = useAuth();
+  const { pinnedTools } = usePinnedTools();
   const [demoIndex, setDemoIndex] = useState(0);
   const demo = COMMAND_DEMO[demoIndex];
+
+  const appEntryRoute = pinnedTools.length > 0
+    ? toFlatRoute(pinnedTools[0].route)
+    : '/catalog';
 
   useEffect(() => {
     const id = window.setInterval(() => {
@@ -80,11 +90,11 @@ export default function ToolsLandingPage() {
             <div className="tools-landing-actions">
               {!isLoading && user ? (
                 <>
-                  <Link to="/tools/dashboard" className="btn btn-primary tools-landing-btn">
-                    Open Dashboard
+                  <Link to={appEntryRoute} className="btn btn-primary tools-landing-btn">
+                    Go to App
                     <ArrowRight size={16} aria-hidden />
                   </Link>
-                  <Link to="/tools/catalog" className="btn tools-landing-btn-secondary">
+                  <Link to="/catalog" className="btn tools-landing-btn-secondary">
                     Browse tools
                   </Link>
                 </>
@@ -94,7 +104,7 @@ export default function ToolsLandingPage() {
                     Get started
                     <ArrowRight size={16} aria-hidden />
                   </Link>
-                  <Link to="/tools/dashboard" className="btn tools-landing-btn-secondary">
+                  <Link to="/dashboard" className="btn tools-landing-btn-secondary">
                     Try without account
                   </Link>
                 </>
@@ -161,7 +171,7 @@ export default function ToolsLandingPage() {
               All {TOOL_REGISTRY.length} tools — pin your favorites from the catalog.
             </p>
           </div>
-          <Link to="/tools/catalog" className="tools-landing-link">
+          <Link to="/catalog" className="tools-landing-link">
             Open catalog
             <ArrowRight size={14} aria-hidden />
           </Link>
@@ -223,10 +233,10 @@ export default function ToolsLandingPage() {
             in the first minute.
           </p>
           <Link
-            to={user ? '/tools/dashboard' : '/signup'}
+            to={user ? appEntryRoute : '/signup'}
             className="btn btn-primary tools-landing-btn"
           >
-            {user ? 'Go to dashboard' : 'Create free account'}
+            {user ? 'Go to App' : 'Create free account'}
             <ArrowRight size={16} aria-hidden />
           </Link>
         </div>

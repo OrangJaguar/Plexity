@@ -42,26 +42,46 @@ export default function AppRoutes() {
       </Route>
 
       <Route element={<ToolsAppShell />}>
-        <Route path="/tools" element={<Navigate to="/tools/dashboard" replace />} />
-        <Route path="/tools/dashboard" element={<ToolsDashboardPage />} />
-        <Route path="/tools/tasks" element={<ToolsTasksPage />} />
-        <Route path="/tools/calendar" element={<ToolsCalendarPage />} />
-        <Route path="/tools/focus" element={<ToolsFocusPage />} />
-        <Route path="/tools/grades" element={<ToolsGradesPage />} />
-        <Route path="/tools/pdf/*" element={<ToolsPdfToolsPage />} />
-        <Route path="/tools/pdftools/*" element={<Navigate to="/tools/pdf" replace />} />
-        <Route path="/tools/stocks/*" element={<ToolsStocksPage />} />
-        <Route path="/tools/typing" element={<ToolsTypingPage />} />
-        <Route path="/tools/college" element={<ToolsCollegePage />} />
-        <Route path="/tools/units" element={<ToolsUnitsPage />} />
-        <Route path="/tools/journal" element={<ToolsJournalPage />} />
-        <Route path="/tools/goals" element={<ToolsGoalsPage />} />
-        <Route path="/tools/profile" element={<ToolsProfileToolPage />} />
-        <Route path="/tools/lists" element={<ToolsListsPage />} />
-        <Route path="/tools/passwords" element={<ToolsPasswordsPage />} />
-        <Route path="/tools/calculator" element={<ToolsCalculatorPage />} />
-        <Route path="/tools/catalog" element={<ToolsCatalogPage />} />
-        <Route path="/tools/settings" element={<ToolsSettingsPage />} />
+        <Route path="/dashboard" element={<ToolsDashboardPage />} />
+        <Route path="/tasks" element={<ToolsTasksPage />} />
+        <Route path="/calendar" element={<ToolsCalendarPage />} />
+        <Route path="/focus" element={<ToolsFocusPage />} />
+        <Route path="/grades" element={<ToolsGradesPage />} />
+        <Route path="/pdf/*" element={<ToolsPdfToolsPage />} />
+        <Route path="/stocks/*" element={<ToolsStocksPage />} />
+        <Route path="/typing" element={<ToolsTypingPage />} />
+        <Route path="/college" element={<ToolsCollegePage />} />
+        <Route path="/units" element={<ToolsUnitsPage />} />
+        <Route path="/journal" element={<ToolsJournalPage />} />
+        <Route path="/goals" element={<ToolsGoalsPage />} />
+        <Route path="/profile" element={<ToolsProfileToolPage />} />
+        <Route path="/lists" element={<ToolsListsPage />} />
+        <Route path="/passwords" element={<ToolsPasswordsPage />} />
+        <Route path="/calculator" element={<ToolsCalculatorPage />} />
+        <Route path="/catalog" element={<ToolsCatalogPage />} />
+        <Route path="/settings" element={<ToolsSettingsPage />} />
+
+        {/* Legacy /tools/* redirects — keeps old links working */}
+        <Route path="/tools" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/tools/dashboard" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/tools/tasks" element={<Navigate to="/tasks" replace />} />
+        <Route path="/tools/calendar" element={<Navigate to="/calendar" replace />} />
+        <Route path="/tools/focus" element={<Navigate to="/focus" replace />} />
+        <Route path="/tools/grades" element={<Navigate to="/grades" replace />} />
+        <Route path="/tools/pdf" element={<Navigate to="/pdf" replace />} />
+        <Route path="/tools/pdftools" element={<Navigate to="/pdf" replace />} />
+        <Route path="/tools/stocks" element={<Navigate to="/stocks" replace />} />
+        <Route path="/tools/typing" element={<Navigate to="/typing" replace />} />
+        <Route path="/tools/college" element={<Navigate to="/college" replace />} />
+        <Route path="/tools/units" element={<Navigate to="/units" replace />} />
+        <Route path="/tools/journal" element={<Navigate to="/journal" replace />} />
+        <Route path="/tools/goals" element={<Navigate to="/goals" replace />} />
+        <Route path="/tools/profile" element={<Navigate to="/profile" replace />} />
+        <Route path="/tools/lists" element={<Navigate to="/lists" replace />} />
+        <Route path="/tools/passwords" element={<Navigate to="/passwords" replace />} />
+        <Route path="/tools/calculator" element={<Navigate to="/calculator" replace />} />
+        <Route path="/tools/catalog" element={<Navigate to="/catalog" replace />} />
+        <Route path="/tools/settings" element={<Navigate to="/settings" replace />} />
       </Route>
 
       <Route element={<MarketingLayout />}>
