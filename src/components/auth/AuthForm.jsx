@@ -161,10 +161,17 @@ export default function AuthForm({
       const user = await base44.auth.me();
       const chosenUsername = pendingUsernameRef.current || normalizeUsername(username);
       if (chosenUsername) {
-        await createUserPreferencesOnSignup({
-          username: chosenUsername,
-          userEmail: user.email,
-        });
+        try {
+          await createUserPreferencesOnSignup({
+            username: chosenUsername,
+            userEmail: user.email,
+          });
+        } catch (prefErr) {
+          const prefMsg = prefErr?.message || 'Could not save your username. Try again or contact support.';
+          setError(prefMsg);
+          setLoading(false);
+          return;
+        }
         try {
           await syncAuthUserFullName(chosenUsername);
         } catch {

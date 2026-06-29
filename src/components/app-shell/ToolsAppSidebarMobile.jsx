@@ -15,7 +15,7 @@ export default function ToolsAppSidebarMobile() {
   const items = getToolsNavItems(pinnedToolIds);
 
   return (
-    <nav className="app-sidebar-mobile">
+    <nav className="app-sidebar-mobile app-sidebar-mobile--tools">
       <SidebarNavLink
         to={TOOLS_CATALOG_NAV_ITEM.to}
         label="Catalog"

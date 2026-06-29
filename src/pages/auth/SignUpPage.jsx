@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import PublicOnly from '@/components/routing/PublicOnly';
 import AuthForm from '@/components/auth/AuthForm';
 import { useAuth } from '@/hooks/useAuth';
+import { touchLastActive } from '@/api/entities/preferences';
 
 export default function SignUpPage() {
   const navigate = useNavigate();
@@ -9,6 +10,7 @@ export default function SignUpPage() {
 
   function handleSuccess(user) {
     setUser(user);
+    touchLastActive().catch(() => {});
     navigate('/tools/dashboard', { replace: true });
   }
 

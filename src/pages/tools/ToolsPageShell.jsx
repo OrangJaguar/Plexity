@@ -1,6 +1,5 @@
 import LoginPrompt from '@/components/stubs/LoginPrompt';
 import VeridianLoading from '@/components/shared/VeridianLoading';
-import ToolsChromeToggle from '@/components/tools/chrome/ToolsChromeToggle';
 import { useAuth } from '@/hooks/useAuth';
 import { useUiStore } from '@/store/uiStore';
 
@@ -25,7 +24,6 @@ export default function ToolsPageShell({ children, className = '' }) {
   return (
     <div className={pageClass}>
       {children}
-      <ToolsChromeToggle />
     </div>
   );
 }

@@ -1,0 +1,58 @@
+# Base44 data entities — deploy checklist
+
+Your Base44 **Data** tab should show **13 custom tables** plus the built-in **User** table (14 total).
+
+If you only see 8, you are missing entities that the app already uses in code. Deploy/sync them from this repo's `base44/entities/` folder.
+
+## Required entities (in repo)
+
+| Entity | Used by |
+|--------|---------|
+| **UserPreferences** | Username, theme, pinned tools, dashboard widgets, habits, weather, stocks symbols |
+| **ToolsTask** | Tasks tool |
+| **ToolsCalendarEvent** | Calendar tool |
+| **ToolsSchedule** | Dashboard class schedule |
+| **ToolsJournalEntry** | Journal tool |
+| **ToolsFocusSession** | Focus timer history |
+| **ToolsGrades** | Grades tool |
+| **ToolsGoals** | Goals tool |
+| **ToolsLists** | Lists tool |
+| **ToolsProfile** | Profile tool |
+| **ToolsCollege** | College planner workspace |
+| **ToolsCalculator** | Calculator saved expressions/tables |
+| **ToolsStocksWorkspace** | Stocks watchlist and research notes |
+
+## Built-in (not in `base44/entities/`)
+
+| Table | Purpose |
+|-------|---------|
+| **User** | Auth email/password; **Name** column = `full_name` (synced from username on signup) |
+
+## Likely missing from your dashboard (deploy these)
+
+If you see 8 tables, you probably have the first group but are **missing**:
+
+- ToolsGoals
+- ToolsLists
+- ToolsProfile
+- ToolsCollege
+- ToolsCalculator
+- ToolsStocksWorkspace
+
+**Action:** In Base44, sync/deploy entities from `base44/entities/*.jsonc` or create each missing table from the JSONC definitions. Enable RLS on `userEmail` per each file.
+
+## Tools that do NOT need their own entity
+
+| Tool | Storage |
+|------|---------|
+| Dashboard | Reads Tasks, Schedule, Calendar, UserPreferences |
+| Passwords | Encrypted in browser only |
+| PDF | In-browser only |
+| Typing | Session/local state only |
+| Units | Stateless converter |
+| Catalog | UI only (pins in UserPreferences) |
+| Settings | UserPreferences |
+
+## Removed study entities (safe to delete in Base44)
+
+Journey, Module, Activity, Card, Session — see [ENTITIES_CLEANUP.md](./ENTITIES_CLEANUP.md).

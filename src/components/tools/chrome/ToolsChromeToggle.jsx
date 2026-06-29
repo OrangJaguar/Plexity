@@ -1,7 +1,7 @@
 import { ArrowDownLeft, ArrowUpRight } from 'lucide-react';
 import { useUiStore } from '@/store/uiStore';
 
-export default function ToolsChromeToggle() {
+export default function ToolsChromeToggle({ isMobile = false }) {
   const collapsed = useUiStore((s) => s.toolsChromeCollapsed);
   const setCollapsed = useUiStore((s) => s.setToolsChromeCollapsed);
 
@@ -11,10 +11,10 @@ export default function ToolsChromeToggle() {
         type="button"
         className="tools-chrome-toggle tools-chrome-toggle--expand"
         onClick={() => setCollapsed(false)}
-        aria-label="Show navigation"
+        aria-label="Show navigation and footer"
         title="Show navigation"
       >
-        <ArrowUpRight size={10} strokeWidth={2.5} />
+        <ArrowUpRight size={11} strokeWidth={2.5} />
       </button>
     );
   }
@@ -22,12 +22,12 @@ export default function ToolsChromeToggle() {
   return (
     <button
       type="button"
-      className="tools-chrome-toggle tools-chrome-toggle--collapse"
+      className={`tools-chrome-toggle tools-chrome-toggle--collapse${isMobile ? ' tools-chrome-toggle--mobile' : ''}`}
       onClick={() => setCollapsed(true)}
-      aria-label="Expand tools to full screen"
-      title="Expand to full screen"
+      aria-label="Hide navigation for full screen"
+      title="Full screen"
     >
-      <ArrowDownLeft size={10} strokeWidth={2.5} />
+      <ArrowDownLeft size={11} strokeWidth={2.5} />
     </button>
   );
 }

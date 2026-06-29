@@ -11,7 +11,15 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const catalogPath = path.join(__dirname, '../src/lib/tools/college/college-catalog.json');
 
-const API_KEY = process.env.COLLEGE_SCORECARD_API_KEY || 'DEMO_KEY';
+const API_KEY = process.env.COLLEGE_SCORECARD_API_KEY;
+if (!API_KEY) {
+  console.error(
+    'Missing COLLEGE_SCORECARD_API_KEY.\n'
+    + 'Request a free key at https://api.data.gov/signup/ then run:\n'
+    + '  COLLEGE_SCORECARD_API_KEY=your_key node scripts/import-college-scorecard.mjs',
+  );
+  process.exit(1);
+}
 const PER_PAGE = 100;
 const REQUEST_DELAY_MS = 650;
 

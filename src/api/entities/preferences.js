@@ -72,10 +72,12 @@ export async function createUserPreferencesOnSignup({ username, userEmail }) {
   const now = Date.now();
   const payload = {
     username: normalized,
+    displayName: normalized,
     userEmail,
     createdAt: now,
     lastActiveAt: now,
     hintsShown: [],
+    pinnedToolIds: getDefaultPinnedToolIds(),
     notificationPref: 'off',
     defaultPrivacy: 'private',
   };

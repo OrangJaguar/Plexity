@@ -11,6 +11,7 @@ import VeridianLogo from '@/components/layout/VeridianLogo';
 import ThemeSync from '@/components/ThemeSync';
 import SyncUserDisplayName from '@/components/auth/SyncUserDisplayName';
 import { applyThemeFromStorage } from '@/lib/theme';
+import ToolsChromeToggle from '@/components/tools/chrome/ToolsChromeToggle';
 
 export default function ToolsAppShell() {
   const isMobile = useIsMobile();
@@ -24,6 +25,7 @@ export default function ToolsAppShell() {
 
   const shellClass = [
     'app-shell',
+    isMobile ? 'app-shell--mobile' : '',
     hideChrome ? 'app-shell--tools-immersive' : '',
   ].filter(Boolean).join(' ');
 
@@ -46,11 +48,12 @@ export default function ToolsAppShell() {
           </main>
           {!hideChrome && (
             <div className="app-shell-bottom-chrome">
-              {isMobile && <ToolsAppSidebarMobile />}
               <AppFooter />
+              {isMobile && <ToolsAppSidebarMobile />}
             </div>
           )}
         </div>
+        <ToolsChromeToggle isMobile={isMobile} />
       </div>
     </CommandBarProvider>
   );
