@@ -6,8 +6,9 @@ import SignInPage from '@/pages/auth/SignInPage';
 import SignUpPage from '@/pages/auth/SignUpPage';
 import ForgotPasswordPage from '@/pages/auth/ForgotPasswordPage';
 import ResetPasswordPage from '@/pages/auth/ResetPasswordPage';
+import TermsPage from '@/pages/legal/TermsPage';
+import PrivacyPage from '@/pages/legal/PrivacyPage';
 import NotFoundPage from '@/pages/NotFoundPage';
-import StudyRedirectPage from '@/pages/StudyRedirectPage';
 import ToolsDashboardPage from '@/pages/tools/ToolsDashboardPage';
 import ToolsTasksPage from '@/pages/tools/ToolsTasksPage';
 import ToolsCalendarPage from '@/pages/tools/ToolsCalendarPage';
@@ -36,6 +37,8 @@ export default function AppRoutes() {
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/terms" element={<TermsPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
       </Route>
 
       <Route element={<ToolsAppShell />}>
@@ -59,7 +62,6 @@ export default function AppRoutes() {
         <Route path="/tools/calculator" element={<ToolsCalculatorPage />} />
         <Route path="/tools/catalog" element={<ToolsCatalogPage />} />
         <Route path="/tools/settings" element={<ToolsSettingsPage />} />
-        <Route path="/study/:sessionId" element={<StudyRedirectPage />} />
       </Route>
 
       <Route element={<MarketingLayout />}>

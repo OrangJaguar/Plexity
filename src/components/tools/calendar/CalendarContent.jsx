@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import ToolsModal from '@/components/tools/shared/ToolsModal';
 import ToolsMonthViewDialog from '@/components/tools/shared/ToolsMonthViewDialog';
 import VeridianCheckbox from '@/components/shared/form/VeridianCheckbox';
-import { useJourneys } from '@/hooks/queries/useJourneys';
 import {
   getCalendarEventsForWeek,
   getCalendarEventsForDay,
@@ -62,7 +61,6 @@ function SeriesScopeDialog({ open, onOpenChange, action, onChoose }) {
 }
 
 function CalendarEventDialog({ open, onOpenChange, event, initial, onSave, onDelete, onSwitchToTask }) {
-  const { data: journeys = [] } = useJourneys({ archived: false });
   const [title, setTitle] = useState('');
   const [start, setStart] = useState('');
   const [end, setEnd] = useState('');
@@ -71,7 +69,6 @@ function CalendarEventDialog({ open, onOpenChange, event, initial, onSave, onDel
   const [repeatRule, setRepeatRule] = useState('none');
   const [repeatIntervalWeeks, setRepeatIntervalWeeks] = useState(1);
   const [repeatDays, setRepeatDays] = useState([]);
-  const [linkedJourneyIds, setLinkedJourneyIds] = useState([]);
   const [notes, setNotes] = useState('');
 
   useEffect(() => {
@@ -85,18 +82,11 @@ function CalendarEventDialog({ open, onOpenChange, event, initial, onSave, onDel
     setRepeatRule(e.repeatRule || 'none');
     setRepeatIntervalWeeks(Math.max(1, Number(e.repeatIntervalWeeks) || 1));
     setRepeatDays(e.repeatDays || []);
-    setLinkedJourneyIds(e.linkedJourneyIds || []);
     setNotes(e.notes || '');
   }, [open, event, initial]);
 
   const toggleDay = (dow) => {
     setRepeatDays((prev) => (prev.includes(dow) ? prev.filter((d) => d !== dow) : [...prev, dow]));
-  };
-
-  const toggleJourney = (journeyId) => {
-    setLinkedJourneyIds((prev) => (
-      prev.includes(journeyId) ? prev.filter((id) => id !== journeyId) : [...prev, journeyId]
-    ));
   };
 
   const handleSubmit = (e) => {
@@ -110,7 +100,7 @@ function CalendarEventDialog({ open, onOpenChange, event, initial, onSave, onDel
       repeatRule,
       repeatIntervalWeeks: repeatRule === 'interval' ? repeatIntervalWeeks : undefined,
       repeatDays,
-      linkedJourneyIds,
+      linkedJourneyIds: event?.linkedJourneyIds ?? [],
       notes,
     });
     onOpenChange(false);
@@ -198,25 +188,6 @@ function CalendarEventDialog({ open, onOpenChange, event, initial, onSave, onDel
                   </button>
                 ))}
               </div>
-            )}
-          </div>
-        </div>
-        <div className="tools-modal-field">
-          <label>Linked journeys</label>
-          <div className="tools-calendar-journey-select">
-            {journeys.length === 0 ? (
-              <div className="tools-empty-hint">No active journeys.</div>
-            ) : (
-              journeys.map((j) => (
-                <label key={j.journeyId || j.id} className="tools-calendar-journey-option">
-                  <input
-                    type="checkbox"
-                    checked={linkedJourneyIds.includes(j.journeyId || j.id)}
-                    onChange={() => toggleJourney(j.journeyId || j.id)}
-                  />
-                  <span>{j.title || j.name || 'Untitled journey'}</span>
-                </label>
-              ))
             )}
           </div>
         </div>

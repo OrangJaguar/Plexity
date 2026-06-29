@@ -4,13 +4,7 @@ export const LEGACY_PERSIST_CACHE_KEY = 'veridian-query-cache';
 export const PERSIST_CACHE_BUSTER = 'phase3-user-scoped-v1';
 
 export const persistableQueryKeys = new Set([
-  'journeys',
-  'modules',
-  'activities',
-  'cards',
-  'dueToday',
   'preferences',
-  'studyPlan',
 ]);
 
 export function shouldPersistQuery(query) {
@@ -42,17 +36,7 @@ export const defaultDehydrateOptions = {
 
 /** In-memory query keys that hold per-user app data (not auth token). */
 export const USER_SCOPED_QUERY_ROOTS = [
-  'journeys',
-  'modules',
-  'activities',
-  'cards',
-  'dueToday',
   'preferences',
-  'studyPlan',
-  'catalog',
-  'library',
-  'sessions',
-  'profile',
 ];
 
 export function clearInMemoryUserQueries(queryClient) {

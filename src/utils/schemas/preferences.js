@@ -21,11 +21,7 @@ export const preferencesSchema = z.object({
   gradeLevel: z.string().optional(),
   country: z.string().optional(),
   usState: z.string().optional(),
-  studyGoals: z.array(z.string()).optional(),
-  researchConsent: z.boolean().optional(),
-  researchConsentAt: z.number().optional(),
   onboardingCompletedAt: z.number().optional(),
-  onboardingStep: z.number().optional(),
   themeDark: z.boolean().optional(),
   haptics: z.boolean().optional(),
   audio: z.boolean().optional(),
@@ -36,13 +32,7 @@ export const preferencesSchema = z.object({
   defaultShowSources: z.boolean().optional(),
   dailyTimeBudgetMin: z.number().min(10).max(180).optional(),
   usernameChangedAt: z.number().optional(),
-  lastReminderEmailAt: z.number().optional(),
-  examReminderSentFor: z.array(z.string()).optional(),
-  maiScoreOnboarding: z.number().min(5).max(25).nullable().optional(),
-  maiScoreDay60: z.number().min(5).max(25).nullable().optional(),
-  maiSurveyOnboardingCompletedAt: z.number().nullable().optional(),
-  maiSurveyDay60CompletedAt: z.number().nullable().optional(),
-  maiSurveyDay60DismissedAt: z.number().nullable().optional(),
+  pinnedToolIds: z.array(z.string()).optional(),
 });
 
 export const updatePreferencesSchema = preferencesSchema.partial();

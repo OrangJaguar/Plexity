@@ -1,6 +1,5 @@
 import { base44 } from '@/api/base44Client';
 import { requireAuth } from '@/api/requireAuth';
-import { markOnboardingDoneLocally } from '@/lib/onboardingStorage';
 import { normalizeUsername, isValidUsernameFormat } from '@/utils/schemas/preferences';
 import { getDefaultPinnedToolIds } from '@/lib/tools/pinned-tools';
 
@@ -35,7 +34,6 @@ export async function updatePreferences(patch) {
     pinnedToolIds: patch.pinnedToolIds ?? getDefaultPinnedToolIds(),
     notificationPref: patch.notificationPref ?? 'off',
     defaultPrivacy: patch.defaultPrivacy ?? 'private',
-    researchConsent: patch.researchConsent ?? false,
     createdAt: patch.createdAt ?? Date.now(),
   });
 }
@@ -80,7 +78,6 @@ export async function createUserPreferencesOnSignup({ username, userEmail }) {
     hintsShown: [],
     notificationPref: 'off',
     defaultPrivacy: 'private',
-    researchConsent: false,
   };
 
   if (rows.length > 0) {
@@ -90,7 +87,7 @@ export async function createUserPreferencesOnSignup({ username, userEmail }) {
 }
 
 export async function touchLastActive() {
-  const user = await requireAuth();
+  await requireAuth();
   const rows = await base44.entities.UserPreferences.list();
   const now = Date.now();
   const pref = pickBestPreferencesRow(rows);
@@ -98,51 +95,4 @@ export async function touchLastActive() {
     return base44.entities.UserPreferences.update(pref.id, { lastActiveAt: now });
   }
   return null;
-}
-
-export async function saveOnboardingProgress(stepIndex, patch) {
-  const user = await requireAuth();
-  const rows = await base44.entities.UserPreferences.list();
-  const data = {
-    ...patch,
-    onboardingStep: stepIndex,
-  };
-
-  if (rows.length > 0) {
-    return base44.entities.UserPreferences.update(rows[0].id, data);
-  }
-  return base44.entities.UserPreferences.create({
-    userEmail: user.email,
-    createdAt: Date.now(),
-    hintsShown: [],
-    notificationPref: 'off',
-    defaultPrivacy: 'private',
-    researchConsent: false,
-    ...data,
-  });
-}
-
-export async function completeOnboarding(patch = {}) {
-  const user = await requireAuth();
-  const rows = await base44.entities.UserPreferences.list();
-  const now = Date.now();
-  const data = {
-    ...patch,
-    onboardingCompletedAt: now,
-  };
-  markOnboardingDoneLocally(user.email);
-
-  const existing = pickBestPreferencesRow(rows);
-  if (existing) {
-    return base44.entities.UserPreferences.update(existing.id, data);
-  }
-  return base44.entities.UserPreferences.create({
-    userEmail: user.email,
-    createdAt: now,
-    hintsShown: [],
-    notificationPref: 'off',
-    defaultPrivacy: 'private',
-    researchConsent: patch.researchConsent ?? false,
-    ...data,
-  });
 }

@@ -2,20 +2,24 @@ import { requireAuth } from '@/api/requireAuth';
 import { hasToolsEntity, safeCreate, safeFilter, safeUpdate } from '@/api/entities/toolsApi';
 import { emptyGradesDocument, seedPeriods } from '@/lib/tools/grade-periods';
 
-const STORAGE_KEY = 'veridian.toolsGrades';
+const LEGACY_KEY = 'veridian.toolsGrades';
+const MIGRATED_KEY = 'veridian.migrated.ToolsGrades';
 
-function readLocal() {
+function readLegacy() {
+  if (typeof window === 'undefined') return null;
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = window.localStorage.getItem(LEGACY_KEY);
     return raw ? JSON.parse(raw) : null;
   } catch {
     return null;
   }
 }
 
-function writeLocal(data) {
+function clearLegacy() {
+  if (typeof window === 'undefined') return;
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    window.localStorage.removeItem(LEGACY_KEY);
+    window.localStorage.setItem(MIGRATED_KEY, '1');
   } catch { /* ignore */ }
 }
 
@@ -26,11 +30,7 @@ function mergeGradesDocs(server, local) {
   const localCourses = local.courses || [];
   const periodSystem = local.periodSystem ?? server.periodSystem;
   if (!serverCourses.length && localCourses.length) {
-    return {
-      ...server,
-      courses: localCourses,
-      periodSystem,
-    };
+    return { ...server, courses: localCourses, periodSystem };
   }
   if (local.updatedAt && server.updatedAt && local.updatedAt > server.updatedAt) {
     return {
@@ -39,70 +39,67 @@ function mergeGradesDocs(server, local) {
       periodSystem,
     };
   }
-  return {
-    ...server,
-    periodSystem,
-  };
+  return { ...server, periodSystem };
 }
 
 export async function getOrCreateGrades() {
   const user = await requireAuth();
-  const local = readLocal();
+  const legacy = readLegacy();
+  const migrated = typeof window !== 'undefined' && window.localStorage.getItem(MIGRATED_KEY) === '1';
 
   if (!hasToolsEntity('ToolsGrades')) {
-    return local ?? { ...emptyGradesDocument(), userEmail: user.email };
+    return legacy ?? { ...emptyGradesDocument(), userEmail: user.email };
   }
 
   try {
     const rows = await safeFilter('ToolsGrades', { userEmail: user.email });
     if (rows.length > 0) {
-      const doc = mergeGradesDocs(rows[0], local);
-      writeLocal(doc);
+      let doc = mergeGradesDocs(rows[0], legacy && !migrated ? legacy : null);
+      if (legacy && !migrated && (legacy.updatedAt ?? 0) > (rows[0].updatedAt ?? 0)) {
+        doc = await saveGradesDocument(doc);
+        clearLegacy();
+        return doc;
+      }
+      if (legacy && !migrated) clearLegacy();
       return doc;
     }
-    if (local?.courses?.length) {
-      const payload = { ...local, userEmail: user.email, updatedAt: Date.now() };
-      try {
-        const created = await safeCreate('ToolsGrades', payload);
-        writeLocal(created);
-        return created;
-      } catch {
-        writeLocal(payload);
-        return payload;
-      }
+
+    if (legacy?.courses?.length) {
+      const saved = await saveGradesDocument({ ...legacy, userEmail: user.email });
+      clearLegacy();
+      return saved;
     }
+
     const now = Date.now();
     const created = await safeCreate('ToolsGrades', {
       userEmail: user.email,
       ...emptyGradesDocument(),
       updatedAt: now,
     });
-    writeLocal(created);
     return created;
   } catch {
-    return local ?? { ...emptyGradesDocument(), userEmail: user.email };
+    return legacy ?? { ...emptyGradesDocument(), userEmail: user.email };
   }
 }
 
 export async function saveGradesDocument(doc) {
   const user = await requireAuth();
   const payload = { ...doc, userEmail: user.email, updatedAt: Date.now() };
-  writeLocal(payload);
 
   if (!hasToolsEntity('ToolsGrades')) {
     return payload;
   }
 
-  try {
-    const rows = await safeFilter('ToolsGrades', { userEmail: user.email });
-    const existing = rows[0];
-    if (!existing?.id) {
-      return safeCreate('ToolsGrades', payload);
-    }
-    return safeUpdate('ToolsGrades', existing.id, payload);
-  } catch {
-    return payload;
+  const rows = await safeFilter('ToolsGrades', { userEmail: user.email });
+  const existing = rows[0];
+  if (!existing?.id) {
+    const created = await safeCreate('ToolsGrades', payload);
+    clearLegacy();
+    return created;
   }
+  const updated = await safeUpdate('ToolsGrades', existing.id, payload);
+  clearLegacy();
+  return updated;
 }
 
 export async function updateGrades(patch) {

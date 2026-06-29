@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
-const DEFAULT_DESCRIPTION = 'Veridian — study smarter with spaced repetition and AI-generated study materials.';
-const SITE_NAME = 'Veridian';
+const DEFAULT_DESCRIPTION = 'Veridian Tools — a student productivity suite with tasks, calendar, focus, and more.';
+const SITE_NAME = 'Veridian Tools';
 
 function upsertMeta(attr, key, content) {
   if (!content) return;

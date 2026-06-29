@@ -32,7 +32,7 @@ export default class ErrorBoundary extends React.Component {
           </p>
           <button
             type="button"
-            className="veridian-btn veridian-btn-primary"
+            className="btn btn-primary"
             onClick={() => window.location.reload()}
           >
             Refresh

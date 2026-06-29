@@ -1,7 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import { useDueToday } from '@/hooks/queries/useDueToday';
 import { useToolsSettings } from '@/hooks/queries/useToolsSettings';
 import { useToolsWeather, useToolsStocks } from '@/hooks/queries/useToolsWeather';
 import { usePreferences } from '@/hooks/queries/usePreferences';
@@ -40,7 +38,6 @@ export default function DailyIntelligencePanel({
   const { settings } = useToolsSettings();
   const { data: preferences } = usePreferences();
   const updatePrefs = useUpdatePreferences();
-  const { data: dueItems = [] } = useDueToday();
   const weatherLocation = settings.toolsWeatherLocation || settings.toolsWeatherCity;
   const weatherUnit = settings.toolsWeatherUnit || 'fahrenheit';
   const { data: weather } = useToolsWeather(weatherLocation, weatherUnit);
@@ -78,10 +75,7 @@ export default function DailyIntelligencePanel({
     dueTasks ? `${dueTasks} task${dueTasks === 1 ? '' : 's'} due` : null,
     remainingEvents ? `${remainingEvents} event${remainingEvents === 1 ? '' : 's'} remaining` : null,
     formatFreeTimeHours(freeMin),
-    dueItems.length ? `${dueItems.length} card${dueItems.length === 1 ? '' : 's'} due` : null,
   ].filter(Boolean);
-
-  const studyLaunch = dueItems[0];
 
   return (
     <section className={`tools-intel-panel${expanded ? ' expanded' : ' collapsed'}`}>
@@ -129,18 +123,6 @@ export default function DailyIntelligencePanel({
                 )}
               </div>
             </div>
-
-            {dueItems.length > 0 && (
-              <div className="tools-intel-section">
-                <h4>Study Suggestion</h4>
-                <p>You have {dueItems.length} card{dueItems.length === 1 ? '' : 's'} due. A ~{Math.min(25, dueItems.length * 2)}-minute session could help before your next commitment.</p>
-                {studyLaunch?.journeyId && (
-                  <Link to={`/study/${studyLaunch.journeyId}`} className="btn btn-primary btn-sm">
-                    Launch study
-                  </Link>
-                )}
-              </div>
-            )}
 
             {priorityTasks.length > 0 && (
               <div className="tools-intel-section">

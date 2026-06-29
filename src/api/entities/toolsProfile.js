@@ -1,34 +1,22 @@
-import { requireAuth } from '@/api/requireAuth';
 import { emptyProfileDocument, normalizeProfileDocument } from '@/lib/tools/profile/profile-model';
+import { getOrCreateUserDocument, saveUserDocument } from '@/api/entities/toolsUserDocument';
 
-const STORAGE_KEY = 'veridian.toolsProfile';
-
-function readLocal() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
-}
-
-function writeLocal(data) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  } catch { /* ignore */ }
-}
+const ENTITY = 'ToolsProfile';
+const LEGACY_KEY = 'veridian.toolsProfile';
 
 export async function getOrCreateProfile() {
-  const user = await requireAuth();
-  const doc = normalizeProfileDocument(readLocal());
-  return { ...doc, userEmail: user.email };
+  return getOrCreateUserDocument(ENTITY, {
+    empty: emptyProfileDocument,
+    normalize: normalizeProfileDocument,
+    legacyStorageKey: LEGACY_KEY,
+  });
 }
 
 export async function saveProfileDocument(doc) {
-  const user = await requireAuth();
-  const payload = normalizeProfileDocument({ ...doc, userEmail: user.email, updatedAt: Date.now() });
-  writeLocal(payload);
-  return payload;
+  return saveUserDocument(ENTITY, doc, {
+    normalize: normalizeProfileDocument,
+    legacyStorageKey: LEGACY_KEY,
+  });
 }
 
 export { emptyProfileDocument, normalizeProfileDocument };

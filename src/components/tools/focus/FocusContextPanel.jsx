@@ -1,7 +1,5 @@
 import { useMemo, useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import { useDueToday } from '@/hooks/queries/useDueToday';
-import { useLaunchDueItem, actionVerbForType } from '@/hooks/home/useLaunchDueItem';
 import { getDebriefItemsForToday, formatDebriefItemTime } from '@/lib/tools/debrief';
 
 export default function FocusContextPanel({
@@ -12,17 +10,10 @@ export default function FocusContextPanel({
   onToggleTask,
 }) {
   const [expanded, setExpanded] = useState(false);
-  const { data: dueItems = [] } = useDueToday();
-  const launch = useLaunchDueItem();
 
   const debriefItems = useMemo(
     () => getDebriefItemsForToday(events, tasks),
     [events, tasks],
-  );
-
-  const taskItems = useMemo(
-    () => debriefItems.filter((it) => it.kind === 'task'),
-    [debriefItems],
   );
 
   const pinnedTask = useMemo(() => {
@@ -103,32 +94,6 @@ export default function FocusContextPanel({
           </div>
         )}
       </div>
-
-      {dueItems.length > 0 && (
-        <div className="tools-focus-context-section">
-          <div className="tools-focus-context-label">Study due today</div>
-          <div className="tools-focus-context-list">
-            {dueItems.slice(0, 6).map((item) => (
-              <div key={item.id} className="tools-focus-study-row">
-                <div className="tools-focus-study-row-main">
-                  <div className="tools-focus-study-row-title">{item.activityLabel}</div>
-                  <div className="tools-focus-study-row-meta">
-                    {item.journeyTitle}
-                    {item.moduleName ? ` · ${item.moduleName}` : ''}
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  className="tools-focus-btn tools-focus-btn--sm"
-                  onClick={() => launch(item)}
-                >
-                  {actionVerbForType(item.activityType)}
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </aside>
   );
 }

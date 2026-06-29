@@ -11,7 +11,7 @@ function isEditableTarget(target) {
 }
 
 /**
- * Cmd/Ctrl+Shift+K toggles between Veridian study home and Tools dashboard.
+ * Cmd/Ctrl+Shift+K toggles between the marketing landing page and Tools dashboard.
  */
 export function useHubToggleShortcut() {
   const navigate = useNavigate();

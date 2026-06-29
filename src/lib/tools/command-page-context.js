@@ -18,10 +18,8 @@ const ROUTE_PAGE_MAP = [
   { prefix: '/tools/college', pageId: 'college' },
   { prefix: '/tools/units', pageId: 'units' },
   { prefix: '/tools/pdftools', pageId: 'pdftools' },
+  { prefix: '/tools/pdf', pageId: 'pdftools' },
   { prefix: '/tools/stocks', pageId: 'stocks' },
-  { prefix: '/home', pageId: 'study' },
-  { prefix: '/journeys', pageId: 'study' },
-  { prefix: '/study', pageId: 'study' },
 ];
 
 /**

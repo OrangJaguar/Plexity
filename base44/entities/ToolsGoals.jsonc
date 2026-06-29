@@ -1,0 +1,16 @@
+{
+  "name": "ToolsGoals",
+  "type": "object",
+  "properties": {
+    "userEmail": { "type": "string" },
+    "updatedAt": { "type": "number" },
+    "document": { "type": "object", "description": "Goals workspace JSON" }
+  },
+  "required": ["userEmail"],
+  "rls": {
+    "create": { "data.userEmail": "{{user.email}}" },
+    "read": { "data.userEmail": "{{user.email}}" },
+    "update": { "data.userEmail": "{{user.email}}" },
+    "delete": { "data.userEmail": "{{user.email}}" }
+  }
+}

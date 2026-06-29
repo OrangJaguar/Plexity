@@ -7,11 +7,7 @@ describe('command-page-context', () => {
     expect(resolvePageContext('/tools/tasks').pageId).toBe('tasks');
     expect(resolvePageContext('/tools/focus').pageId).toBe('focus');
     expect(resolvePageContext('/tools/dashboard').pageId).toBe('dashboard');
-  });
-
-  it('maps study routes', () => {
-    expect(resolvePageContext('/home').pageId).toBe('study');
-    expect(resolvePageContext('/study/foo').pageId).toBe('study');
+    expect(resolvePageContext('/tools/pdf').pageId).toBe('pdftools');
   });
 
   it('falls back to global', () => {

@@ -4,7 +4,6 @@ import { base44 } from '@/api/base44Client';
 import { createUserPreferencesOnSignup } from '@/api/entities/preferences';
 import { queryClient } from '@/lib/query-client';
 import { clearInMemoryUserQueries, clearLegacyPersistedCache } from '@/lib/query-persist';
-import { clearOnboardingDoneLocally } from '@/lib/onboardingStorage';
 import { trackProductEvent } from '@/lib/analytics';
 import { syncAuthUserFullName, refreshAuthUser } from '@/api/auth/userProfile';
 import { useUsernameAvailability } from '@/hooks/useUsernameAvailability';
@@ -172,7 +171,6 @@ export default function AuthForm({
           // UserPreferences.username still saved; SyncUserDisplayName repairs on next load
         }
       }
-      clearOnboardingDoneLocally(user.email);
       clearInMemoryUserQueries(queryClient);
       clearLegacyPersistedCache();
       const refreshedUser = await refreshAuthUser();

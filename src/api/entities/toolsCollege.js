@@ -1,37 +1,24 @@
-import { requireAuth } from '@/api/requireAuth';
 import { emptyCollegeDocument, normalizeCollegeDocument } from '@/lib/tools/college/college-model';
+import { getOrCreateUserDocument, saveUserDocument } from '@/api/entities/toolsUserDocument';
 
-const STORAGE_KEY = 'veridian.toolsCollege';
-
-function readLocal() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
-}
-
-function writeLocal(data) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  } catch { /* ignore */ }
-}
+const ENTITY = 'ToolsCollege';
+const LEGACY_KEY = 'veridian.toolsCollege';
 
 export { emptyCollegeDocument, normalizeCollegeDocument };
 
 export async function getOrCreateCollege() {
-  const user = await requireAuth();
-  const local = readLocal();
-  const doc = normalizeCollegeDocument(local);
-  return { ...doc, userEmail: user.email };
+  return getOrCreateUserDocument(ENTITY, {
+    empty: emptyCollegeDocument,
+    normalize: normalizeCollegeDocument,
+    legacyStorageKey: LEGACY_KEY,
+  });
 }
 
 export async function saveCollegeDocument(doc) {
-  const user = await requireAuth();
-  const payload = normalizeCollegeDocument({ ...doc, userEmail: user.email, updatedAt: Date.now() });
-  writeLocal(payload);
-  return payload;
+  return saveUserDocument(ENTITY, doc, {
+    normalize: normalizeCollegeDocument,
+    legacyStorageKey: LEGACY_KEY,
+  });
 }
 
 export function newListItem(fields = {}) {
