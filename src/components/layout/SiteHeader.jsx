@@ -1,13 +1,20 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { usePinnedTools } from '@/hooks/queries/usePinnedTools';
+
+function toFlatRoute(route) {
+  return route.startsWith('/tools/') ? route.slice(6) : route;
+}
 
 export default function SiteHeader({ actions, showLogo = false }) {
   const { user, isLoading } = useAuth();
+  const { pinnedTools } = usePinnedTools();
+  const appEntryRoute = pinnedTools.length > 0 ? toFlatRoute(pinnedTools[0].route) : '/catalog';
 
   const defaultActions = !isLoading && (
     user ? (
-      <Link to="/tools/dashboard" className="btn btn-primary site-header-cta">
-        Open Dashboard
+      <Link to={appEntryRoute} className="btn btn-primary site-header-cta">
+        Go to App
       </Link>
     ) : (
       <>
