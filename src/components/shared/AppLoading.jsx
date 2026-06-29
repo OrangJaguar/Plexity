@@ -1,10 +1,12 @@
 import { useId } from 'react';
 import { useThemeDark } from '@/hooks/useThemeDark';
 
-const V_SHAPE = 'M 11 13 L 28 47 L 45 13 L 37.5 13 L 28 31.5 L 18.5 13 Z';
+/** Bold sans P — matches Plexity wordmark proportions in a 56×56 viewBox */
+const P_SHAPE =
+  'M 14 9 V 47 H 23 V 31 H 31 C 40 31 44 25 44 19 C 44 11 39 9 31 9 H 14 Z';
 
 /**
- * Branded loading indicator — solid V with a clipped accent fluid sweep inside.
+ * Branded loading indicator — solid P with a clipped accent fluid sweep inside.
  * Logo fill stays pure white (dark) or black (light); no opacity pulsing on the mark.
  */
 export default function AppLoading({
@@ -29,7 +31,7 @@ export default function AppLoading({
     >
       <defs>
         <clipPath id={clipId}>
-          <path d={V_SHAPE} />
+          <path d={P_SHAPE} />
         </clipPath>
         <linearGradient id={gradId} gradientUnits="userSpaceOnUse" x1="4" y1="8" x2="52" y2="48">
           <stop offset="0%" stopColor="var(--accent, #22c55e)" stopOpacity="0" />
@@ -37,7 +39,7 @@ export default function AppLoading({
           <stop offset="100%" stopColor="var(--accent, #22c55e)" stopOpacity="0" />
         </linearGradient>
       </defs>
-      <path className="app-loading-v-base" d={V_SHAPE} fill={logoFill} />
+      <path className="app-loading-p-base" d={P_SHAPE} fill={logoFill} />
       <g clipPath={`url(#${clipId})`}>
         <rect
           className="app-loading-fluid"

@@ -1,10 +1,13 @@
-import { LOGO_PATH, SITE_NAME } from '@/lib/branding/constants';
+import { logoPathForTheme, SITE_NAME } from '@/lib/branding/constants';
+import { useThemeDark } from '@/hooks/useThemeDark';
 
-export default function PlexityLogo({ size = 32, className = '' }) {
+export default function PlexityLogo({ size = 32, className = '', alt }) {
+  const dark = useThemeDark();
+
   return (
     <img
-      src={LOGO_PATH}
-      alt={SITE_NAME}
+      src={logoPathForTheme(dark)}
+      alt={alt ?? SITE_NAME}
       width={size}
       height={size}
       className={`app-logo ${className}`.trim()}

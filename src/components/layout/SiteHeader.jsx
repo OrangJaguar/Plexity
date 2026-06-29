@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { usePinnedTools } from '@/hooks/queries/usePinnedTools';
 import { TOOL_CATALOG_ROUTE } from '@/lib/tools/registry';
+import PlexityLogo from '@/components/layout/PlexityLogo';
 
 export default function SiteHeader({ actions, showLogo = false }) {
   const { user, isLoading } = useAuth();
@@ -30,7 +31,7 @@ export default function SiteHeader({ actions, showLogo = false }) {
       <Link to="/" className={`site-wordmark${showLogo ? ' site-wordmark--brand' : ''}`}>
         {showLogo ? (
           <>
-            <img src="/plexity-logo.svg" alt="" width={28} height={28} className="app-logo" draggable={false} />
+            <PlexityLogo size={28} alt="" />
             <span>Plexity</span>
           </>
         ) : (
