@@ -19,6 +19,7 @@ import { formatAgendaDateTime } from '@/lib/tools/time-format';
 import { buildManualReorder } from '@/api/entities/toolsTasks';
 import { useCommandBarDraft } from '@/hooks/useCommandBarDraft';
 import { taskFormToEventDraft } from '@/lib/tools/command-bar-draft';
+import { getToolRoute } from '@/lib/tools/tool-routes';
 
 const SORT_MODE_KEY = 'veridian.tasksSortMode';
 
@@ -243,7 +244,7 @@ export default function TasksContent({
   const handleSwitchToEvent = (form) => {
     setDialogOpen(false);
     clearDraft();
-    navigate('/tools/calendar', {
+    navigate(getToolRoute('calendar'), {
       state: { commandBar: { type: 'event', draft: taskFormToEventDraft(form) } },
     });
   };

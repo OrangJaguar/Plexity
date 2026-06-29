@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { TOOLS_HOME, isToolsRoute } from '@/lib/tools/tool-routes';
 
-const TOOLS_HOME = '/tools/dashboard';
 const APP_HOME = '/';
 
 function isEditableTarget(target) {
@@ -24,7 +24,7 @@ export function useHubToggleShortcut() {
 
       e.preventDefault();
 
-      const inTools = location.pathname.startsWith('/tools');
+      const inTools = isToolsRoute(location.pathname);
       navigate(inTools ? APP_HOME : TOOLS_HOME);
     };
 

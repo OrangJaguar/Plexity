@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { NavLink, Route, Routes, useParams } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { STOCKS_SECTIONS } from '@/lib/tools/stocks/stocks-model';
+import { stocksRoute } from '@/lib/tools/tool-routes';
 import { normalizeStocksWorkspace } from '@/lib/tools/stocks/stocks-model';
 import { useToolsStocksWorkspace, useSaveStocksWorkspace } from '@/hooks/queries/useToolsStocksWorkspace';
 import { useStocksRefreshStatus } from '@/hooks/useStocksRefreshStatus';
@@ -61,7 +62,7 @@ export default function StocksWorkspace() {
           {STOCKS_SECTIONS.map((s) => (
             <NavLink
               key={s.id}
-              to={s.path ? `/tools/stocks/${s.path}` : '/tools/stocks'}
+              to={stocksRoute(s.path)}
               end={!s.path}
               className={({ isActive }) => `stocks-nav-item${isActive ? ' is-active' : ''}`}
             >

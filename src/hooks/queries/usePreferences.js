@@ -6,15 +6,15 @@ import { mergePreferencesWithLocalPins } from '@/lib/tools/persist-pinned-tools'
 import { mergePreferencesWithLocalToolsSettings } from '@/lib/tools/persist-tools-settings';
 
 export function usePreferences() {
-  const { isAuthenticated, user } = useAuth();
+  const { user } = useAuth();
 
   return useQuery({
-    queryKey: queryKeys.preferences(user?.email),
+    queryKey: queryKeys.preferences(user?.email ?? 'guest'),
     queryFn: async () => {
       const server = await getPreferences();
       return mergePreferencesWithLocalToolsSettings(mergePreferencesWithLocalPins(server));
     },
-    enabled: isAuthenticated && !!user?.email,
+    enabled: true,
     staleTime: 60_000,
   });
 }

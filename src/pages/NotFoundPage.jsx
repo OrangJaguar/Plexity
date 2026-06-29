@@ -15,7 +15,7 @@ export default function NotFoundPage() {
       </p>
       <div className="not-found-actions">
         <Link to="/" className="btn btn-primary">Return home</Link>
-        <Link to="/tools/dashboard" className="btn">Open dashboard</Link>
+        <Link to="/dashboard" className="btn">Open dashboard</Link>
       </div>
     </div>
   );

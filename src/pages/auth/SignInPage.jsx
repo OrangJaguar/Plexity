@@ -3,6 +3,7 @@ import PublicOnly from '@/components/routing/PublicOnly';
 import AuthForm from '@/components/auth/AuthForm';
 import { useAuth } from '@/hooks/useAuth';
 import { touchLastActive } from '@/api/entities/preferences';
+import { onAuthSuccess } from '@/lib/auth/post-auth-success';
 
 export default function SignInPage() {
   const navigate = useNavigate();
@@ -11,7 +12,8 @@ export default function SignInPage() {
   const { setUser } = useAuth();
   const resetMessage = location.state?.message;
 
-  function handleSuccess(user) {
+  async function handleSuccess(user) {
+    await onAuthSuccess();
     setUser(user);
     touchLastActive().catch(() => {});
     const redirect = searchParams.get('redirect');

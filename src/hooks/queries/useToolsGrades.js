@@ -7,17 +7,15 @@ import {
   upsertPeriodAssignments,
 } from '@/api/entities/toolsGrades';
 import { queryKeys } from '@/api/query-keys';
-import { useAuth } from '@/hooks/useAuth';
 import { emptyGradesDocument } from '@/lib/tools/grade-periods';
 
 export function useToolsGrades() {
   const queryClient = useQueryClient();
-  const { isAuthenticated } = useAuth();
 
   const query = useQuery({
     queryKey: queryKeys.tools.grades,
     queryFn: getOrCreateGrades,
-    enabled: isAuthenticated,
+    enabled: true,
     placeholderData: emptyGradesDocument,
     retry: false,
     staleTime: 30_000,

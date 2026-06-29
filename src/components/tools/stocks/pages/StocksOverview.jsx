@@ -7,6 +7,7 @@ import StocksSectorHeatmap from '@/components/tools/stocks/StocksSectorHeatmap';
 import {
   StocksChange, StocksDataNotice, StocksError, StocksKpi, StocksLoader, StocksPanel,
 } from '@/components/tools/stocks/stocks-shared';
+import { stocksRoute, stocksSymbolRoute } from '@/lib/tools/tool-routes';
 
 export default function StocksOverview({ workspace, onOpenSymbol }) {
   const navigate = useNavigate();
@@ -27,7 +28,7 @@ export default function StocksOverview({ workspace, onOpenSymbol }) {
 
   const open = (symbol) => {
     if (onOpenSymbol) onOpenSymbol(symbol);
-    else navigate(`/tools/stocks/symbol/${encodeURIComponent(symbol)}`);
+    else navigate(stocksSymbolRoute(symbol));
   };
 
   return (
@@ -62,7 +63,7 @@ export default function StocksOverview({ workspace, onOpenSymbol }) {
       <div className="stocks-overview-grid">
         <StocksPanel
           title="Watchlist"
-          action={<Link to="/tools/stocks/watchlist" className="stocks-link">View all</Link>}
+          action={<Link to={stocksRoute('watchlist')} className="stocks-link">View all</Link>}
         >
           {(workspace?.watchlist || []).length === 0 ? (
             <p className="stocks-muted">Add symbols from the screener or search bar.</p>
@@ -120,7 +121,7 @@ export default function StocksOverview({ workspace, onOpenSymbol }) {
           )}
         </StocksPanel>
 
-        <StocksPanel title="Earnings preview" action={<Link to="/tools/stocks/earnings" className="stocks-link">Calendar</Link>}>
+        <StocksPanel title="Earnings preview" action={<Link to={stocksRoute('earnings')} className="stocks-link">Calendar</Link>}>
           {watchlistSymbols.length === 0 ? (
             <p className="stocks-muted">Add watchlist names to see upcoming earnings here.</p>
           ) : (

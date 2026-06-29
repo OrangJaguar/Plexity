@@ -10,6 +10,8 @@ export default function AppFooter() {
         <nav className="site-footer-links" aria-label="Legal">
           <Link to="/privacy">Privacy</Link>
           <span aria-hidden="true">·</span>
+          <Link to="/feedback">Feedback</Link>
+          <span aria-hidden="true">·</span>
           <Link to="/terms">Terms</Link>
         </nav>
       </div>

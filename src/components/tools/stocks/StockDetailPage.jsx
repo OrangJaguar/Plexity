@@ -14,6 +14,7 @@ import StocksAnalystConsensus from '@/components/tools/stocks/StocksAnalystConse
 import {
   StocksChange, StocksDataNotice, StocksError, StocksLoader, StocksPanel,
 } from '@/components/tools/stocks/stocks-shared';
+import { stocksRoute, stocksSymbolRoute } from '@/lib/tools/tool-routes';
 
 export default function StockDetailPage({ symbol, workspace, saveWorkspace, compare }) {
   const navigate = useNavigate();
@@ -71,7 +72,7 @@ export default function StockDetailPage({ symbol, workspace, saveWorkspace, comp
     return (
       <div className="stocks-page">
         <StocksError message={`Could not load ${sym}.`} onRetry={() => summary.refetch()} />
-        <Link to="/tools/stocks" className="stocks-btn stocks-btn--ghost">← Back</Link>
+        <Link to={stocksRoute()} className="stocks-btn stocks-btn--ghost">← Back</Link>
       </div>
     );
   }
@@ -84,7 +85,7 @@ export default function StockDetailPage({ symbol, workspace, saveWorkspace, comp
     <div className="stocks-page stocks-detail">
       <div className="stocks-detail-top">
         <header className="stocks-detail-hero">
-          <button type="button" className="stocks-btn stocks-btn--ghost stocks-detail-back" onClick={() => navigate('/tools/stocks')}>
+          <button type="button" className="stocks-btn stocks-btn--ghost stocks-detail-back" onClick={() => navigate(stocksRoute())}>
             <ArrowLeft size={16} aria-hidden />
             <span className="stocks-detail-back-label">Back</span>
           </button>

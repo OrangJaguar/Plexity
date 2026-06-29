@@ -6,16 +6,14 @@ import {
   saveCalculatorDocument,
 } from '@/api/entities/toolsCalculator';
 import { queryKeys } from '@/api/query-keys';
-import { useAuth } from '@/hooks/useAuth';
 
 export function useToolsCalculator() {
   const queryClient = useQueryClient();
-  const { isAuthenticated } = useAuth();
 
   const query = useQuery({
     queryKey: queryKeys.tools.calculator,
     queryFn: getOrCreateCalculator,
-    enabled: isAuthenticated,
+    enabled: true,
     placeholderData: emptyCalculatorWorkspace,
     staleTime: 30_000,
   });

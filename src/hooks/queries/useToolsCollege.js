@@ -6,16 +6,14 @@ import {
   saveCollegeDocument,
 } from '@/api/entities/toolsCollege';
 import { queryKeys } from '@/api/query-keys';
-import { useAuth } from '@/hooks/useAuth';
 
 export function useToolsCollege() {
   const queryClient = useQueryClient();
-  const { isAuthenticated } = useAuth();
 
   const query = useQuery({
     queryKey: queryKeys.tools.college,
     queryFn: getOrCreateCollege,
-    enabled: isAuthenticated,
+    enabled: true,
     placeholderData: emptyCollegeDocument,
     staleTime: 30_000,
   });

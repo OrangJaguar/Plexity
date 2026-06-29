@@ -33,12 +33,12 @@ import {
  * @property {() => Promise<{ default: import('react').ComponentType }>} loadPreview
  */
 
-export const TOOL_CATALOG_ROUTE = '/tools/catalog';
+export const TOOL_CATALOG_ROUTE = '/catalog';
 
 export const TOOL_REGISTRY = [
   {
     id: 'dashboard',
-    route: '/tools/dashboard',
+    route: '/dashboard',
     label: 'Dashboard',
     icon: LayoutDashboard,
     description: 'Live class countdown, schedule blocks, and a daily intelligence panel.',
@@ -51,7 +51,7 @@ export const TOOL_REGISTRY = [
   },
   {
     id: 'tasks',
-    route: '/tools/tasks',
+    route: '/tasks',
     label: 'Tasks',
     icon: ListChecks,
     description: 'Agenda task list with priorities, subtasks, sort/filter, and drag reorder.',
@@ -64,7 +64,7 @@ export const TOOL_REGISTRY = [
   },
   {
     id: 'calendar',
-    route: '/tools/calendar',
+    route: '/calendar',
     label: 'Calendar',
     icon: Calendar,
     description: 'Week grid planner with drag create, resize, repeats, and color blocks.',
@@ -77,7 +77,7 @@ export const TOOL_REGISTRY = [
   },
   {
     id: 'focus',
-    route: '/tools/focus',
+    route: '/focus',
     label: 'Focus',
     icon: Target,
     description: 'Live clock and Pomodoro timer with today\'s schedule as quiet context.',
@@ -90,7 +90,7 @@ export const TOOL_REGISTRY = [
   },
   {
     id: 'goals',
-    route: '/tools/goals',
+    route: '/goals',
     label: 'Goals',
     icon: Flag,
     description: 'Personal strategy from North Star to weekly check-ins.',
@@ -103,7 +103,7 @@ export const TOOL_REGISTRY = [
   },
   {
     id: 'journal',
-    route: '/tools/journal',
+    route: '/journal',
     label: 'Journal',
     icon: BookOpen,
     description: 'Daily reflections with mood, tags, autosave, streaks, and search.',
@@ -116,7 +116,7 @@ export const TOOL_REGISTRY = [
   },
   {
     id: 'profile',
-    route: '/tools/profile',
+    route: '/profile',
     label: 'Profile',
     icon: CircleUser,
     description: 'A personal hub for identity, background, projects, and links.',
@@ -129,7 +129,7 @@ export const TOOL_REGISTRY = [
   },
   {
     id: 'lists',
-    route: '/tools/lists',
+    route: '/lists',
     label: 'Lists',
     icon: ClipboardList,
     description: 'Personal collections for movies, books, restaurants, prompts, and more.',
@@ -142,7 +142,7 @@ export const TOOL_REGISTRY = [
   },
   {
     id: 'passwords',
-    route: '/tools/passwords',
+    route: '/passwords',
     label: 'Passwords',
     icon: KeyRound,
     description: 'Zero-knowledge encrypted vault for passwords and secure notes.',
@@ -155,7 +155,7 @@ export const TOOL_REGISTRY = [
   },
   {
     id: 'calculator',
-    route: '/tools/calculator',
+    route: '/calculator',
     label: 'Calculator',
     icon: Calculator,
     description: 'Desmos-style graphing calculator with expressions, tables, and interactive analysis.',
@@ -168,7 +168,7 @@ export const TOOL_REGISTRY = [
   },
   {
     id: 'grades',
-    route: '/tools/grades',
+    route: '/grades',
     label: 'Grades',
     icon: GraduationCap,
     description: 'Import LMS grades, track letter grades, and view by quarter.',
@@ -181,7 +181,7 @@ export const TOOL_REGISTRY = [
   },
   {
     id: 'pdftools',
-    route: '/tools/pdf',
+    route: '/pdf',
     label: 'PDF',
     icon: FileStack,
     description: 'Unified PDF editor — merge, split, reorder, rotate, and annotate locally.',
@@ -194,7 +194,7 @@ export const TOOL_REGISTRY = [
   },
   {
     id: 'stocks',
-    route: '/tools/stocks',
+    route: '/stocks',
     label: 'Stocks',
     icon: CandlestickChart,
     description: 'Stock research workspace — screener, watchlist, charts, and company deep dives.',
@@ -207,7 +207,7 @@ export const TOOL_REGISTRY = [
   },
   {
     id: 'typing',
-    route: '/tools/typing',
+    route: '/typing',
     label: 'Typing',
     icon: Keyboard,
     description: 'Practice typing with live WPM, accuracy, and timed tests.',
@@ -220,7 +220,7 @@ export const TOOL_REGISTRY = [
   },
   {
     id: 'college',
-    route: '/tools/college',
+    route: '/college',
     label: 'College',
     icon: School,
     description: 'College application workspace — list, essays, activities, and deadlines.',
@@ -233,7 +233,7 @@ export const TOOL_REGISTRY = [
   },
   {
     id: 'units',
-    route: '/tools/units',
+    route: '/units',
     label: 'Units',
     icon: Scale,
     description: 'Convert length, weight, volume, time, temperature, and currency.',

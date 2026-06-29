@@ -1,6 +1,6 @@
 # Base44 data entities — deploy checklist
 
-Your Base44 **Data** tab should show **13 custom tables** plus the built-in **User** table (14 total).
+Your Base44 **Data** tab should show **14 custom tables** plus the built-in **User** table (15 total).
 
 If you only see 8, you are missing entities that the app already uses in code. Deploy/sync them from this repo's `base44/entities/` folder.
 
@@ -21,6 +21,14 @@ If you only see 8, you are missing entities that the app already uses in code. D
 | **ToolsCollege** | College planner workspace |
 | **ToolsCalculator** | Calculator saved expressions/tables |
 | **ToolsStocksWorkspace** | Stocks watchlist and research notes |
+| **ToolsFeedback** | User feedback submissions (admin inbox) |
+
+## Server functions
+
+| Function | Purpose |
+|----------|---------|
+| **submitFeedback** | Auth-gated feedback submission with rate limit and request ID generation |
+| **toolsMarketData** | Yahoo market data proxy |
 
 ## Built-in (not in `base44/entities/`)
 

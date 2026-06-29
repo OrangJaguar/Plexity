@@ -1,7 +1,8 @@
-import { TOOL_REGISTRY } from '@/lib/tools/registry';
+import { TOOL_REGISTRY, TOOL_CATALOG_ROUTE } from '@/lib/tools/registry';
 import { parseCommandLocally } from '@/lib/tools/command-parser';
 import { answerQueryLocally } from '@/lib/tools/command-query';
 import { buildCommandBarNavigation } from '@/lib/tools/command-bar-draft';
+import { getToolRoute } from '@/lib/tools/tool-routes';
 
 /** @typedef {'create'|'query'|'navigate'|'action'} CommandCategory */
 
@@ -275,7 +276,7 @@ export function executeSlashCommand(commandId, remainder, ctx) {
         type: 'action',
         actionId: 'completeTask',
         payload: { taskId: task.taskId, title: task.title },
-        route: '/tools/tasks',
+        route: getToolRoute('tasks'),
         source: 'slash',
         commandId,
       };
@@ -292,7 +293,7 @@ export function executeSlashCommand(commandId, remainder, ctx) {
         type: 'action',
         actionId: 'filterTasks',
         payload,
-        route: '/tools/tasks',
+        route: getToolRoute('tasks'),
         source: 'slash',
         commandId,
       };
@@ -303,7 +304,7 @@ export function executeSlashCommand(commandId, remainder, ctx) {
         type: 'action',
         actionId: 'startFocus',
         payload: { minutes: mins, mode: 'focus' },
-        route: '/tools/focus',
+        route: getToolRoute('focus'),
         source: 'slash',
         commandId,
       };
@@ -316,7 +317,7 @@ export function executeSlashCommand(commandId, remainder, ctx) {
         payload: { minutes: mins, mode: 'break' },
         source: 'slash',
         commandId,
-        route: '/tools/focus',
+        route: getToolRoute('focus'),
       };
     }
     case 'focus': {
@@ -325,7 +326,7 @@ export function executeSlashCommand(commandId, remainder, ctx) {
         type: 'action',
         actionId: 'startFocus',
         payload: { taskId: task?.taskId, taskTitle: remainder || task?.title, mode: 'focus' },
-        route: '/tools/focus',
+        route: getToolRoute('focus'),
         source: 'slash',
         commandId,
       };
@@ -335,7 +336,7 @@ export function executeSlashCommand(commandId, remainder, ctx) {
         type: 'action',
         actionId: 'openDebrief',
         payload: {},
-        route: '/tools/dashboard',
+        route: getToolRoute('dashboard'),
         source: 'slash',
         commandId,
       };
@@ -345,7 +346,7 @@ export function executeSlashCommand(commandId, remainder, ctx) {
         type: 'action',
         actionId: 'addGoal',
         payload: { title: remainder || '' },
-        route: '/tools/goals',
+        route: getToolRoute('goals'),
         source: 'slash',
         commandId,
       };
@@ -355,7 +356,7 @@ export function executeSlashCommand(commandId, remainder, ctx) {
         type: 'action',
         actionId: 'logGoal',
         payload: { text: remainder || '' },
-        route: '/tools/goals',
+        route: getToolRoute('goals'),
         source: 'slash',
         commandId,
       };
@@ -365,7 +366,7 @@ export function executeSlashCommand(commandId, remainder, ctx) {
         type: 'action',
         actionId: 'weeklyReview',
         payload: {},
-        route: '/tools/goals',
+        route: getToolRoute('goals'),
         source: 'slash',
         commandId,
       };
@@ -375,7 +376,7 @@ export function executeSlashCommand(commandId, remainder, ctx) {
         type: 'action',
         actionId: 'journalEntry',
         payload: { text: remainder || '' },
-        route: '/tools/journal',
+        route: getToolRoute('journal'),
         source: 'slash',
         commandId,
       };
@@ -387,7 +388,7 @@ export function executeSlashCommand(commandId, remainder, ctx) {
           type: 'action',
           actionId: 'searchVault',
           payload: { query: remainder || '' },
-          route: '/tools/passwords',
+          route: getToolRoute('passwords'),
           source: 'slash',
           commandId,
         };
@@ -396,7 +397,7 @@ export function executeSlashCommand(commandId, remainder, ctx) {
         type: 'action',
         actionId: 'searchJournal',
         payload: { query: remainder || '' },
-        route: '/tools/journal',
+        route: getToolRoute('journal'),
         source: 'slash',
         commandId,
       };
@@ -406,7 +407,7 @@ export function executeSlashCommand(commandId, remainder, ctx) {
         type: 'action',
         actionId: 'addListItem',
         payload: { text: remainder || '' },
-        route: '/tools/lists',
+        route: getToolRoute('lists'),
         source: 'slash',
         commandId,
       };
@@ -416,7 +417,7 @@ export function executeSlashCommand(commandId, remainder, ctx) {
         type: 'action',
         actionId: 'createList',
         payload: { name: remainder || '' },
-        route: '/tools/lists',
+        route: getToolRoute('lists'),
         source: 'slash',
         commandId,
       };
@@ -426,7 +427,7 @@ export function executeSlashCommand(commandId, remainder, ctx) {
         type: 'action',
         actionId: 'calculatorExpr',
         payload: { raw: remainder || '' },
-        route: '/tools/calculator',
+        route: getToolRoute('calculator'),
         source: 'slash',
         commandId,
       };
@@ -436,7 +437,7 @@ export function executeSlashCommand(commandId, remainder, ctx) {
         type: 'action',
         actionId: 'calculatorTable',
         payload: {},
-        route: '/tools/calculator',
+        route: getToolRoute('calculator'),
         source: 'slash',
         commandId,
       };
@@ -446,7 +447,7 @@ export function executeSlashCommand(commandId, remainder, ctx) {
         type: 'action',
         actionId: 'addCredential',
         payload: { label: remainder || '' },
-        route: '/tools/passwords',
+        route: getToolRoute('passwords'),
         source: 'slash',
         commandId,
       };
@@ -456,7 +457,7 @@ export function executeSlashCommand(commandId, remainder, ctx) {
         type: 'action',
         actionId: 'pinTool',
         payload: { toolName: remainder || '' },
-        route: '/tools/catalog',
+        route: TOOL_CATALOG_ROUTE,
         source: 'slash',
         commandId,
       };

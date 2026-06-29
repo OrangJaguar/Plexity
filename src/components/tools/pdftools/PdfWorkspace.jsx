@@ -19,6 +19,7 @@ import {
 } from '@/lib/tools/pdftools/pdf-operations';
 import { outputFilename } from '@/lib/tools/pdftools/pdf-download';
 import { getPageCount } from '@/lib/tools/pdftools/pdf-render';
+import { PDF_ROUTE } from '@/lib/tools/tool-routes';
 
 /**
  * @param {{ toolId: import('@/lib/tools/pdftools/constants').PdfToolId }} props
@@ -190,7 +191,7 @@ export default function PdfWorkspace({ toolId }) {
     return (
       <div className="pdf-workspace">
         <p>Unknown tool.</p>
-        <button type="button" className="pdf-btn" onClick={() => navigate('/tools/pdftools')}>
+        <button type="button" className="pdf-btn" onClick={() => navigate(PDF_ROUTE)}>
           Back to PDF tools
         </button>
       </div>
@@ -201,7 +202,7 @@ export default function PdfWorkspace({ toolId }) {
     <div className="pdf-workspace">
       <header className="pdf-action-bar">
         <div className="pdf-action-bar-left">
-          <button type="button" className="pdf-btn pdf-btn--ghost" onClick={() => navigate('/tools/pdftools')}>
+          <button type="button" className="pdf-btn pdf-btn--ghost" onClick={() => navigate(PDF_ROUTE)}>
             <ArrowLeft size={16} /> Tools
           </button>
           <h2>{tool.name}</h2>
@@ -254,7 +255,7 @@ export default function PdfWorkspace({ toolId }) {
             <PdfResultPanel
               result={ws.result}
               onStartOver={ws.reset}
-              onSwitchTool={() => navigate('/tools/pdftools')}
+              onSwitchTool={() => navigate(PDF_ROUTE)}
             />
           ) : !hasFiles ? (
             <PdfUploadZone

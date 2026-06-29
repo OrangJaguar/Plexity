@@ -81,7 +81,7 @@ describe('command-registry', () => {
   it('executeSlashCommand goto resolves tool route', () => {
     const out = executeSlashCommand('goto', 'calendar', { tasks: [], events: [] });
     expect(out?.type).toBe('navigate');
-    expect(out?.route).toBe('/tools/calendar');
+    expect(out?.route).toBe('/calendar');
   });
 
   it('every definition has required fields', () => {

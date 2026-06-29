@@ -4,16 +4,14 @@ import {
   savePasswordsEnvelope,
 } from '@/api/entities/toolsPasswords';
 import { queryKeys } from '@/api/query-keys';
-import { useAuth } from '@/hooks/useAuth';
 
 export function useToolsPasswords() {
   const queryClient = useQueryClient();
-  const { isAuthenticated } = useAuth();
 
   const query = useQuery({
     queryKey: queryKeys.tools.passwords,
     queryFn: getPasswordsEnvelope,
-    enabled: isAuthenticated,
+    enabled: true,
     staleTime: 30_000,
   });
 

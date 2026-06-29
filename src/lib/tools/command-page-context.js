@@ -1,33 +1,18 @@
-import { TOOL_REGISTRY } from '@/lib/tools/registry';
+import { TOOL_CATALOG_ROUTE, TOOL_REGISTRY } from '@/lib/tools/registry';
+import { TOOLS_SETTINGS_ROUTE, normalizeToolPathname } from '@/lib/tools/tool-routes';
 
 const ROUTE_PAGE_MAP = [
-  { prefix: '/tools/dashboard', pageId: 'dashboard' },
-  { prefix: '/tools/tasks', pageId: 'tasks' },
-  { prefix: '/tools/calendar', pageId: 'calendar' },
-  { prefix: '/tools/focus', pageId: 'focus' },
-  { prefix: '/tools/goals', pageId: 'goals' },
-  { prefix: '/tools/journal', pageId: 'journal' },
-  { prefix: '/tools/lists', pageId: 'lists' },
-  { prefix: '/tools/calculator', pageId: 'calculator' },
-  { prefix: '/tools/passwords', pageId: 'passwords' },
-  { prefix: '/tools/catalog', pageId: 'catalog' },
-  { prefix: '/tools/settings', pageId: 'settings' },
-  { prefix: '/tools/grades', pageId: 'grades' },
-  { prefix: '/tools/profile', pageId: 'profile' },
-  { prefix: '/tools/typing', pageId: 'typing' },
-  { prefix: '/tools/college', pageId: 'college' },
-  { prefix: '/tools/units', pageId: 'units' },
-  { prefix: '/tools/pdftools', pageId: 'pdftools' },
-  { prefix: '/tools/pdf', pageId: 'pdftools' },
-  { prefix: '/tools/stocks', pageId: 'stocks' },
-];
+  ...TOOL_REGISTRY.map((t) => ({ prefix: t.route, pageId: t.id })),
+  { prefix: TOOL_CATALOG_ROUTE, pageId: 'catalog' },
+  { prefix: TOOLS_SETTINGS_ROUTE, pageId: 'settings' },
+].sort((a, b) => b.prefix.length - a.prefix.length);
 
 /**
  * @param {string} pathname
  * @returns {{ pageId: string, route: string, toolLabel?: string }}
  */
 export function resolvePageContext(pathname = '') {
-  const route = pathname || '/';
+  const route = normalizeToolPathname(pathname || '/');
   const match = ROUTE_PAGE_MAP.find(({ prefix }) => route === prefix || route.startsWith(`${prefix}/`));
   const pageId = match?.pageId || 'global';
   const tool = TOOL_REGISTRY.find((t) => route === t.route || route.startsWith(`${t.route}/`));

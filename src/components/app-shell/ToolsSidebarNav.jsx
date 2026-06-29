@@ -65,7 +65,7 @@ function ToolsSidebarNavItem({
     >
       <NavLink
         to={item.to}
-        end={item.to === '/tools/dashboard'}
+        end={item.to === '/dashboard'}
         data-tooltip={item.label}
         className={({ isActive }) => {
           const classes = ['app-sidebar-link', 'tools-sidebar-link'];

@@ -6,16 +6,14 @@ import {
   saveGoalsDocument,
 } from '@/api/entities/toolsGoals';
 import { queryKeys } from '@/api/query-keys';
-import { useAuth } from '@/hooks/useAuth';
 
 export function useToolsGoals() {
   const queryClient = useQueryClient();
-  const { isAuthenticated } = useAuth();
 
   const query = useQuery({
     queryKey: queryKeys.tools.goals,
     queryFn: getOrCreateGoals,
-    enabled: isAuthenticated,
+    enabled: true,
     placeholderData: emptyGoalsDocument,
     staleTime: 30_000,
   });

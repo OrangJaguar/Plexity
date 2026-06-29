@@ -6,13 +6,13 @@ describe('command-executor', () => {
     tasks: [{ taskId: 't1', title: 'Chem lab', completed: false }],
     events: [],
     schedule: {},
-    pageContext: { pageId: 'tasks', route: '/tools/tasks' },
+    pageContext: { pageId: 'tasks', route: '/tasks' },
   };
 
   it('routes slash /goto to navigate', async () => {
     const out = await runCommandAssistant('/goto calendar', ctx);
     expect(out.type).toBe('navigate');
-    expect(out.route).toBe('/tools/calendar');
+    expect(out.route).toBe('/calendar');
   });
 
   it('routes slash /ask to local answer', async () => {

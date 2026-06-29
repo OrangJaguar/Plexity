@@ -8,6 +8,7 @@ import { loadScreenerPresets, newWatchlistItem } from '@/lib/tools/stocks/stocks
 import {
   StocksChange, StocksDataNotice, StocksError, StocksLoader, StocksTable,
 } from '@/components/tools/stocks/stocks-shared';
+import { stocksSymbolRoute } from '@/lib/tools/tool-routes';
 
 const DEFAULT_FILTERS = {
   sector: 'all',
@@ -103,7 +104,7 @@ export default function StocksScreener({ workspace, saveWorkspace, compare }) {
         setRowIndex((i) => Math.max(i - 1, 0));
       }
       if (e.key === 'Enter' && sortedRows[rowIndex]) {
-        navigate(`/tools/stocks/symbol/${encodeURIComponent(sortedRows[rowIndex].symbol)}`);
+        navigate(stocksSymbolRoute(sortedRows[rowIndex].symbol));
       }
       if (e.key === 'w' && sortedRows[rowIndex]) {
         addWatch(sortedRows[rowIndex]);
@@ -260,7 +261,7 @@ export default function StocksScreener({ workspace, saveWorkspace, compare }) {
           sortDir={tableSort.dir}
           onSort={handleSort}
           highlightIndex={rowIndex}
-          onRowClick={(r) => navigate(`/tools/stocks/symbol/${encodeURIComponent(r.symbol)}`)}
+          onRowClick={(r) => navigate(stocksSymbolRoute(r.symbol))}
         />
       )}
     </div>

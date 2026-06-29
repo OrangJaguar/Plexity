@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { formatDate } from '@/lib/tools/stocks/stocks-format';
 import { useStockSummary } from '@/hooks/queries/useStocksMarket';
 import { StocksDataNotice, StocksLoader } from '@/components/tools/stocks/stocks-shared';
+import { stocksSymbolRoute } from '@/lib/tools/tool-routes';
 
 function EarningsRow({ symbol, onOpen }) {
   const { data, isLoading } = useStockSummary(symbol);
@@ -32,7 +33,7 @@ export default function StocksEarnings({ workspace }) {
     return ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'META', 'TSLA', 'JPM', 'V', 'UNH'];
   }, [scope, workspace]);
 
-  const open = (sym) => navigate(`/tools/stocks/symbol/${encodeURIComponent(sym)}?tab=earnings`);
+  const open = (sym) => navigate(stocksSymbolRoute(sym, { tab: 'earnings' }));
 
   return (
     <div className="stocks-page">

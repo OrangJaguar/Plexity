@@ -1,6 +1,8 @@
 import { requireAuth } from '@/api/requireAuth';
+import { getStorageContext } from '@/api/storage-context';
 import { hasToolsEntity, safeCreate, safeFilter, safeUpdate } from '@/api/entities/toolsApi';
 import { emptyGradesDocument, seedPeriods } from '@/lib/tools/grade-periods';
+import { GUEST_KEYS, readGuestJson, writeGuestJson } from '@/lib/storage/guest-store';
 
 const LEGACY_KEY = 'veridian.toolsGrades';
 const MIGRATED_KEY = 'veridian.migrated.ToolsGrades';
@@ -43,6 +45,13 @@ function mergeGradesDocs(server, local) {
 }
 
 export async function getOrCreateGrades() {
+  const ctx = await getStorageContext();
+
+  if (ctx.mode === 'guest') {
+    const stored = readGuestJson(GUEST_KEYS.grades, null);
+    return stored ?? emptyGradesDocument();
+  }
+
   const user = await requireAuth();
   const legacy = readLegacy();
   const migrated = typeof window !== 'undefined' && window.localStorage.getItem(MIGRATED_KEY) === '1';
@@ -83,8 +92,16 @@ export async function getOrCreateGrades() {
 }
 
 export async function saveGradesDocument(doc) {
+  const ctx = await getStorageContext();
+  const payload = { ...doc, updatedAt: Date.now() };
+
+  if (ctx.mode === 'guest') {
+    writeGuestJson(GUEST_KEYS.grades, payload);
+    return payload;
+  }
+
   const user = await requireAuth();
-  const payload = { ...doc, userEmail: user.email, updatedAt: Date.now() };
+  payload.userEmail = user.email;
 
   if (!hasToolsEntity('ToolsGrades')) {
     return payload;

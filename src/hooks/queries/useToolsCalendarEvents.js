@@ -6,16 +6,14 @@ import {
   deleteEvent,
 } from '@/api/entities/toolsCalendar';
 import { queryKeys } from '@/api/query-keys';
-import { useAuth } from '@/hooks/useAuth';
 
 export function useToolsCalendarEvents() {
   const queryClient = useQueryClient();
-  const { isAuthenticated } = useAuth();
 
   const query = useQuery({
     queryKey: queryKeys.tools.calendar,
     queryFn: listEvents,
-    enabled: isAuthenticated,
+    enabled: true,
     placeholderData: [],
     retry: false,
     staleTime: 30_000,

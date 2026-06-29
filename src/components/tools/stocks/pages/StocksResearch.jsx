@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { RESEARCH_TAGS } from '@/lib/tools/stocks/stocks-model';
 import { formatDateTime } from '@/lib/tools/stocks/stocks-format';
 import { StocksDataNotice } from '@/components/tools/stocks/stocks-shared';
+import { stocksSymbolRoute } from '@/lib/tools/tool-routes';
 
 export default function StocksResearch({ workspace, saveWorkspace }) {
   const navigate = useNavigate();
@@ -73,7 +74,7 @@ export default function StocksResearch({ workspace, saveWorkspace }) {
             <>
               <header>
                 <h2>{active.symbol}</h2>
-                <button type="button" className="stocks-btn stocks-btn--primary stocks-btn--sm" onClick={() => navigate(`/tools/stocks/symbol/${encodeURIComponent(active.symbol)}?tab=analysis`)}>
+                <button type="button" className="stocks-btn stocks-btn--primary stocks-btn--sm" onClick={() => navigate(stocksSymbolRoute(active.symbol, { tab: 'analysis' }))}>
                   Open full analysis
                 </button>
               </header>

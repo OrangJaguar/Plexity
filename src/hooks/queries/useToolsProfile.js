@@ -6,16 +6,14 @@ import {
   saveProfileDocument,
 } from '@/api/entities/toolsProfile';
 import { queryKeys } from '@/api/query-keys';
-import { useAuth } from '@/hooks/useAuth';
 
 export function useToolsProfile() {
   const queryClient = useQueryClient();
-  const { isAuthenticated } = useAuth();
 
   const query = useQuery({
     queryKey: queryKeys.tools.profile,
     queryFn: getOrCreateProfile,
-    enabled: isAuthenticated,
+    enabled: true,
     placeholderData: emptyProfileDocument,
     staleTime: 30_000,
   });

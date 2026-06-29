@@ -13,7 +13,7 @@ export default function ScheduleSetupPrompt() {
         <p className="tools-schedule-setup-prompt-lead">
           Add school, work, or recurring classes so Dashboard can show what you&apos;re in now.
         </p>
-        <Link to="/tools/settings?setup=schedule" className="btn btn-primary btn-sm">
+        <Link to="/settings?setup=schedule" className="btn btn-primary btn-sm">
           Set up schedule
         </Link>
       </div>

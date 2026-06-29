@@ -1,7 +1,9 @@
 import { base44 } from '@/api/base44Client';
 import { requireAuth } from '@/api/requireAuth';
+import { getStorageContext } from '@/api/storage-context';
 import { normalizeUsername, isValidUsernameFormat } from '@/utils/schemas/preferences';
 import { getDefaultPinnedToolIds } from '@/lib/tools/pinned-tools';
+import { GUEST_KEYS, readGuestJson, writeGuestJson } from '@/lib/storage/guest-store';
 
 function pickBestPreferencesRow(rows) {
   if (!rows?.length) return null;
@@ -15,13 +17,39 @@ function pickBestPreferencesRow(rows) {
   });
 }
 
+function defaultGuestPreferences() {
+  const now = Date.now();
+  return {
+    pinnedToolIds: getDefaultPinnedToolIds(),
+    hintsShown: [],
+    notificationPref: 'off',
+    defaultPrivacy: 'private',
+    themeDark: true,
+    createdAt: now,
+    lastActiveAt: now,
+  };
+}
+
 export async function getPreferences() {
+  const ctx = await getStorageContext();
+  if (ctx.mode === 'guest') {
+    return readGuestJson(GUEST_KEYS.preferences, defaultGuestPreferences());
+  }
   await requireAuth();
   const rows = await base44.entities.UserPreferences.list();
   return pickBestPreferencesRow(rows);
 }
 
 export async function updatePreferences(patch) {
+  const ctx = await getStorageContext();
+
+  if (ctx.mode === 'guest') {
+    const current = readGuestJson(GUEST_KEYS.preferences, defaultGuestPreferences());
+    const next = { ...current, ...patch, lastActiveAt: Date.now() };
+    writeGuestJson(GUEST_KEYS.preferences, next);
+    return next;
+  }
+
   const user = await requireAuth();
   const rows = await base44.entities.UserPreferences.list();
   if (rows.length > 0) {
@@ -89,6 +117,13 @@ export async function createUserPreferencesOnSignup({ username, userEmail }) {
 }
 
 export async function touchLastActive() {
+  const ctx = await getStorageContext();
+  if (ctx.mode === 'guest') {
+    const current = readGuestJson(GUEST_KEYS.preferences, defaultGuestPreferences());
+    const next = { ...current, lastActiveAt: Date.now() };
+    writeGuestJson(GUEST_KEYS.preferences, next);
+    return next;
+  }
   await requireAuth();
   const rows = await base44.entities.UserPreferences.list();
   const now = Date.now();

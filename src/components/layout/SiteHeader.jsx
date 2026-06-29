@@ -1,15 +1,12 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { usePinnedTools } from '@/hooks/queries/usePinnedTools';
-
-function toFlatRoute(route) {
-  return route.startsWith('/tools/') ? route.slice(6) : route;
-}
+import { TOOL_CATALOG_ROUTE } from '@/lib/tools/registry';
 
 export default function SiteHeader({ actions, showLogo = false }) {
   const { user, isLoading } = useAuth();
   const { pinnedTools } = usePinnedTools();
-  const appEntryRoute = pinnedTools.length > 0 ? toFlatRoute(pinnedTools[0].route) : '/catalog';
+  const appEntryRoute = pinnedTools.length > 0 ? pinnedTools[0].route : TOOL_CATALOG_ROUTE;
 
   const defaultActions = !isLoading && (
     user ? (

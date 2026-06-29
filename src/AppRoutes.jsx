@@ -27,6 +27,11 @@ import ToolsPasswordsPage from '@/pages/tools/ToolsPasswordsPage';
 import ToolsCalculatorPage from '@/pages/tools/ToolsCalculatorPage';
 import ToolsCatalogPage from '@/pages/tools/ToolsCatalogPage';
 import ToolsSettingsPage from '@/pages/tools/ToolsSettingsPage';
+import LegacyToolsRedirect from '@/components/routing/LegacyToolsRedirect';
+import RequireAdmin from '@/components/routing/RequireAdmin';
+import AdminLayout from '@/layouts/AdminLayout';
+import FeedbackPage from '@/pages/feedback/FeedbackPage';
+import AdminFeedbackPage from '@/pages/admin/AdminFeedbackPage';
 
 export default function AppRoutes() {
   return (
@@ -39,6 +44,14 @@ export default function AppRoutes() {
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/feedback" element={<FeedbackPage />} />
+      </Route>
+
+      <Route element={<RequireAdmin />}>
+        <Route element={<AdminLayout />}>
+          <Route path="/admin" element={<Navigate to="/admin/feedback" replace />} />
+          <Route path="/admin/feedback" element={<AdminFeedbackPage />} />
+        </Route>
       </Route>
 
       <Route element={<ToolsAppShell />}>
@@ -63,25 +76,7 @@ export default function AppRoutes() {
 
         {/* Legacy /tools/* redirects — keeps old links working */}
         <Route path="/tools" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/tools/dashboard" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/tools/tasks" element={<Navigate to="/tasks" replace />} />
-        <Route path="/tools/calendar" element={<Navigate to="/calendar" replace />} />
-        <Route path="/tools/focus" element={<Navigate to="/focus" replace />} />
-        <Route path="/tools/grades" element={<Navigate to="/grades" replace />} />
-        <Route path="/tools/pdf" element={<Navigate to="/pdf" replace />} />
-        <Route path="/tools/pdftools" element={<Navigate to="/pdf" replace />} />
-        <Route path="/tools/stocks" element={<Navigate to="/stocks" replace />} />
-        <Route path="/tools/typing" element={<Navigate to="/typing" replace />} />
-        <Route path="/tools/college" element={<Navigate to="/college" replace />} />
-        <Route path="/tools/units" element={<Navigate to="/units" replace />} />
-        <Route path="/tools/journal" element={<Navigate to="/journal" replace />} />
-        <Route path="/tools/goals" element={<Navigate to="/goals" replace />} />
-        <Route path="/tools/profile" element={<Navigate to="/profile" replace />} />
-        <Route path="/tools/lists" element={<Navigate to="/lists" replace />} />
-        <Route path="/tools/passwords" element={<Navigate to="/passwords" replace />} />
-        <Route path="/tools/calculator" element={<Navigate to="/calculator" replace />} />
-        <Route path="/tools/catalog" element={<Navigate to="/catalog" replace />} />
-        <Route path="/tools/settings" element={<Navigate to="/settings" replace />} />
+        <Route path="/tools/*" element={<LegacyToolsRedirect />} />
       </Route>
 
       <Route element={<MarketingLayout />}>

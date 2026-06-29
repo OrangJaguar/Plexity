@@ -30,6 +30,7 @@ import { toDateTimeLocalKey } from '@/lib/tools/date';
 import { CALENDAR_COLOR_SWATCHES, DEFAULT_EVENT_COLOR } from '@/lib/tools/constants';
 import { useCommandBarDraft } from '@/hooks/useCommandBarDraft';
 import { eventFormToTaskDraft } from '@/lib/tools/command-bar-draft';
+import { getToolRoute } from '@/lib/tools/tool-routes';
 
 const RESIZE_EDGE_PX = 7;
 
@@ -275,7 +276,7 @@ export default function CalendarContent({ events, createEvent, updateEvent, dele
     setEventOpen(false);
     clearDraft();
     setInitial(null);
-    navigate('/tools/tasks', {
+    navigate(getToolRoute('tasks'), {
       state: { commandBar: { type: 'task', draft: eventFormToTaskDraft({ title, start }) } },
     });
   };

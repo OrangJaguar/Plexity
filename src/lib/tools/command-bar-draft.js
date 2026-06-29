@@ -1,4 +1,5 @@
 import { toDateTimeLocalKey } from '@/lib/tools/date';
+import { getToolRoute, TOOLS_HOME } from '@/lib/tools/tool-routes';
 
 export function defaultEndFromStart(start) {
   if (!start) return '';
@@ -40,14 +41,14 @@ export function buildCommandBarNavigation(result, kind) {
   if (asEvent) {
     const draft = result.events?.[0] || taskDraftToEventDraft(result.task);
     return {
-      route: '/tools/calendar',
+      route: getToolRoute('calendar'),
       state: { commandBar: { type: 'event', draft } },
     };
   }
 
   const draft = result.task || eventDraftToTaskDraft(result.events?.[0]);
   return {
-    route: '/tools/tasks',
+    route: getToolRoute('tasks'),
     state: { commandBar: { type: 'task', draft } },
   };
 }
@@ -55,7 +56,7 @@ export function buildCommandBarNavigation(result, kind) {
 /** @returns {{ route: string, state: { commandBar: object } }} */
 export function buildCommandBarAction(result) {
   return {
-    route: result.route || '/tools/dashboard',
+    route: result.route || TOOLS_HOME,
     state: {
       commandBar: {
         type: 'action',

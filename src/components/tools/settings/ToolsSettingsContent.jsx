@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import ScheduleEditor from '@/components/tools/settings/ScheduleEditor';
 import DashboardWidgetsEditor from '@/components/tools/settings/DashboardWidgetsEditor';
 import { useToolsSettings } from '@/hooks/queries/useToolsSettings';
@@ -16,8 +17,10 @@ import {
   MAX_DASHBOARD_WIDGETS,
   HABIT_LABEL_MAX,
 } from '@/lib/tools/widget-layout';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function ToolsSettingsContent() {
+  const { isAuthenticated } = useAuth();
   const { settings } = useToolsSettings();
   const { data: preferences } = usePreferences();
   const updatePrefs = useUpdatePreferences();
@@ -88,6 +91,19 @@ export default function ToolsSettingsContent() {
       <header className="tools-settings-page-header">
         <h1>Tools Settings</h1>
       </header>
+
+      {!isAuthenticated && (
+        <section className="tools-settings-section tools-settings-card tools-settings-local-mode">
+          <h2>Local mode</h2>
+          <p className="tools-settings-lead">
+            You&apos;re using Veridian on this device only. Preferences and tool data stay in your
+            browser until you sign in.
+          </p>
+          <Link to="/signin?redirect=%2Fsettings" className="btn btn-primary btn-sm">
+            Sign in to sync
+          </Link>
+        </section>
+      )}
 
       <section className="tools-settings-section tools-settings-theme-box">
         <div className="tools-settings-theme-row">

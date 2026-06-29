@@ -8,17 +8,14 @@ import {
   reorderTasks,
 } from '@/api/entities/toolsTasks';
 import { queryKeys } from '@/api/query-keys';
-import { useAuth } from '@/hooks/useAuth';
 import { spawnNextRecurrenceTask } from '@/lib/tools/task-recurrence';
 
 export function useToolsTasks() {
   const queryClient = useQueryClient();
-  const { isAuthenticated } = useAuth();
-
   const query = useQuery({
     queryKey: queryKeys.tools.tasks,
     queryFn: listTasks,
-    enabled: isAuthenticated,
+    enabled: true,
     placeholderData: [],
     retry: false,
     staleTime: 30_000,

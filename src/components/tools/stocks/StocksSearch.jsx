@@ -4,6 +4,7 @@ import { ChevronRight, Clock, Search } from 'lucide-react';
 import { searchSymbolsWithQuotes } from '@/lib/tools/stocks/stocks-provider';
 import { clearRecentStocks, loadRecentStocks, trackRecentStock } from '@/lib/tools/stocks/stocks-model';
 import { changeClass, formatChange, formatPrice } from '@/lib/tools/stocks/stocks-format';
+import { stocksSymbolRoute } from '@/lib/tools/tool-routes';
 
 export default function StocksSearch({ className = '' }) {
   const navigate = useNavigate();
@@ -58,7 +59,7 @@ export default function StocksSearch({ className = '' }) {
     setRecent(loadRecentStocks());
     setOpen(false);
     setQuery('');
-    navigate(`/tools/stocks/symbol/${encodeURIComponent(symbol)}`);
+    navigate(stocksSymbolRoute(symbol));
   };
 
   const clearHistory = (e) => {

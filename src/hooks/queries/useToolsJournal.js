@@ -2,7 +2,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getEntry, listEntries, upsertEntry } from '@/api/entities/toolsJournal';
 import { queryKeys } from '@/api/query-keys';
 import { getTodayKey } from '@/lib/tools/date';
-import { useAuth } from '@/hooks/useAuth';
 
 function normalizeUpsertArgs(dateKey, patch) {
   if (typeof patch === 'string') return { dateKey, content: patch };
@@ -11,13 +10,12 @@ function normalizeUpsertArgs(dateKey, patch) {
 
 export function useToolsJournal() {
   const queryClient = useQueryClient();
-  const { isAuthenticated } = useAuth();
   const todayKey = getTodayKey();
 
   const todayQuery = useQuery({
     queryKey: queryKeys.tools.journal(todayKey),
     queryFn: () => getEntry(todayKey),
-    enabled: isAuthenticated,
+    enabled: true,
     retry: false,
     staleTime: 10_000,
   });
@@ -25,7 +23,7 @@ export function useToolsJournal() {
   const allQuery = useQuery({
     queryKey: queryKeys.tools.journalAll,
     queryFn: listEntries,
-    enabled: isAuthenticated,
+    enabled: true,
     placeholderData: [],
     retry: false,
     staleTime: 30_000,

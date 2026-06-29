@@ -12,6 +12,8 @@ import ThemeSync from '@/components/ThemeSync';
 import SyncUserDisplayName from '@/components/auth/SyncUserDisplayName';
 import { applyThemeFromStorage } from '@/lib/theme';
 import ToolsChromeToggle from '@/components/tools/chrome/ToolsChromeToggle';
+import GuestLocalNotice from '@/components/guest/GuestLocalNotice';
+import LocalOnlyBanner from '@/components/guest/LocalOnlyBanner';
 
 export default function ToolsAppShell() {
   const isMobile = useIsMobile();
@@ -34,6 +36,7 @@ export default function ToolsAppShell() {
       <div className={shellClass}>
         <ThemeSync />
         <SyncUserDisplayName />
+        <GuestLocalNotice />
         {!hideChrome && !isMobile && <ToolsAppSidebar />}
         <div className="app-shell-main">
           {!hideChrome && isMobile && (
@@ -43,6 +46,7 @@ export default function ToolsAppShell() {
               </Link>
             </header>
           )}
+          <LocalOnlyBanner />
           <main className="app-shell-content">
             <Outlet />
           </main>

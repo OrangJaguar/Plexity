@@ -7,6 +7,7 @@ import { useWatchlistQuotes } from '@/hooks/queries/useStocksMarket';
 import StocksFiftyTwoWeekBar from '@/components/tools/stocks/StocksFiftyTwoWeekBar';
 import StocksSparkline from '@/components/tools/stocks/StocksSparkline';
 import { StocksChange, StocksDataNotice, StocksLoader, StocksTable } from '@/components/tools/stocks/stocks-shared';
+import { stocksSymbolRoute } from '@/lib/tools/tool-routes';
 
 export default function StocksWatchlist({ workspace, saveWorkspace, compare }) {
   const navigate = useNavigate();
@@ -165,7 +166,7 @@ export default function StocksWatchlist({ workspace, saveWorkspace, compare }) {
         <StocksTable
           columns={columns}
           rows={rows}
-          onRowClick={(r) => navigate(`/tools/stocks/symbol/${encodeURIComponent(r.symbol)}`)}
+          onRowClick={(r) => navigate(stocksSymbolRoute(r.symbol))}
         />
       )}
     </div>

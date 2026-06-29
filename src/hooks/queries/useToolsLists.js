@@ -6,16 +6,14 @@ import {
   saveListsDocument,
 } from '@/api/entities/toolsLists';
 import { queryKeys } from '@/api/query-keys';
-import { useAuth } from '@/hooks/useAuth';
 
 export function useToolsLists() {
   const queryClient = useQueryClient();
-  const { isAuthenticated } = useAuth();
 
   const query = useQuery({
     queryKey: queryKeys.tools.lists,
     queryFn: getOrCreateLists,
-    enabled: isAuthenticated,
+    enabled: true,
     placeholderData: emptyListsWorkspace,
     staleTime: 30_000,
   });
