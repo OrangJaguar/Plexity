@@ -1,0 +1,57 @@
+import { useEffect } from 'react';
+import { Link, Outlet } from 'react-router-dom';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { useHubToggleShortcut } from '@/hooks/useHubToggleShortcut';
+import { useUiStore } from '@/store/uiStore';
+import ToolsAppSidebar from '@/components/app-shell/ToolsAppSidebar';
+import ToolsAppSidebarMobile from '@/components/app-shell/ToolsAppSidebarMobile';
+import AppFooter from '@/components/layout/AppFooter';
+import { CommandBarProvider } from '@/components/command-bar/CommandBarProvider';
+import VeridianLogo from '@/components/layout/VeridianLogo';
+import ThemeSync from '@/components/ThemeSync';
+import SyncUserDisplayName from '@/components/auth/SyncUserDisplayName';
+import { applyThemeFromStorage } from '@/lib/theme';
+
+export default function ToolsAppShell() {
+  const isMobile = useIsMobile();
+  useHubToggleShortcut();
+  const toolsChromeCollapsed = useUiStore((s) => s.toolsChromeCollapsed);
+  const hideChrome = toolsChromeCollapsed;
+
+  useEffect(() => {
+    applyThemeFromStorage();
+  }, []);
+
+  const shellClass = [
+    'app-shell',
+    hideChrome ? 'app-shell--tools-immersive' : '',
+  ].filter(Boolean).join(' ');
+
+  return (
+    <CommandBarProvider>
+      <div className={shellClass}>
+        <ThemeSync />
+        <SyncUserDisplayName />
+        {!hideChrome && !isMobile && <ToolsAppSidebar />}
+        <div className="app-shell-main">
+          {!hideChrome && isMobile && (
+            <header className="site-header app-shell-mobile-header">
+              <Link to="/" className="app-sidebar-logo-link" title="Veridian Tools home">
+                <VeridianLogo size={32} />
+              </Link>
+            </header>
+          )}
+          <main className="app-shell-content">
+            <Outlet />
+          </main>
+          {!hideChrome && (
+            <div className="app-shell-bottom-chrome">
+              {isMobile && <ToolsAppSidebarMobile />}
+              <AppFooter />
+            </div>
+          )}
+        </div>
+      </div>
+    </CommandBarProvider>
+  );
+}

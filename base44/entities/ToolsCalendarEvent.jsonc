@@ -1,0 +1,41 @@
+{
+  "name": "ToolsCalendarEvent",
+  "type": "object",
+  "properties": {
+    "userEmail": { "type": "string" },
+    "eventId": { "type": "string", "description": "Client-stable ID" },
+    "title": { "type": "string" },
+    "start": { "type": "string" },
+    "end": { "type": "string" },
+    "allDay": { "type": "boolean" },
+    "color": { "type": "string" },
+    "repeatRule": {
+      "type": "string",
+      "description": "none | daily | weekly | weekdays | interval | custom"
+    },
+    "repeatIntervalWeeks": { "type": "number" },
+    "repeatDays": {
+      "type": "array",
+      "items": { "type": "number" }
+    },
+    "linkedJourneyIds": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "instanceOverrides": {
+      "type": "array",
+      "items": { "type": "object" },
+      "description": "dateKey, start, end, cancelled"
+    },
+    "notes": { "type": "string" },
+    "createdAt": { "type": "number" },
+    "updatedAt": { "type": "number" }
+  },
+  "required": ["eventId", "userEmail", "title", "start", "end"],
+  "rls": {
+    "create": { "data.userEmail": "{{user.email}}" },
+    "read": { "data.userEmail": "{{user.email}}" },
+    "update": { "data.userEmail": "{{user.email}}" },
+    "delete": { "data.userEmail": "{{user.email}}" }
+  }
+}

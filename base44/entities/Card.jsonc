@@ -1,0 +1,63 @@
+{
+  "name": "Card",
+  "type": "object",
+  "properties": {
+    "cardId": {
+      "type": "string",
+      "description": "Client-side stable ID"
+    },
+    "activityId": {
+      "type": "string"
+    },
+    "journeyId": {
+      "type": "string"
+    },
+    "userEmail": {
+      "type": "string",
+      "description": "Email of the owning user"
+    },
+    "front": {
+      "type": "string"
+    },
+    "back": {
+      "type": "string"
+    },
+    "conceptTag": {
+      "type": "string"
+    },
+    "fsrsState": {
+      "type": "object"
+    },
+    "suspended": {
+      "type": "boolean"
+    },
+    "libraryVisible": {
+      "type": "boolean",
+      "description": "True when parent journey is public (library read access)"
+    }
+  },
+  "required": [
+    "cardId",
+    "activityId",
+    "journeyId",
+    "front",
+    "back"
+  ],
+  "rls": {
+    "create": {
+      "data.userEmail": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        { "data.userEmail": "{{user.email}}" },
+        { "data.libraryVisible": { "$eq": true } }
+      ]
+    },
+    "update": {
+      "data.userEmail": "{{user.email}}"
+    },
+    "delete": {
+      "data.userEmail": "{{user.email}}"
+    }
+  }
+}

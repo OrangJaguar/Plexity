@@ -1,0 +1,26 @@
+{
+  "name": "ToolsFocusSession",
+  "type": "object",
+  "properties": {
+    "userEmail": { "type": "string" },
+    "sessionId": { "type": "string" },
+    "startedAt": { "type": "number" },
+    "endedAt": { "type": "number" },
+    "preset": { "type": "string", "description": "deep | standard | sprint | custom" },
+    "workMinutes": { "type": "number" },
+    "breakMinutes": { "type": "number" },
+    "goal": { "type": "string" },
+    "goalAchieved": { "type": "boolean" },
+    "pauseCount": { "type": "number" },
+    "cyclesCompleted": { "type": "number" },
+    "elapsedSeconds": { "type": "number" },
+    "createdAt": { "type": "number" }
+  },
+  "required": ["userEmail", "sessionId", "startedAt"],
+  "rls": {
+    "create": { "data.userEmail": "{{user.email}}" },
+    "read": { "data.userEmail": "{{user.email}}" },
+    "update": { "data.userEmail": "{{user.email}}" },
+    "delete": { "data.userEmail": "{{user.email}}" }
+  }
+}

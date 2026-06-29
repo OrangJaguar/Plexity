@@ -1,0 +1,38 @@
+{
+  "name": "ToolsTask",
+  "type": "object",
+  "properties": {
+    "userEmail": { "type": "string" },
+    "taskId": { "type": "string", "description": "Client-stable ID" },
+    "title": { "type": "string" },
+    "due": { "type": "string" },
+    "priority": { "type": "string", "description": "high | medium | low | empty" },
+    "className": { "type": "string" },
+    "notes": { "type": "string" },
+    "type": { "type": "string", "description": "task | event" },
+    "estimatedMinutes": { "type": "number" },
+    "subtasks": {
+      "type": "array",
+      "items": { "type": "object" },
+      "description": "id, title, completed"
+    },
+    "recurrenceRule": {
+      "type": "object",
+      "description": "type, intervalWeeks, repeatDays"
+    },
+    "recurrenceParentId": { "type": "string" },
+    "completed": { "type": "boolean" },
+    "completedAt": { "type": "number" },
+    "sortOrder": { "type": "number" },
+    "manualSortOrder": { "type": "number" },
+    "createdAt": { "type": "number" },
+    "updatedAt": { "type": "number" }
+  },
+  "required": ["taskId", "userEmail", "title"],
+  "rls": {
+    "create": { "data.userEmail": "{{user.email}}" },
+    "read": { "data.userEmail": "{{user.email}}" },
+    "update": { "data.userEmail": "{{user.email}}" },
+    "delete": { "data.userEmail": "{{user.email}}" }
+  }
+}

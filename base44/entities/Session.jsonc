@@ -1,0 +1,92 @@
+{
+  "name": "Session",
+  "type": "object",
+  "properties": {
+    "sessionId": {
+      "type": "string",
+      "description": "Client-side stable ID"
+    },
+    "journeyId": {
+      "type": "string"
+    },
+    "moduleId": {
+      "type": "string"
+    },
+    "activityId": {
+      "type": "string"
+    },
+    "userEmail": {
+      "type": "string",
+      "description": "Email of the owning user"
+    },
+    "activityType": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "description": "completed | abandoned"
+    },
+    "score": {
+      "type": "number"
+    },
+    "sessionData": {
+      "type": "object",
+      "description": "Type-specific ephemeral payload — quiz Q&A lives here"
+    },
+    "startedAt": {
+      "type": "number"
+    },
+    "endedAt": {
+      "type": "number"
+    },
+    "durationSec": {
+      "type": "number"
+    },
+    "sessionDurationMs": {
+      "type": "number"
+    },
+    "hintsUsed": {
+      "type": "number"
+    },
+    "questionsAnswered": {
+      "type": "number"
+    },
+    "accuracyPercent": {
+      "type": "number"
+    },
+    "timePerQuestion": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "abandonedAt": {
+      "type": "number"
+    },
+    "outcomeSummary": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "sessionId",
+    "journeyId",
+    "activityId",
+    "activityType",
+    "startedAt",
+    "status"
+  ],
+  "rls": {
+    "create": {
+      "data.userEmail": "{{user.email}}"
+    },
+    "read": {
+      "data.userEmail": "{{user.email}}"
+    },
+    "update": {
+      "data.userEmail": "{{user.email}}"
+    },
+    "delete": {
+      "data.userEmail": "{{user.email}}"
+    }
+  }
+}

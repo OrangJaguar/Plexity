@@ -1,0 +1,190 @@
+{
+  "name": "UserPreferences",
+  "type": "object",
+  "properties": {
+    "userEmail": {
+      "type": "string",
+      "description": "Email of the owning user"
+    },
+    "username": {
+      "type": "string",
+      "description": "Unique public handle (lowercase a-z, 0-9, _, .)"
+    },
+    "displayName": {
+      "type": "string"
+    },
+    "createdAt": {
+      "type": "number"
+    },
+    "lastActiveAt": {
+      "type": "number"
+    },
+    "gradeLevel": {
+      "type": "string"
+    },
+    "country": {
+      "type": "string"
+    },
+    "usState": {
+      "type": "string"
+    },
+    "studyGoals": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "researchConsent": {
+      "type": "boolean"
+    },
+    "researchConsentAt": {
+      "type": "number"
+    },
+    "onboardingCompletedAt": {
+      "type": "number"
+    },
+    "onboardingStep": {
+      "type": "number"
+    },
+    "themeDark": {
+      "type": "boolean"
+    },
+    "haptics": {
+      "type": "boolean"
+    },
+    "audio": {
+      "type": "boolean"
+    },
+    "strictMode": {
+      "type": "boolean"
+    },
+    "hintsShown": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "notificationPref": {
+      "type": "string",
+      "description": "daily | urgent | off"
+    },
+    "defaultPrivacy": {
+      "type": "string",
+      "description": "private | public"
+    },
+    "defaultShowSources": {
+      "type": "boolean"
+    },
+    "dailyTimeBudgetMin": {
+      "type": "number",
+      "description": "Daily study time budget in minutes (default 35)"
+    },
+    "usernameChangedAt": {
+      "type": "number",
+      "description": "Timestamp of last username change (6-month cooldown)"
+    },
+    "lastReminderEmailAt": {
+      "type": "number",
+      "description": "Last study reminder email sent (rate limit)"
+    },
+    "examReminderSentFor": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "journeyId:examDate keys for urgent exam reminders already sent"
+    },
+    "maiScoreOnboarding": {
+      "type": "number",
+      "description": "MAI total score at onboarding (5-25)"
+    },
+    "maiScoreDay60": {
+      "type": "number",
+      "description": "MAI total score at day 60 (5-25)"
+    },
+    "maiSurveyOnboardingCompletedAt": {
+      "type": "number"
+    },
+    "maiSurveyDay60CompletedAt": {
+      "type": "number"
+    },
+    "maiSurveyDay60DismissedAt": {
+      "type": "number"
+    },
+    "pinnedToolIds": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Tool registry ids starred for /tools sidebar"
+    },
+    "toolsSleepBufferMin": {
+      "type": "number",
+      "description": "Default 480 (8h)"
+    },
+    "toolsTravelBufferMin": {
+      "type": "number",
+      "description": "Default 30"
+    },
+    "toolsDashboardWidgets": {
+      "type": "object",
+      "description": "weather, quote, habits, stocks toggles"
+    },
+    "toolsDashboardWidgetLayout": {
+      "type": "array",
+      "items": { "type": "object" },
+      "description": "Dashboard widget order, size, enabled state"
+    },
+    "toolsJournalTags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Editable journal hashtag presets"
+    },
+    "toolsCustomCategories": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "toolsHabitChecks": {
+      "type": "object",
+      "description": "habitId -> checked for today"
+    },
+    "toolsHabitDefinitions": {
+      "type": "array",
+      "items": { "type": "object" },
+      "description": "id, label"
+    },
+    "journalMinWords": { "type": "number" },
+    "journalDailyPromptEnabled": { "type": "boolean" },
+    "journalPinHash": { "type": "string" },
+    "journalGraceUsedAt": { "type": "number" },
+    "journalStreakSavedShownAt": { "type": "number" },
+    "focusLastPreset": { "type": "string" },
+    "focusCustomWorkMin": { "type": "number" },
+    "focusCustomBreakMin": { "type": "number" },
+    "focusAmbientSound": { "type": "string" },
+    "focusAmbientVolume": { "type": "number" },
+    "toolsWeatherCity": { "type": "string" },
+    "toolsWeatherLocation": {
+      "type": "object",
+      "description": "Open-Meteo geocoded city with lat/lon"
+    },
+    "toolsWeatherUnit": { "type": "string", "description": "fahrenheit or celsius" },
+    "toolsStockSymbols": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "required": [],
+  "rls": {
+    "create": {
+      "data.userEmail": "{{user.email}}"
+    },
+    "read": {
+      "data.userEmail": "{{user.email}}"
+    },
+    "update": {
+      "data.userEmail": "{{user.email}}"
+    },
+    "delete": {
+      "data.userEmail": "{{user.email}}"
+    }
+  }
+}

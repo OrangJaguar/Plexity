@@ -1,0 +1,31 @@
+{
+  "name": "ToolsJournalEntry",
+  "type": "object",
+  "properties": {
+    "userEmail": { "type": "string" },
+    "dateKey": { "type": "string", "description": "YYYY-MM-DD" },
+    "content": { "type": "string", "description": "HTML from contentEditable" },
+    "mood": {
+      "type": "string",
+      "description": "great | good | neutral | rough | bad"
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "wordCount": { "type": "number" },
+    "comments": {
+      "type": "array",
+      "items": { "type": "object" },
+      "description": "id, highlightStart, highlightEnd, text, createdAt"
+    },
+    "updatedAt": { "type": "number" }
+  },
+  "required": ["userEmail", "dateKey"],
+  "rls": {
+    "create": { "data.userEmail": "{{user.email}}" },
+    "read": { "data.userEmail": "{{user.email}}" },
+    "update": { "data.userEmail": "{{user.email}}" },
+    "delete": { "data.userEmail": "{{user.email}}" }
+  }
+}

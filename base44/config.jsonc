@@ -1,5 +1,7 @@
 {
-  "name": "untitled",
+  "name": "Veridian",
+  "functionsDir": "./functions",
+  "entitiesDir": "./entities",
   "site": {
     "installCommand": "npm install",
     "buildCommand": "npm run build",

@@ -1,0 +1,62 @@
+{
+  "name": "ToolsSchedule",
+  "type": "object",
+  "properties": {
+    "userEmail": {
+      "type": "string",
+      "description": "Email of the owning user"
+    },
+    "weekday": {
+      "type": "array",
+      "items": { "type": "object" },
+      "description": "Legacy weekday bell schedule mods"
+    },
+    "wednesday": {
+      "type": "array",
+      "items": { "type": "object" },
+      "description": "Legacy Wednesday bell schedule mods"
+    },
+    "recurringBlocks": {
+      "type": "array",
+      "items": { "type": "object" },
+      "description": "Recurring schedule blocks: id, title, days[], start, end, template, color"
+    },
+    "templateA": {
+      "type": "array",
+      "items": { "type": "object" },
+      "description": "A-day recurring blocks"
+    },
+    "templateB": {
+      "type": "array",
+      "items": { "type": "object" },
+      "description": "B-day recurring blocks"
+    },
+    "useAbTemplates": {
+      "type": "boolean",
+      "description": "Whether alternating A/B day templates are active"
+    },
+    "activeTemplate": {
+      "type": "string",
+      "description": "A | B when useAbTemplates"
+    },
+    "dayTypeOverride": {
+      "type": "string",
+      "description": "Manual override: A | B | null"
+    },
+    "exceptions": {
+      "type": "array",
+      "items": { "type": "object" },
+      "description": "Date-specific overrides: dateKey, cancelled, blocks[]"
+    },
+    "updatedAt": {
+      "type": "number"
+    }
+  },
+  "required": ["userEmail"],
+  "rls": {
+    "create": { "data.userEmail": "{{user.email}}" },
+    "read": { "data.userEmail": "{{user.email}}" },
+    "update": { "data.userEmail": "{{user.email}}" },
+    "delete": { "data.userEmail": "{{user.email}}" }
+  }
+}

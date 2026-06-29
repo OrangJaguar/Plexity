@@ -1,0 +1,24 @@
+{
+  "name": "ToolsGrades",
+  "type": "object",
+  "properties": {
+    "userEmail": { "type": "string" },
+    "periodSystem": {
+      "type": "string",
+      "description": "quarter | semester — default grading period layout"
+    },
+    "courses": {
+      "type": "array",
+      "items": { "type": "object" },
+      "description": "courseId, name, periodSystem?, sortOrder, periods[]"
+    },
+    "updatedAt": { "type": "number" }
+  },
+  "required": ["userEmail"],
+  "rls": {
+    "create": { "data.userEmail": "{{user.email}}" },
+    "read": { "data.userEmail": "{{user.email}}" },
+    "update": { "data.userEmail": "{{user.email}}" },
+    "delete": { "data.userEmail": "{{user.email}}" }
+  }
+}
