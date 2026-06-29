@@ -17,7 +17,7 @@ export const BUG_SEVERITIES = [
   { id: 'high', label: 'High' },
 ];
 
-export const FEEDBACK_SUPPORT_EMAIL = 'support.veridian@gmail.com';
+export { SUPPORT_EMAIL as FEEDBACK_SUPPORT_EMAIL } from '@/lib/branding/constants';
 
 export const FEEDBACK_LIMITS = {
   subject: 200,

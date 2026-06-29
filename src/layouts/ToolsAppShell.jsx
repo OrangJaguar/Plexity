@@ -7,7 +7,7 @@ import ToolsAppSidebar from '@/components/app-shell/ToolsAppSidebar';
 import ToolsAppSidebarMobile from '@/components/app-shell/ToolsAppSidebarMobile';
 import AppFooter from '@/components/layout/AppFooter';
 import { CommandBarProvider } from '@/components/command-bar/CommandBarProvider';
-import VeridianLogo from '@/components/layout/VeridianLogo';
+import PlexityLogo from '@/components/layout/PlexityLogo';
 import ThemeSync from '@/components/ThemeSync';
 import SyncUserDisplayName from '@/components/auth/SyncUserDisplayName';
 import { applyThemeFromStorage } from '@/lib/theme';
@@ -41,8 +41,8 @@ export default function ToolsAppShell() {
         <div className="app-shell-main">
           {!hideChrome && isMobile && (
             <header className="site-header app-shell-mobile-header">
-              <Link to="/" className="app-sidebar-logo-link" title="Veridian Tools home">
-                <VeridianLogo size={32} />
+              <Link to="/" className="app-sidebar-logo-link" title="Plexity home">
+                <PlexityLogo size={32} />
               </Link>
             </header>
           )}

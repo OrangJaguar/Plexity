@@ -4,14 +4,14 @@ export default function TermsPage() {
   return (
     <LegalPageShell title="Terms of Service" updated="June 28, 2026">
       <p>
-        Veridian Tools is operated by Sanskar Gupta. By creating an account or using the service,
+        Plexity is operated by Sanskar Gupta. By creating an account or using the service,
         you agree to these terms.
       </p>
 
       <h2>Using the service</h2>
       <p>
         You must provide accurate account information and keep your credentials secure.
-        You are responsible for activity under your account. Do not use Veridian Tools to store
+        You are responsible for activity under your account. Do not use Plexity to store
         or transmit illegal content, attempt to access other users&apos; data, or disrupt the platform.
       </p>
 
@@ -43,7 +43,7 @@ export default function TermsPage() {
       <h2>Contact</h2>
       <p>
         Questions about these terms: reach out through the contact information listed on the
-        Veridian Tools home page footer.
+        Plexity home page footer.
       </p>
     </LegalPageShell>
   );

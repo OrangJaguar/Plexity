@@ -2,7 +2,7 @@ import { emptyStocksWorkspace, normalizeStocksWorkspace } from '@/lib/tools/stoc
 import { getOrCreateUserDocument, saveUserDocument } from '@/api/entities/toolsUserDocument';
 
 const ENTITY = 'ToolsStocksWorkspace';
-const LEGACY_KEY = 'veridian.toolsStocksWorkspace';
+const LEGACY_KEY = 'plexity.toolsStocksWorkspace';
 
 export async function getOrCreateStocksWorkspace() {
   return getOrCreateUserDocument(ENTITY, {

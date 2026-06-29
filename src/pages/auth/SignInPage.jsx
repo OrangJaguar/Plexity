@@ -24,7 +24,7 @@ export default function SignInPage() {
     <PublicOnly>
       <div style={{ maxWidth: 400, margin: '0 auto', padding: '3rem 1.5rem' }}>
         <h1 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '1.5rem', textAlign: 'center' }}>
-          Sign in to Veridian Tools
+          Sign in to Plexity
         </h1>
         {resetMessage && (
           <div className="auth-banner auth-banner-info" style={{ marginBottom: '1rem' }}>

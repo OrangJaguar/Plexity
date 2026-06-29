@@ -23,7 +23,7 @@ function buildRequestId(date = new Date()) {
   const y = date.getUTCFullYear();
   const m = String(date.getUTCMonth() + 1).padStart(2, "0");
   const d = String(date.getUTCDate()).padStart(2, "0");
-  return `VRD-${y}${m}${d}-${randomSuffix()}`;
+  return `PLX-${y}${m}${d}-${randomSuffix()}`;
 }
 
 function validatePayload(body: Record<string, unknown>) {

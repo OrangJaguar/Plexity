@@ -12,7 +12,7 @@ export default defineConfig({
         target: 'https://query1.finance.yahoo.com',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/yahoo-finance/, ''),
-        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; Veridian/1.0)' },
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; Plexity/1.0)' },
       },
     },
   },

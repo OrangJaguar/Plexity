@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Settings } from 'lucide-react';
-import VeridianLogo from '@/components/layout/VeridianLogo';
+import PlexityLogo from '@/components/layout/PlexityLogo';
 import {
   getToolsNavItems,
   TOOLS_CATALOG_NAV_ITEM,
@@ -19,8 +19,8 @@ export default function ToolsAppSidebar() {
   return (
     <aside className="app-sidebar">
       <div className="app-sidebar-wordmark">
-        <Link to="/" className="app-sidebar-logo-link" title="Veridian Tools home">
-          <VeridianLogo size={28} />
+        <Link to="/" className="app-sidebar-logo-link" title="Plexity home">
+          <PlexityLogo size={28} />
         </Link>
       </div>
       <div className="tools-sidebar-catalog-slot">

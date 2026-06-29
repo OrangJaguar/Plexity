@@ -1,7 +1,5 @@
 import { useEffect } from 'react';
-
-const DEFAULT_DESCRIPTION = 'Veridian Tools — a student productivity suite with tasks, calendar, focus, and more.';
-const SITE_NAME = 'Veridian Tools';
+import { DEFAULT_PAGE_DESCRIPTION, SITE_NAME } from '@/lib/branding/constants';
 
 function upsertMeta(attr, key, content) {
   if (!content) return;
@@ -16,7 +14,7 @@ function upsertMeta(attr, key, content) {
 
 export function usePageMeta({
   title,
-  description = DEFAULT_DESCRIPTION,
+  description = DEFAULT_PAGE_DESCRIPTION,
   canonicalPath,
   noindex = false,
 } = {}) {

@@ -10,7 +10,7 @@ import {
   Timer,
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import VeridianLogo from '@/components/layout/VeridianLogo';
+import PlexityLogo from '@/components/layout/PlexityLogo';
 
 const HIGHLIGHTS = [
   { icon: CheckSquare, label: 'Tasks & goals' },
@@ -48,8 +48,8 @@ export default function LoginPrompt({ action = 'use this feature' }) {
 
         <div className="tools-auth-gate-body">
           <div className="tools-auth-gate-brand">
-            <VeridianLogo size={40} />
-            <span className="tools-auth-gate-brand-name">Veridian Tools</span>
+            <PlexityLogo size={40} />
+            <span className="tools-auth-gate-brand-name">Plexity</span>
           </div>
 
           <p className="tools-auth-gate-eyebrow">

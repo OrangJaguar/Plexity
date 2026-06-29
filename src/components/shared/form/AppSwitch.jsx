@@ -1,4 +1,4 @@
-export default function VeridianSwitch({
+export default function AppSwitch({
   checked,
   onChange,
   disabled,
@@ -13,11 +13,11 @@ export default function VeridianSwitch({
       id={id}
       aria-checked={checked}
       aria-label={ariaLabel}
-      className={`veridian-switch${checked ? ' on' : ''}${className ? ` ${className}` : ''}`}
+      className={`app-switch${checked ? ' on' : ''}${className ? ` ${className}` : ''}`}
       disabled={disabled}
       onClick={() => onChange(!checked)}
     >
-      <span className="veridian-switch-thumb" />
+      <span className="app-switch-thumb" />
     </button>
   );
 }

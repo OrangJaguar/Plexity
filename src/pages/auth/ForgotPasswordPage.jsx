@@ -38,7 +38,7 @@ export default function ForgotPasswordPage() {
             </p>
             {error && <div className="auth-banner auth-banner-error">{error}</div>}
             <form onSubmit={handleSubmit} className="auth-form-fields">
-              <div className="veridian-form-field auth-field-block" style={{ margin: 0 }}>
+              <div className="app-form-field auth-field-block" style={{ margin: 0 }}>
                 <label htmlFor="forgot-email">Email</label>
                 <input
                   id="forgot-email"

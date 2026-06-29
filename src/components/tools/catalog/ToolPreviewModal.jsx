@@ -1,7 +1,7 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ToolsModal from '@/components/tools/shared/ToolsModal';
-import VeridianLoading from '@/components/shared/VeridianLoading';
+import AppLoading from '@/components/shared/AppLoading';
 
 export default function ToolPreviewModal({ tool, open, onOpenChange }) {
   const navigate = useNavigate();
@@ -24,8 +24,8 @@ export default function ToolPreviewModal({ tool, open, onOpenChange }) {
   return (
     <ToolsModal open={open} onOpenChange={onOpenChange} title={tool.label} maxWidth="820px" className="tools-catalog-preview-modal">
       <div className="tools-catalog-preview-wrap">
-        <Suspense fallback={<VeridianLoading />}>
-          {PreviewComponent ? <PreviewComponent /> : <VeridianLoading />}
+        <Suspense fallback={<AppLoading />}>
+          {PreviewComponent ? <PreviewComponent /> : <AppLoading />}
         </Suspense>
       </div>
       {tool.longDescription && (

@@ -2,7 +2,7 @@ import { emptyListsWorkspace, normalizeListsWorkspace } from '@/lib/tools/lists/
 import { getOrCreateUserDocument, saveUserDocument } from '@/api/entities/toolsUserDocument';
 
 const ENTITY = 'ToolsLists';
-const LEGACY_KEY = 'veridian.toolsLists';
+const LEGACY_KEY = 'plexity.toolsLists';
 
 export async function getOrCreateLists() {
   return getOrCreateUserDocument(ENTITY, {

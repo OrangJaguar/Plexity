@@ -2,7 +2,7 @@ import { emptyGoalsDocument, normalizeGoalsDocument } from '@/lib/tools/goals/go
 import { getOrCreateUserDocument, saveUserDocument } from '@/api/entities/toolsUserDocument';
 
 const ENTITY = 'ToolsGoals';
-const LEGACY_KEY = 'veridian.toolsGoals';
+const LEGACY_KEY = 'plexity.toolsGoals';
 
 export async function getOrCreateGoals() {
   return getOrCreateUserDocument(ENTITY, {

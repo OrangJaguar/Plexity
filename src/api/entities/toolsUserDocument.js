@@ -6,8 +6,7 @@ import {
   readGuestJson,
   writeGuestJson,
 } from '@/lib/storage/guest-store';
-
-const migratedKey = (entityName) => `veridian.migrated.${entityName}`;
+import { migratedKey } from '@/lib/storage/storage-keys';
 
 function readLegacyLocal(key) {
   if (!key || typeof window === 'undefined') return null;

@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useAdminFeedback } from '@/hooks/queries/useAdminFeedback';
 import FeedbackDetailModal from '@/components/admin/FeedbackDetailModal';
 import { FEEDBACK_STATUSES, FEEDBACK_TYPES } from '@/lib/feedback/constants';
-import VeridianLoading from '@/components/shared/VeridianLoading';
+import AppLoading from '@/components/shared/AppLoading';
 
 function formatDate(ts) {
   if (!ts) return '—';
@@ -35,7 +35,7 @@ export default function AdminFeedbackPage() {
       .sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0));
   }, [rows, search, typeFilter, statusFilter]);
 
-  if (isLoading) return <VeridianLoading />;
+  if (isLoading) return <AppLoading />;
   if (isError) {
     return <p className="admin-feedback-error">Could not load feedback inbox.</p>;
   }

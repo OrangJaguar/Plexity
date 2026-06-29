@@ -2,7 +2,7 @@ import { emptyCalculatorWorkspace, normalizeCalculatorWorkspace } from '@/lib/to
 import { getOrCreateUserDocument, saveUserDocument } from '@/api/entities/toolsUserDocument';
 
 const ENTITY = 'ToolsCalculator';
-const LEGACY_KEY = 'veridian.toolsCalculator';
+const LEGACY_KEY = 'plexity.toolsCalculator';
 
 export async function getOrCreateCalculator() {
   return getOrCreateUserDocument(ENTITY, {

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Upload, X } from 'lucide-react';
-import VeridianCheckbox from '@/components/shared/form/VeridianCheckbox';
+import AppCheckbox from '@/components/shared/form/AppCheckbox';
 import { VaultBtn } from '@/components/tools/passwords/passwords-shared';
 import { mapCsvRowToCredential, parseCredentialCsv } from '@/lib/tools/passwords/passwords-model';
 
@@ -61,12 +61,12 @@ export default function ImportCsvModal({ open, onClose, onImport }) {
                   const title = row.title || row.name || row.login || `Row ${idx + 1}`;
                   return (
                     <li key={idx}>
-                      <VeridianCheckbox
+                      <AppCheckbox
                         checked={selected.has(idx)}
                         onChange={() => toggle(idx)}
                       >
                         {title}
-                      </VeridianCheckbox>
+                      </AppCheckbox>
                     </li>
                   );
                 })}

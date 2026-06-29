@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronUp, Pencil, Plus, X } from 'lucide-react';
-import VeridianCheckbox from '@/components/shared/form/VeridianCheckbox';
+import AppCheckbox from '@/components/shared/form/AppCheckbox';
 
 export function GoalsLayerLabel({ children, active = false }) {
   return (
@@ -90,13 +90,13 @@ export function GoalsTextarea(props) {
 
 export function GoalsUncertainToggle({ checked, onChange, label = "I'm not sure yet — that's okay" }) {
   return (
-    <VeridianCheckbox
+    <AppCheckbox
       className="goals-uncertain-checkbox"
       checked={checked}
       onChange={(e) => onChange(e.target.checked)}
     >
       {label}
-    </VeridianCheckbox>
+    </AppCheckbox>
   );
 }
 

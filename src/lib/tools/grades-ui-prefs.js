@@ -1,4 +1,4 @@
-const STORAGE_KEY = 'veridian.gradesUi';
+const STORAGE_KEY = 'plexity.gradesUi';
 
 const DEFAULTS = {
   periodSystem: 'quarter',

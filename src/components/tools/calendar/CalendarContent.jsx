@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ToolsModal from '@/components/tools/shared/ToolsModal';
 import ToolsMonthViewDialog from '@/components/tools/shared/ToolsMonthViewDialog';
-import VeridianCheckbox from '@/components/shared/form/VeridianCheckbox';
+import AppCheckbox from '@/components/shared/form/AppCheckbox';
 import {
   getCalendarEventsForWeek,
   getCalendarEventsForDay,
@@ -115,14 +115,14 @@ function CalendarEventDialog({ open, onOpenChange, event, initial, onSave, onDel
           <input id="cal-title" type="text" value={title} onChange={(e) => setTitle(e.target.value)} required />
         </div>
         <div className="tools-calendar-all-day-row">
-          <VeridianCheckbox
-            className="settings-veridian-check"
+          <AppCheckbox
+            className="settings-app-check"
             id="cal-all-day"
             checked={allDay}
             onChange={(e) => setAllDay(e.target.checked)}
           >
             All day
-          </VeridianCheckbox>
+          </AppCheckbox>
         </div>
         {!allDay && (
           <div className="tools-calendar-modal-grid">

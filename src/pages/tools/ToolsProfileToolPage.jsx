@@ -1,7 +1,7 @@
 import ToolsPageShell from '@/pages/tools/ToolsPageShell';
 import ProfileContent from '@/components/tools/profile/ProfileContent';
 import { useToolsProfile } from '@/hooks/queries/useToolsProfile';
-import VeridianLoading from '@/components/shared/VeridianLoading';
+import AppLoading from '@/components/shared/AppLoading';
 
 export default function ToolsProfileToolPage() {
   const { data, isLoading, saveDocument } = useToolsProfile();
@@ -9,7 +9,7 @@ export default function ToolsProfileToolPage() {
   if (isLoading) {
     return (
       <ToolsPageShell className="tools-page--profile-tool">
-        <VeridianLoading />
+        <AppLoading />
       </ToolsPageShell>
     );
   }

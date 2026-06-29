@@ -1,5 +1,5 @@
 /** Vite dev middleware: attach Yahoo crumb for quoteSummary & screener POST. */
-const UA = 'Mozilla/5.0 (compatible; Veridian/1.0)';
+const UA = 'Mozilla/5.0 (compatible; Plexity/1.0)';
 
 function needsCrumb(path, method = 'GET') {
   if (path.includes('/quoteSummary/')) return true;

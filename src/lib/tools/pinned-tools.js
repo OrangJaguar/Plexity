@@ -1,6 +1,7 @@
 import { TOOL_REGISTRY } from '@/lib/tools/registry';
+import { STORAGE_KEYS } from '@/lib/storage/storage-keys';
 
-export const PINNED_TOOLS_STORAGE_KEY = 'veridian.pinnedToolIds';
+export const PINNED_TOOLS_STORAGE_KEY = STORAGE_KEYS.pinnedToolIds;
 
 const VALID_IDS = new Set(TOOL_REGISTRY.map((t) => t.id));
 

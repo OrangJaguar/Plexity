@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import VeridianCheckbox from '@/components/shared/form/VeridianCheckbox';
+import AppCheckbox from '@/components/shared/form/AppCheckbox';
 import {
   GoalsField,
   GoalsInput,
@@ -167,7 +167,7 @@ export default function GoalsWeeklyCheckin({
           <p className="goals-checkin-lead">Carry still-relevant priorities into next week, or start fresh.</p>
           <div className="goals-checkin-carry-list">
             {priorities.map((p) => (
-              <VeridianCheckbox
+              <AppCheckbox
                 key={p.id}
                 className="goals-carry-item"
                 checked={carryIds.includes(p.id)}
@@ -178,7 +178,7 @@ export default function GoalsWeeklyCheckin({
                 }}
               >
                 {p.text}
-              </VeridianCheckbox>
+              </AppCheckbox>
             ))}
           </div>
           <GoalsField label="Add a priority for next week" hint="Optional">

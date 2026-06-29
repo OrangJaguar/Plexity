@@ -281,7 +281,7 @@ export default function AuthForm({
 
           <form onSubmit={handleSubmit} className="auth-form-fields">
             {isSignup && (
-              <div className="veridian-form-field auth-field-block" style={{ margin: 0 }}>
+              <div className="app-form-field auth-field-block" style={{ margin: 0 }}>
                 <label htmlFor="auth-username">Username</label>
                 <input
                   id="auth-username"
@@ -302,7 +302,7 @@ export default function AuthForm({
                 <UsernameStatus status={usernameStatus} />
               </div>
             )}
-            <div className="veridian-form-field auth-field-block" style={{ margin: 0 }}>
+            <div className="app-form-field auth-field-block" style={{ margin: 0 }}>
               <label htmlFor="auth-email">Email</label>
               <input
                 id="auth-email"
@@ -315,7 +315,7 @@ export default function AuthForm({
                 autoComplete="email"
               />
             </div>
-            <div className="veridian-form-field auth-field-block" style={{ margin: 0 }}>
+            <div className="app-form-field auth-field-block" style={{ margin: 0 }}>
               <label htmlFor="auth-password">Password</label>
               <div style={{ position: 'relative' }}>
                 <input
@@ -340,7 +340,7 @@ export default function AuthForm({
               )}
             </div>
             {isSignup && (
-              <div className="veridian-form-field auth-field-block" style={{ margin: 0 }}>
+              <div className="app-form-field auth-field-block" style={{ margin: 0 }}>
                 <label htmlFor="auth-confirm-password">Confirm password</label>
                 <div style={{ position: 'relative' }}>
                   <input

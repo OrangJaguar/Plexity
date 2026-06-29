@@ -1,4 +1,4 @@
-import VeridianLoading from '@/components/shared/VeridianLoading';
+import AppLoading from '@/components/shared/AppLoading';
 import { useAuth } from '@/hooks/useAuth';
 import { useUiStore } from '@/store/uiStore';
 
@@ -7,7 +7,7 @@ export default function ToolsPageShell({ children, className = '' }) {
   const toolsChromeCollapsed = useUiStore((s) => s.toolsChromeCollapsed);
 
   if (isLoading) {
-    return <VeridianLoading fullPage />;
+    return <AppLoading fullPage />;
   }
 
   const pageClass = [

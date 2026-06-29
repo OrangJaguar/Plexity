@@ -145,7 +145,7 @@ export function VaultTrustBanner() {
   return (
     <div className="vault-trust-banner">
       <strong>Encrypted on your device</strong>
-      <p>Credentials are encrypted before storage. Veridian syncs encrypted data only — we cannot read your vault contents.</p>
+      <p>Credentials are encrypted before storage. Plexity syncs encrypted data only — we cannot read your vault contents.</p>
     </div>
   );
 }

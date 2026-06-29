@@ -4,7 +4,7 @@ import { usePageMeta } from '@/hooks/usePageMeta';
 export default function NotFoundPage() {
   usePageMeta({
     title: 'Page not found',
-    description: 'The page you are looking for does not exist on Veridian Tools.',
+    description: 'The page you are looking for does not exist on Plexity.',
   });
 
   return (

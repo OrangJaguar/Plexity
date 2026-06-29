@@ -43,7 +43,7 @@ export default function FeedbackPage() {
 
   usePageMeta({
     title: 'Feedback',
-    description: 'Send bug reports, feature requests, or general feedback about Veridian Tools.',
+    description: 'Send bug reports, feature requests, or general feedback about Plexity.',
     canonicalPath: '/feedback',
   });
 
@@ -111,7 +111,7 @@ export default function FeedbackPage() {
     <div className="feedback-page">
       <div className="feedback-page-inner">
         <header className="feedback-page-header">
-          <p className="feedback-page-eyebrow">Help improve Veridian</p>
+          <p className="feedback-page-eyebrow">Help improve Plexity</p>
           <h1>Send feedback</h1>
           <p className="feedback-page-lead">
             Bug reports, ideas, or anything else — signed-in submissions help prevent spam.

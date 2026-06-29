@@ -4,8 +4,8 @@ import { hasToolsEntity, safeCreate, safeFilter, safeUpdate } from '@/api/entiti
 import { emptyGradesDocument, seedPeriods } from '@/lib/tools/grade-periods';
 import { GUEST_KEYS, readGuestJson, writeGuestJson } from '@/lib/storage/guest-store';
 
-const LEGACY_KEY = 'veridian.toolsGrades';
-const MIGRATED_KEY = 'veridian.migrated.ToolsGrades';
+const LEGACY_KEY = 'plexity.toolsGrades';
+const MIGRATED_KEY = 'plexity.migrated.ToolsGrades';
 
 function readLegacy() {
   if (typeof window === 'undefined') return null;

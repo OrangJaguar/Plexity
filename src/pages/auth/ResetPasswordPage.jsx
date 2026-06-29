@@ -67,7 +67,7 @@ export default function ResetPasswordPage() {
         <p className="reset-password-lead">Enter a new password for your account.</p>
         {error && <div className="auth-banner auth-banner-error">{error}</div>}
         <form onSubmit={handleSubmit} className="auth-form-fields">
-          <div className="veridian-form-field auth-field-block" style={{ margin: 0 }}>
+          <div className="app-form-field auth-field-block" style={{ margin: 0 }}>
             <label htmlFor="reset-password">New password</label>
             <input
               id="reset-password"
@@ -85,7 +85,7 @@ export default function ResetPasswordPage() {
               <AuthFieldRules rules={passwordRules} columns={1} />
             )}
           </div>
-          <div className="veridian-form-field auth-field-block" style={{ margin: 0 }}>
+          <div className="app-form-field auth-field-block" style={{ margin: 0 }}>
             <label htmlFor="reset-confirm">Confirm password</label>
             <input
               id="reset-confirm"

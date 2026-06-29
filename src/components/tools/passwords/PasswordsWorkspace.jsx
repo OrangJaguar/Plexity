@@ -131,7 +131,7 @@ export default function PasswordsWorkspace({
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'veridian-vault-export.csv';
+    a.download = 'plexity-vault-export.csv';
     a.click();
     URL.revokeObjectURL(url);
     toast.success('Export started — store this file securely');

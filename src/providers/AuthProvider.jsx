@@ -12,19 +12,19 @@ import {
 
 export const AuthContext = createContext(null);
 
-if (typeof window !== 'undefined' && !window.__veridianAuthCallbacks) {
-  window.__veridianAuthCallbacks = { onUserLoaded: null };
+if (typeof window !== 'undefined' && !window.__plexityAuthCallbacks) {
+  window.__plexityAuthCallbacks = { onUserLoaded: null };
 }
 
 export default function AuthProvider({ children }) {
   const { data: user, isLoading, refetch } = useCurrentUser();
 
   useEffect(() => {
-    window.__veridianAuthCallbacks.onUserLoaded = (u) => {
+    window.__plexityAuthCallbacks.onUserLoaded = (u) => {
       queryClient.setQueryData(['auth', 'me'], u ?? null);
     };
     return () => {
-      window.__veridianAuthCallbacks.onUserLoaded = null;
+      window.__plexityAuthCallbacks.onUserLoaded = null;
     };
   }, []);
 

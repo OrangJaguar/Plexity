@@ -5,7 +5,7 @@ import VaultSetupWizard from '@/components/tools/passwords/VaultSetupWizard';
 import VaultUnlockScreen from '@/components/tools/passwords/VaultUnlockScreen';
 import { useToolsPasswords } from '@/hooks/queries/useToolsPasswords';
 import { useVaultSession } from '@/hooks/useVaultSession';
-import VeridianLoading from '@/components/shared/VeridianLoading';
+import AppLoading from '@/components/shared/AppLoading';
 
 export default function PasswordsContent() {
   const { envelope, isLoading, saveEnvelope, isSaving } = useToolsPasswords();
@@ -43,7 +43,7 @@ export default function PasswordsContent() {
     await session.persistEncrypted(saveEnvelope, envelope, dataOverride);
   }, [envelope, saveEnvelope, session]);
 
-  if (isLoading) return <VeridianLoading />;
+  if (isLoading) return <AppLoading />;
 
   if (!envelope) {
     return <VaultSetupWizard onComplete={handleSetupComplete} saving={setupSaving} />;

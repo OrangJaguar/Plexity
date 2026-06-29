@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { queryClient } from '@/lib/query-client';
-import VeridianLoading from '@/components/shared/VeridianLoading';
+import AppLoading from '@/components/shared/AppLoading';
 import {
   activatePersistForUser,
   clearInMemoryUserQueries,
@@ -11,7 +11,7 @@ import {
 
 /**
  * Clears cross-account in-memory cache on sign-in/out. Disk persistence is disabled
- * for Veridian Tools — data lives in Base44 entities or localStorage per tool.
+ * for Plexity — data lives in Base44 entities or localStorage per tool.
  */
 export default function QueryPersistManager({ children }) {
   const { user, isLoading: authLoading } = useAuth();
@@ -59,7 +59,7 @@ export default function QueryPersistManager({ children }) {
   }, [authLoading, user?.email]);
 
   if (authLoading) {
-    return <VeridianLoading fullPage />;
+    return <AppLoading fullPage />;
   }
 
   return children;

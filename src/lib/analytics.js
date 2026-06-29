@@ -1,4 +1,4 @@
-const ANON_KEY = 'veridian_anonymous_id';
+const ANON_KEY = 'plexity_anonymous_id';
 
 const TRACKED_ONCE = new Set();
 

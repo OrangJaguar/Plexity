@@ -1,33 +1,12 @@
-const GUEST_PREFIX = 'veridian.guest.';
+import {
+  GUEST_ENTITY_KEYS,
+  GUEST_PREFIX,
+  STORAGE_KEYS,
+} from '@/lib/storage/storage-keys';
 
-export const GUEST_KEYS = {
-  tasks: `${GUEST_PREFIX}ToolsTask`,
-  calendar: `${GUEST_PREFIX}ToolsCalendarEvent`,
-  schedule: `${GUEST_PREFIX}ToolsSchedule`,
-  journal: `${GUEST_PREFIX}ToolsJournalEntry`,
-  focus: `${GUEST_PREFIX}ToolsFocusSession`,
-  grades: `${GUEST_PREFIX}ToolsGrades`,
-  goals: `${GUEST_PREFIX}ToolsGoals`,
-  lists: `${GUEST_PREFIX}ToolsLists`,
-  profile: `${GUEST_PREFIX}ToolsProfile`,
-  college: `${GUEST_PREFIX}ToolsCollege`,
-  calculator: `${GUEST_PREFIX}ToolsCalculator`,
-  stocks: `${GUEST_PREFIX}ToolsStocksWorkspace`,
-  preferences: `${GUEST_PREFIX}UserPreferences`,
-  passwords: `${GUEST_PREFIX}ToolsPasswords`,
-};
-
-/** Map Base44 entity names to guest localStorage keys. */
-export const GUEST_ENTITY_KEYS = {
-  ToolsGoals: GUEST_KEYS.goals,
-  ToolsLists: GUEST_KEYS.lists,
-  ToolsProfile: GUEST_KEYS.profile,
-  ToolsCollege: GUEST_KEYS.college,
-  ToolsCalculator: GUEST_KEYS.calculator,
-  ToolsStocksWorkspace: GUEST_KEYS.stocks,
-};
-
-export const LOCAL_ONLY_NOTICE_KEY = 'veridian.notice.localOnly.v1';
+export const GUEST_KEYS = STORAGE_KEYS.guest;
+export { GUEST_ENTITY_KEYS };
+export const LOCAL_ONLY_NOTICE_KEY = STORAGE_KEYS.localOnlyNotice;
 
 export function readGuestJson(key, fallback) {
   if (typeof window === 'undefined') return fallback;

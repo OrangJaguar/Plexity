@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-const TOOLS_CHROME_STORAGE_KEY = 'veridian.toolsChromeCollapsed';
+const TOOLS_CHROME_STORAGE_KEY = 'plexity.toolsChromeCollapsed';
 
 function readToolsChromeCollapsed() {
   try {

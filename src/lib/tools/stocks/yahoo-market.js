@@ -3,7 +3,7 @@
  */
 import { base44 } from '@/api/base44Client';
 
-const UA = 'Mozilla/5.0 (compatible; Veridian/1.0)';
+const UA = 'Mozilla/5.0 (compatible; Plexity/1.0)';
 
 const SUMMARY_MODULES = [
   'price', 'summaryDetail', 'defaultKeyStatistics', 'assetProfile',

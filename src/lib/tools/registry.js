@@ -147,7 +147,7 @@ export const TOOL_REGISTRY = [
     icon: KeyRound,
     description: 'Zero-knowledge encrypted vault for passwords and secure notes.',
     longDescription:
-      'Client-side encrypted credentials vault with a separate master password, recovery key, auto-lock, password health, CSV import, and fast search — Veridian syncs encrypted data only.',
+      'Client-side encrypted credentials vault with a separate master password, recovery key, auto-lock, password health, CSV import, and fast search — Plexity syncs encrypted data only.',
     createdAt: '2026-06-23',
     popularityRank: 15,
     defaultPinned: false,

@@ -34,7 +34,7 @@ export default function VaultUnlockScreen({ envelope, onUnlock, unlocking }) {
         </div>
         <h1>Vault locked</h1>
         <p>
-          You are signed in to Veridian, but your credentials vault is separate.
+          You are signed in to Plexity, but your credentials vault is separate.
           Unlock with your master password to decrypt entries on this device.
         </p>
 

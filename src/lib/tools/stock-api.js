@@ -1,7 +1,7 @@
 import { searchStockSymbolsRemote, fetchStockQuotesRemote } from '@/api/tools/marketData';
 import { POPULAR_TICKERS } from '@/lib/tools/popular-tickers';
 
-const UA = 'Mozilla/5.0 (compatible; Veridian/1.0)';
+const UA = 'Mozilla/5.0 (compatible; Plexity/1.0)';
 
 function localSymbolSearch(query) {
   const q = query?.trim().toUpperCase();

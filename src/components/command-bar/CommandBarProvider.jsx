@@ -11,7 +11,7 @@ import { createPortal } from 'react-dom';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Mic, MicOff, Square, ArrowUp } from 'lucide-react';
 import { toast } from 'sonner';
-import VeridianLogo from '@/components/layout/VeridianLogo';
+import PlexityLogo from '@/components/layout/PlexityLogo';
 import { useAuth } from '@/hooks/useAuth';
 import { useToolsTasks } from '@/hooks/queries/useToolsTasks';
 import { useToolsCalendarEvents } from '@/hooks/queries/useToolsCalendarEvents';
@@ -341,7 +341,7 @@ export function CommandBarProvider({ children }) {
         aria-hidden
         onMouseDown={close}
       />
-      <div className="command-bar-root" role="dialog" aria-label="Veridian command bar">
+      <div className="command-bar-root" role="dialog" aria-label="Plexity command bar">
       {phase === 'preview' && result?.type === 'confirm' && (
         <CommandBarPreviewCard
           result={result}
@@ -383,7 +383,7 @@ export function CommandBarProvider({ children }) {
           <>
             <div className="command-bar-thinking-mark">
               <span className="command-bar-thinking-ring" aria-hidden />
-              <VeridianLogo size={20} />
+              <PlexityLogo size={20} />
             </div>
             <span className="command-bar-thinking-text">Thinking…</span>
             <button type="button" className="command-bar-stop" onClick={stopThinking} aria-label="Stop">

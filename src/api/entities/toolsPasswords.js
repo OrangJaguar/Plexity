@@ -2,7 +2,7 @@ import { requireAuth } from '@/api/requireAuth';
 import { getStorageContext } from '@/api/storage-context';
 import { GUEST_KEYS, readGuestJson, writeGuestJson } from '@/lib/storage/guest-store';
 
-const STORAGE_KEY = 'veridian.toolsPasswords';
+const STORAGE_KEY = 'plexity.toolsPasswords';
 
 function storageKeyForUser(email) {
   return `${STORAGE_KEY}.${email}`;

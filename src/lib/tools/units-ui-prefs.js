@@ -1,4 +1,4 @@
-const STORAGE_KEY = 'veridian.unitsUi';
+const STORAGE_KEY = 'plexity.unitsUi';
 
 const DEFAULTS = {
   pinnedPairs: [],

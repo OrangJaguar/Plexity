@@ -2,7 +2,7 @@ import { emptyProfileDocument, normalizeProfileDocument } from '@/lib/tools/prof
 import { getOrCreateUserDocument, saveUserDocument } from '@/api/entities/toolsUserDocument';
 
 const ENTITY = 'ToolsProfile';
-const LEGACY_KEY = 'veridian.toolsProfile';
+const LEGACY_KEY = 'plexity.toolsProfile';
 
 export async function getOrCreateProfile() {
   return getOrCreateUserDocument(ENTITY, {

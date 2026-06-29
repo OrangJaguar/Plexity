@@ -21,7 +21,7 @@ import { useCommandBarDraft } from '@/hooks/useCommandBarDraft';
 import { taskFormToEventDraft } from '@/lib/tools/command-bar-draft';
 import { getToolRoute } from '@/lib/tools/tool-routes';
 
-const SORT_MODE_KEY = 'veridian.tasksSortMode';
+const SORT_MODE_KEY = 'plexity.tasksSortMode';
 
 function readSortMode() {
   try {

@@ -5,7 +5,7 @@ export default function LegalPageShell({ title, updated, children }) {
     <div className="legal-page-wrap">
       <article className="legal-page">
         <header className="legal-page-header">
-          <p className="legal-page-eyebrow">Veridian Tools</p>
+          <p className="legal-page-eyebrow">Plexity</p>
           <h1>{title}</h1>
           {updated ? <p className="legal-page-updated">Last updated {updated}</p> : null}
         </header>

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
-import VeridianCheckbox from '@/components/shared/form/VeridianCheckbox';
+import AppCheckbox from '@/components/shared/form/AppCheckbox';
 
 const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -39,14 +39,14 @@ export default function ScheduleDaysPicker({ days, onChange }) {
       {open && (
         <div className="tools-schedule-days-menu">
           {DAY_LABELS.map((label, day) => (
-            <VeridianCheckbox
+            <AppCheckbox
               key={label}
               className="tools-schedule-days-check"
               checked={days.includes(day)}
               onChange={() => toggleDay(day)}
             >
               {label}
-            </VeridianCheckbox>
+            </AppCheckbox>
           ))}
         </div>
       )}

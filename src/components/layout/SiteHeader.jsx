@@ -30,11 +30,11 @@ export default function SiteHeader({ actions, showLogo = false }) {
       <Link to="/" className={`site-wordmark${showLogo ? ' site-wordmark--brand' : ''}`}>
         {showLogo ? (
           <>
-            <img src="/veridian-logo.png" alt="" width={28} height={28} className="veridian-logo" draggable={false} />
-            <span>Veridian Tools</span>
+            <img src="/plexity-logo.svg" alt="" width={28} height={28} className="app-logo" draggable={false} />
+            <span>Plexity</span>
           </>
         ) : (
-          'Veridian Tools'
+          'Plexity'
         )}
       </Link>
       <div className="site-header-actions">

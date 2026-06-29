@@ -4,7 +4,7 @@ export default function PrivacyPage() {
   return (
     <LegalPageShell title="Privacy Policy" updated="June 28, 2026">
       <p>
-        Veridian Tools respects your privacy. This policy explains what we collect, how data is stored,
+        Plexity respects your privacy. This policy explains what we collect, how data is stored,
         and what stays on your device.
       </p>
 

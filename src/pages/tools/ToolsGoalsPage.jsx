@@ -1,7 +1,7 @@
 import ToolsPageShell from '@/pages/tools/ToolsPageShell';
 import GoalsContent from '@/components/tools/goals/GoalsContent';
 import { useToolsGoals } from '@/hooks/queries/useToolsGoals';
-import VeridianLoading from '@/components/shared/VeridianLoading';
+import AppLoading from '@/components/shared/AppLoading';
 
 export default function ToolsGoalsPage() {
   const { data, isLoading, saveDocument } = useToolsGoals();
@@ -9,7 +9,7 @@ export default function ToolsGoalsPage() {
   if (isLoading) {
     return (
       <ToolsPageShell className="tools-page--goals">
-        <VeridianLoading />
+        <AppLoading />
       </ToolsPageShell>
     );
   }

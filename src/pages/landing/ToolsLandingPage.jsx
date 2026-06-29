@@ -116,7 +116,7 @@ export default function ToolsLandingPage() {
 
   usePageMeta({
     description:
-      'Veridian Tools — a free, no-AI student workspace. One person rebuilding everyday utilities cleaner, in one place.',
+      'Plexity — a free, no-AI student workspace. One person rebuilding everyday utilities cleaner, in one place.',
     canonicalPath: '/',
   });
 
@@ -159,7 +159,7 @@ export default function ToolsLandingPage() {
               <span className="tools-landing-gradient">rebuilt cleaner.</span>
             </h1>
             <p className="tools-landing-lead">
-              Veridian Tools is me scratching my own itches: apps that feel bloated, flows that
+              Plexity is me scratching my own itches: apps that feel bloated, flows that
               waste clicks, utilities scattered across tabs. I remake the ones I rely on, collect
               them in one shell, and ship them because it&apos;s fun — not because I&apos;m trying
               to sell you a platform.
@@ -302,7 +302,7 @@ export default function ToolsLandingPage() {
           <p className="tools-landing-eyebrow">The pledge</p>
           <h2>Free isn&apos;t a trial. It&apos;s the deal.</h2>
           <p>
-            Veridian Tools will stay free. No paywalled core utilities, no selling your homework
+            Plexity will stay free. No paywalled core utilities, no selling your homework
             data to train models — there aren&apos;t any models. I build this because I use it
             every day and I&apos;d rather share a clean workspace than gate it.
           </p>

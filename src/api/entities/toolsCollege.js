@@ -2,7 +2,7 @@ import { emptyCollegeDocument, normalizeCollegeDocument } from '@/lib/tools/coll
 import { getOrCreateUserDocument, saveUserDocument } from '@/api/entities/toolsUserDocument';
 
 const ENTITY = 'ToolsCollege';
-const LEGACY_KEY = 'veridian.toolsCollege';
+const LEGACY_KEY = 'plexity.toolsCollege';
 
 export { emptyCollegeDocument, normalizeCollegeDocument };
 

@@ -6,8 +6,8 @@ import { useToolsSettings } from '@/hooks/queries/useToolsSettings';
 import { usePreferences } from '@/hooks/queries/usePreferences';
 import { useUpdatePreferences } from '@/hooks/mutations/usePreferencesMutations';
 import { applyThemeFromPreferences, persistThemeToStorage } from '@/lib/theme';
-import VeridianSwitch from '@/components/shared/form/VeridianSwitch';
-import VeridianCheckbox from '@/components/shared/form/VeridianCheckbox';
+import AppSwitch from '@/components/shared/form/AppSwitch';
+import AppCheckbox from '@/components/shared/form/AppCheckbox';
 import { JOURNAL_PROMPTS, JOURNAL_PRESET_TAGS, TOOLS_SETTINGS_DEFAULTS } from '@/lib/tools/tools-settings';
 import {
   DEFAULT_WIDGET_LAYOUT,
@@ -96,7 +96,7 @@ export default function ToolsSettingsContent() {
         <section className="tools-settings-section tools-settings-card tools-settings-local-mode">
           <h2>Local mode</h2>
           <p className="tools-settings-lead">
-            You&apos;re using Veridian on this device only. Preferences and tool data stay in your
+            You&apos;re using Plexity on this device only. Preferences and tool data stay in your
             browser until you sign in.
           </p>
           <Link to="/signin?redirect=%2Fsettings" className="btn btn-primary btn-sm">
@@ -108,7 +108,7 @@ export default function ToolsSettingsContent() {
       <section className="tools-settings-section tools-settings-theme-box">
         <div className="tools-settings-theme-row">
           <span className="tools-settings-theme-label">{themeDark ? 'Dark' : 'Light'}</span>
-          <VeridianSwitch
+          <AppSwitch
             checked={themeDark}
             onChange={handleThemeToggle}
             disabled={updatePrefs.isPending}
@@ -164,13 +164,13 @@ export default function ToolsSettingsContent() {
           </label>
 
           <div className="tools-settings-check-block">
-            <VeridianCheckbox
-              className="settings-veridian-check"
+            <AppCheckbox
+              className="settings-app-check"
               checked={Boolean(settings.journalDailyPromptEnabled)}
               onChange={(e) => updatePrefs.mutate({ journalDailyPromptEnabled: e.target.checked })}
             >
               Show daily writing prompt
-            </VeridianCheckbox>
+            </AppCheckbox>
             <p className="tools-settings-hint">Sample: {JOURNAL_PROMPTS[0]}</p>
           </div>
         </div>

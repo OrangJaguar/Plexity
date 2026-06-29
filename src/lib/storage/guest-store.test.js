@@ -55,10 +55,10 @@ describe('guest-store', () => {
   it('clears all guest-prefixed keys', () => {
     writeGuestJson(GUEST_KEYS.tasks, []);
     writeGuestJson(GUEST_KEYS.calendar, []);
-    window.localStorage.setItem('veridian.other', 'keep');
+    window.localStorage.setItem('plexity.other', 'keep');
     clearGuestStorage();
     expect(window.localStorage.getItem(GUEST_KEYS.tasks)).toBeNull();
     expect(window.localStorage.getItem(GUEST_KEYS.calendar)).toBeNull();
-    expect(window.localStorage.getItem('veridian.other')).toBe('keep');
+    expect(window.localStorage.getItem('plexity.other')).toBe('keep');
   });
 });

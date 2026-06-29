@@ -139,7 +139,7 @@ export function useSpeechRecognition({ onTranscript, lang }) {
 
   const start = useCallback((baseText = '') => {
     if (!isSecureSpeechContext()) {
-      toast.error('Microphone requires HTTPS or localhost. Open Veridian in Chrome or Edge.');
+      toast.error('Microphone requires HTTPS or localhost. Open Plexity in Chrome or Edge.');
       return;
     }
 

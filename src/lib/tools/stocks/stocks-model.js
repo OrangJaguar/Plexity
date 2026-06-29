@@ -112,7 +112,7 @@ export function newWatchlistItem(symbol, name = '') {
   };
 }
 
-const RECENT_STOCKS_KEY = 'veridian-stocks-recent';
+const RECENT_STOCKS_KEY = 'plexity-stocks-recent';
 const MAX_RECENT_STOCKS = 8;
 
 export function loadRecentStocks() {
@@ -137,7 +137,7 @@ export function trackRecentStock(symbol, name = '') {
   localStorage.setItem(RECENT_STOCKS_KEY, JSON.stringify(next));
 }
 
-const PRESETS_KEY = 'veridian-stocks-screener-presets';
+const PRESETS_KEY = 'plexity-stocks-screener-presets';
 
 export const BUILTIN_SCREENER_PRESETS = [
   { id: 'large-cap', name: 'Large cap', filters: { minMarketCap: 10e9 } },

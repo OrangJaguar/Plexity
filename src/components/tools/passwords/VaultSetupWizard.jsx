@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Check, Copy, KeyRound, Shield } from 'lucide-react';
-import VeridianCheckbox from '@/components/shared/form/VeridianCheckbox';
+import AppCheckbox from '@/components/shared/form/AppCheckbox';
 import { VaultBtn, VaultField, VaultInput, VaultTrustBanner, copyToClipboard } from '@/components/tools/passwords/passwords-shared';
 import {
   AuthFieldRules,
@@ -133,12 +133,12 @@ export default function VaultSetupWizard({ onComplete, saving }) {
               Copy
             </VaultBtn>
           </div>
-          <VeridianCheckbox
+          <AppCheckbox
             checked={savedRecovery}
             onChange={(e) => setSavedRecovery(e.target.checked)}
           >
             I have saved my recovery key somewhere safe
-          </VeridianCheckbox>
+          </AppCheckbox>
           {error ? <p className="vault-error">{error}</p> : null}
           <VaultBtn variant="primary" onClick={finish} disabled={!savedRecovery || saving}>
             {saving ? 'Creating vault…' : 'Create vault'}

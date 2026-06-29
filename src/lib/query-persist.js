@@ -1,5 +1,5 @@
 /** @deprecated Legacy global key — removed on session init so accounts never share cache. */
-export const LEGACY_PERSIST_CACHE_KEY = 'veridian-query-cache';
+export const LEGACY_PERSIST_CACHE_KEY = 'plexity-query-cache';
 
 export const PERSIST_CACHE_BUSTER = 'phase3-user-scoped-v1';
 
@@ -16,7 +16,7 @@ export function getPersistCacheKey(email) {
   if (!email || typeof email !== 'string') return null;
   const normalized = email.trim().toLowerCase();
   if (!normalized) return null;
-  return `veridian-query-cache:${encodeURIComponent(normalized)}`;
+  return `plexity-query-cache:${encodeURIComponent(normalized)}`;
 }
 
 export function clearLegacyPersistedCache() {

@@ -1,6 +1,6 @@
 /** Local persistence for tools-related UserPreferences fields (until Base44 schema sync is reliable). */
 
-export const TOOLS_SETTINGS_STORAGE_KEY = 'veridian.toolsSettings';
+export const TOOLS_SETTINGS_STORAGE_KEY = 'plexity.toolsSettings';
 
 /** Preference keys owned by tools settings — persisted locally and merged over server on read. */
 export const TOOLS_SETTINGS_PERSIST_KEYS = [

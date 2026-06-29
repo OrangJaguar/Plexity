@@ -83,7 +83,7 @@ export function speechRecognitionErrorMessage(errorCode) {
     case 'not-allowed':
       return 'Microphone permission denied. Allow the mic in your browser settings and tap Mic again.';
     case 'service-not-allowed':
-      return 'Speech recognition is blocked for this page. Open Veridian in Chrome or Edge (not an embedded preview).';
+      return 'Speech recognition is blocked for this page. Open Plexity in Chrome or Edge (not an embedded preview).';
     case 'network':
       return 'Voice input needs an internet connection in this browser.';
     case 'audio-capture':

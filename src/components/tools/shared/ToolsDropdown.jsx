@@ -49,16 +49,16 @@ export function ToolsDropdownOption({ active, onClick, children }) {
   );
 }
 
-import VeridianCheckbox from '@/components/shared/form/VeridianCheckbox';
+import AppCheckbox from '@/components/shared/form/AppCheckbox';
 
 export function ToolsDropdownCheckOption({ checked, onChange, children }) {
   return (
-    <VeridianCheckbox
+    <AppCheckbox
       className="tools-dropdown-check-option"
       checked={checked}
       onChange={onChange}
     >
       {children}
-    </VeridianCheckbox>
+    </AppCheckbox>
   );
 }

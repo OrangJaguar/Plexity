@@ -213,7 +213,7 @@ export async function upsertErrorLog(
     await sendAdminEmail(
       base44,
       adminEmail,
-      `[Veridian Error] ${message.slice(0, 80)} (${count}×)`,
+      `[Plexity Error] ${message.slice(0, 80)} (${count}×)`,
       [
         `Message: ${message}`,
         `Source: ${payload.source}`,
