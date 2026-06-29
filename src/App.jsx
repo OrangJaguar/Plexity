@@ -6,7 +6,13 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ScrollToTop from './components/ScrollToTop';
-// Add page imports here
+import Home from './pages/Home';
+import TextTools from './pages/TextTools';
+import ColorTools from './pages/ColorTools';
+import NumberTools from './pages/NumberTools';
+import GeneratorTools from './pages/GeneratorTools';
+import DateTimeTools from './pages/DateTimeTools';
+import EncoderTools from './pages/EncoderTools';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -34,7 +40,13 @@ const AuthenticatedApp = () => {
   // Render the main app
   return (
     <Routes>
-      {/* Add your page Route elements here */}
+      <Route path="/" element={<Home />} />
+      <Route path="/text-tools" element={<TextTools />} />
+      <Route path="/color-tools" element={<ColorTools />} />
+      <Route path="/number-tools" element={<NumberTools />} />
+      <Route path="/generator-tools" element={<GeneratorTools />} />
+      <Route path="/datetime-tools" element={<DateTimeTools />} />
+      <Route path="/encoder-tools" element={<EncoderTools />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
