@@ -1,15 +1,13 @@
 import { toast } from 'sonner';
-import { clearGuestStorage } from '@/lib/storage/guest-store';
+import { clearLegacyGuestStorage } from '@/lib/storage/legacy-guest-cleanup';
 import { clearInMemoryUserQueries, clearLegacyPersistedCache } from '@/lib/query-persist';
 import { queryClient } from '@/lib/query-client';
 
-/** Wipe guest local data and refresh queries after sign-in / sign-up. */
+/** Refresh queries after sign-in / sign-up. */
 export async function onAuthSuccess() {
-  clearGuestStorage();
+  clearLegacyGuestStorage();
   clearInMemoryUserQueries(queryClient);
   clearLegacyPersistedCache();
   await queryClient.invalidateQueries();
-  toast.info(
-    'Signed in — your cloud workspace is ready. Local data from this browser wasn\'t transferred.',
-  );
+  toast.success('Signed in — your workspace is ready.');
 }

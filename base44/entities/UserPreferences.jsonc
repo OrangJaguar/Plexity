@@ -19,31 +19,13 @@
     "lastActiveAt": {
       "type": "number"
     },
-    "gradeLevel": {
-      "type": "string"
-    },
     "country": {
       "type": "string"
     },
     "usState": {
       "type": "string"
     },
-    "studyGoals": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "researchConsent": {
-      "type": "boolean"
-    },
-    "researchConsentAt": {
-      "type": "number"
-    },
     "onboardingCompletedAt": {
-      "type": "number"
-    },
-    "onboardingStep": {
       "type": "number"
     },
     "themeDark": {
@@ -58,58 +40,9 @@
     "strictMode": {
       "type": "boolean"
     },
-    "hintsShown": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "notificationPref": {
-      "type": "string",
-      "description": "daily | urgent | off"
-    },
-    "defaultPrivacy": {
-      "type": "string",
-      "description": "private | public"
-    },
-    "defaultShowSources": {
-      "type": "boolean"
-    },
-    "dailyTimeBudgetMin": {
-      "type": "number",
-      "description": "Daily study time budget in minutes (default 35)"
-    },
     "usernameChangedAt": {
       "type": "number",
       "description": "Timestamp of last username change (6-month cooldown)"
-    },
-    "lastReminderEmailAt": {
-      "type": "number",
-      "description": "Last study reminder email sent (rate limit)"
-    },
-    "examReminderSentFor": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "description": "journeyId:examDate keys for urgent exam reminders already sent"
-    },
-    "maiScoreOnboarding": {
-      "type": "number",
-      "description": "MAI total score at onboarding (5-25)"
-    },
-    "maiScoreDay60": {
-      "type": "number",
-      "description": "MAI total score at day 60 (5-25)"
-    },
-    "maiSurveyOnboardingCompletedAt": {
-      "type": "number"
-    },
-    "maiSurveyDay60CompletedAt": {
-      "type": "number"
-    },
-    "maiSurveyDay60DismissedAt": {
-      "type": "number"
     },
     "pinnedToolIds": {
       "type": "array",

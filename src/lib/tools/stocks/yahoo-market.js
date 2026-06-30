@@ -1,12 +1,10 @@
 /**
  * Yahoo Finance market data (unofficial).
- * Production and dev both use the toolsMarketData function (same code path).
- * Local `npm run dev` only falls back to the Vite /yahoo-finance proxy if the function is unreachable.
+ * Always routes through the toolsMarketData Base44 function (dev and production).
+ * No Vite-proxy fallback — a broken function must fail visibly in every environment.
  */
 import { base44 } from '@/api/base44Client';
 import { unwrapFunctionInvoke } from '@/api/tools/invoke-response';
-
-const UA = 'Mozilla/5.0 (compatible; Plexity/1.0)';
 
 const SUMMARY_MODULES = [
   'price', 'summaryDetail', 'defaultKeyStatistics', 'assetProfile',
@@ -32,19 +30,6 @@ function yahooNum(value) {
   return Number.isFinite(n) ? n : null;
 }
 
-async function yahooFetchDevProxy(path, { method = 'GET', body } = {}) {
-  const res = await fetch(`/yahoo-finance${path}`, {
-    method,
-    headers: {
-      'User-Agent': UA,
-      ...(method !== 'GET' ? { 'Content-Type': 'application/json' } : {}),
-    },
-    ...(method !== 'GET' && body != null ? { body: JSON.stringify(body) } : {}),
-  });
-  if (!res.ok) throw new Error(`Market data unavailable (${res.status})`);
-  return res.json();
-}
-
 async function yahooFetchRemote(path, { method = 'GET', body } = {}) {
   try {
     const res = await base44.functions.invoke('toolsMarketData', {
@@ -62,21 +47,12 @@ async function yahooFetchRemote(path, { method = 'GET', body } = {}) {
   }
 }
 
-async function yahooRequest(path, { method = 'GET', body } = {}) {
-  try {
-    return await yahooFetchRemote(path, { method, body });
-  } catch (err) {
-    if (!import.meta.env.DEV) throw err;
-    return yahooFetchDevProxy(path, { method, body });
-  }
-}
-
 async function yahooGet(path) {
-  return yahooRequest(path, { method: 'GET' });
+  return yahooFetchRemote(path, { method: 'GET' });
 }
 
 async function yahooPost(path, body) {
-  return yahooRequest(path, { method: 'POST', body });
+  return yahooFetchRemote(path, { method: 'POST', body });
 }
 
 function metaStatsFromChart(meta) {

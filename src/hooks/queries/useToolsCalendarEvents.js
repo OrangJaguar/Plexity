@@ -47,7 +47,6 @@ export function useToolsCalendarEvents() {
         repeatRule: payload.repeatRule || 'none',
         repeatIntervalWeeks: payload.repeatIntervalWeeks ?? 1,
         repeatDays: payload.repeatDays || [],
-        linkedJourneyIds: payload.linkedJourneyIds || [],
         instanceOverrides: payload.instanceOverrides || [],
         notes: payload.notes || '',
         createdAt: now,

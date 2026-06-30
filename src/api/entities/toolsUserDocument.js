@@ -1,11 +1,5 @@
 import { requireAuth } from '@/api/requireAuth';
-import { getStorageContext } from '@/api/storage-context';
 import { hasToolsEntity, safeCreate, safeFilter, safeUpdate } from '@/api/entities/toolsApi';
-import {
-  GUEST_ENTITY_KEYS,
-  readGuestJson,
-  writeGuestJson,
-} from '@/lib/storage/guest-store';
 import { migratedKey } from '@/lib/storage/storage-keys';
 
 function readLegacyLocal(key) {
@@ -45,10 +39,6 @@ function toEntityPayload(doc, userEmail) {
   };
 }
 
-function guestKeyForEntity(entityName) {
-  return GUEST_ENTITY_KEYS[entityName] ?? null;
-}
-
 /**
  * One Base44 row per user — document field holds the workspace JSON.
  */
@@ -57,14 +47,6 @@ export async function getOrCreateUserDocument(entityName, {
   normalize,
   legacyStorageKey = null,
 }) {
-  const ctx = await getStorageContext();
-  const guestKey = guestKeyForEntity(entityName);
-
-  if (ctx.mode === 'guest' && guestKey) {
-    const stored = readGuestJson(guestKey, null);
-    return normalize(stored ?? empty());
-  }
-
   const user = await requireAuth();
   const legacy = readLegacyLocal(legacyStorageKey);
   const alreadyMigrated = typeof window !== 'undefined'
@@ -105,21 +87,12 @@ export async function saveUserDocument(entityName, doc, {
   normalize,
   legacyStorageKey = null,
 }) {
-  const ctx = await getStorageContext();
-  const guestKey = guestKeyForEntity(entityName);
+  const user = await requireAuth();
   const normalized = normalize({
     ...doc,
-    userEmail: ctx.mode === 'cloud' ? ctx.userEmail : 'guest@local',
+    userEmail: user.email,
     updatedAt: Date.now(),
   });
-
-  if (ctx.mode === 'guest' && guestKey) {
-    writeGuestJson(guestKey, normalized);
-    return normalized;
-  }
-
-  const user = await requireAuth();
-  normalized.userEmail = user.email;
 
   if (!hasToolsEntity(entityName)) {
     return normalized;

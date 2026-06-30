@@ -1,5 +1,5 @@
 export const queryKeys = {
-  preferences: (email) => ['preferences', email ?? 'guest'],
+  preferences: (email) => ['preferences', email],
   tools: {
     schedule: ['tools', 'schedule'],
     tasks: ['tools', 'tasks'],

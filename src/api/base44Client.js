@@ -13,8 +13,8 @@ export const base44 = createClient({
   appBaseUrl
 });
 
-// Expose SDK internals to the browser console for debugging
-if (typeof window !== 'undefined') {
+// Expose SDK internals to the browser console for debugging (dev only)
+if (import.meta.env.DEV && typeof window !== 'undefined') {
   window.__plexitySDK = base44;
   console.groupCollapsed('%c[Plexity SDK] Available methods', 'color:#7f8aa5;font-weight:700;font-size:12px');
   try {

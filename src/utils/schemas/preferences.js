@@ -1,8 +1,5 @@
 import { z } from 'zod';
 
-export const notificationPrefSchema = z.enum(['daily', 'urgent', 'off']);
-export const defaultPrivacySchema = z.enum(['private', 'public']);
-
 export const usernameSchema = z
   .string()
   .trim()
@@ -18,7 +15,6 @@ export const preferencesSchema = z.object({
   displayName: z.string().optional(),
   createdAt: z.number().optional(),
   lastActiveAt: z.number().optional(),
-  gradeLevel: z.string().optional(),
   country: z.string().optional(),
   usState: z.string().optional(),
   onboardingCompletedAt: z.number().optional(),
@@ -26,11 +22,6 @@ export const preferencesSchema = z.object({
   haptics: z.boolean().optional(),
   audio: z.boolean().optional(),
   strictMode: z.boolean().optional(),
-  hintsShown: z.array(z.string()).optional(),
-  notificationPref: notificationPrefSchema.optional(),
-  defaultPrivacy: defaultPrivacySchema.optional(),
-  defaultShowSources: z.boolean().optional(),
-  dailyTimeBudgetMin: z.number().min(10).max(180).optional(),
   usernameChangedAt: z.number().optional(),
   pinnedToolIds: z.array(z.string()).optional(),
 });

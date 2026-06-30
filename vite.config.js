@@ -1,23 +1,11 @@
 import base44 from '@base44/vite-plugin';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
-import { yahooCrumbProxy } from './scripts/yahoo-crumb-proxy.js';
 
 // https://vite.dev/config/
 export default defineConfig({
   logLevel: 'error', // Suppress warnings, only show errors
-  server: {
-    proxy: {
-      '/yahoo-finance': {
-        target: 'https://query1.finance.yahoo.com',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/yahoo-finance/, ''),
-        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; Plexity/1.0)' },
-      },
-    },
-  },
   plugins: [
-    yahooCrumbProxy(),
     base44({
       legacySDKImports: process.env.BASE44_LEGACY_SDK_IMPORTS === 'true',
       hmrNotifier: true,

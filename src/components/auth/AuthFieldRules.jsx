@@ -36,28 +36,6 @@ export function AuthFieldRules({ rules, columns = 1 }) {
   );
 }
 
-export function buildJourneyTitleRules(title, focused) {
-  const value = title ?? '';
-  return [
-    {
-      label: '3–50 characters',
-      state: ruleState(value, focused, (v) => v.trim().length >= 3 && v.trim().length <= 50),
-    },
-    {
-      label: 'Starts with a letter or number',
-      state: ruleState(value, focused, (v) => /^[A-Za-z0-9]/.test(v.trim())),
-    },
-    {
-      label: 'Letters, numbers, spaces, hyphens, and & only',
-      state: ruleState(
-        value,
-        focused,
-        (v) => v.trim().length === 0 || /^[A-Za-z0-9][A-Za-z0-9\s\-&]*$/.test(v.trim()),
-      ),
-    },
-  ];
-}
-
 export function buildUsernameRules(username, focused) {
   const value = username ?? '';
   return [

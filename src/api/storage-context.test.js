@@ -1,4 +1,4 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { getStorageContext } from '@/api/storage-context';
 
 vi.mock('@/api/base44Client', () => ({
@@ -17,12 +17,12 @@ describe('getStorageContext', () => {
     vi.clearAllMocks();
   });
 
-  it('returns guest mode when unsigned', async () => {
+  it('requires authentication', async () => {
     base44.auth.isAuthenticated.mockResolvedValue(false);
-    await expect(getStorageContext()).resolves.toEqual({ mode: 'guest' });
+    await expect(getStorageContext()).rejects.toThrow();
   });
 
-  it('returns cloud mode with email when signed in', async () => {
+  it('returns cloud context for signed-in users', async () => {
     base44.auth.isAuthenticated.mockResolvedValue(true);
     base44.auth.me.mockResolvedValue({ email: 'user@example.com' });
     await expect(getStorageContext()).resolves.toEqual({

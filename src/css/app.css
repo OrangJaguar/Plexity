@@ -20089,34 +20089,6 @@
       }
     }
 
-    /* Guest local-only banner */
-    .local-only-banner {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-      padding: 0.45rem 1rem;
-      font-size: 0.8125rem;
-      color: var(--muted-foreground);
-      background: color-mix(in srgb, var(--muted) 55%, transparent);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .local-only-banner-link {
-      color: var(--foreground);
-      font-weight: 600;
-      text-decoration: underline;
-      text-underline-offset: 2px;
-    }
-
-    .tools-settings-local-mode {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      align-items: flex-start;
-    }
-
     .tools-landing-sync-grid--three {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }

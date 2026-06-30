@@ -12,7 +12,7 @@ export default function ProfilePreview() {
         </header>
         <div className="tools-profile-preview-highlights">
           <span><small>Current focus</small>Research portfolio</span>
-          <span><small>Main project</small>Study app prototype</span>
+          <span><small>Main project</small>Portfolio site</span>
           <span><small>Target path</small>Pre-med + design</span>
         </div>
         <div className="tools-profile-preview-grid tools-profile-preview-grid--hub">

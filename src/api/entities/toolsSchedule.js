@@ -1,8 +1,6 @@
 import { requireAuth } from '@/api/requireAuth';
-import { getStorageContext } from '@/api/storage-context';
 import { normalizeSchedule } from '@/lib/tools/schedule-data';
 import { hasToolsEntity, safeCreate, safeFilter, safeUpdate } from '@/api/entities/toolsApi';
-import { GUEST_KEYS, readGuestJson, writeGuestJson } from '@/lib/storage/guest-store';
 
 function emptySchedule() {
   return {
@@ -15,13 +13,6 @@ function emptySchedule() {
 }
 
 export async function getOrCreateSchedule() {
-  const ctx = await getStorageContext();
-
-  if (ctx.mode === 'guest') {
-    const stored = readGuestJson(GUEST_KEYS.schedule, null);
-    return normalizeSchedule(stored ?? emptySchedule());
-  }
-
   await requireAuth();
 
   if (!hasToolsEntity('ToolsSchedule')) {
@@ -49,15 +40,6 @@ export async function getOrCreateSchedule() {
 }
 
 export async function updateSchedule(patch) {
-  const ctx = await getStorageContext();
-
-  if (ctx.mode === 'guest') {
-    const current = readGuestJson(GUEST_KEYS.schedule, emptySchedule());
-    const next = { ...current, ...patch, updatedAt: Date.now() };
-    writeGuestJson(GUEST_KEYS.schedule, next);
-    return normalizeSchedule(next);
-  }
-
   const user = await requireAuth();
   const rows = await safeFilter('ToolsSchedule', { userEmail: user.email });
   const existing = rows[0];

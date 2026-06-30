@@ -135,7 +135,6 @@ function CalendarEventDialog({ open, onOpenChange, event, initial, onSave, onDel
       repeatRule,
       repeatIntervalWeeks: repeatRule === 'interval' ? repeatIntervalWeeks : undefined,
       repeatDays,
-      linkedJourneyIds: event?.linkedJourneyIds ?? [],
       notes,
     });
     onOpenChange(false);

@@ -69,7 +69,7 @@ export const TOOL_REGISTRY = [
     icon: Calendar,
     description: 'Week grid planner with drag create, resize, repeats, and color blocks.',
     longDescription:
-      'Plan your week in a time-grid view. Drag to create, move, or resize events; set repeating rules; link journeys; and switch to month view. Events feed Dashboard debrief and Focus context.',
+      'Plan your week in a time-grid view. Drag to create, move, or resize events; set repeating rules; and switch to month view. Events feed Dashboard debrief and Focus context.',
     createdAt: '2025-06-02',
     popularityRank: 3,
     defaultPinned: true,

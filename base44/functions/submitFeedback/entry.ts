@@ -1,6 +1,12 @@
+/**
+ * submitFeedback — self-contained feedback handler.
+ *
+ * IMPORTANT (Base44 deploy): Do not import from ../_shared or sibling folders.
+ * Each function deploys as a standalone bundle.
+ */
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
-import { serviceEntities } from "../_shared/serviceRole.ts";
-import { checkRequestRateLimit, rateLimitKey } from "../_shared/requestRateLimit.ts";
+
+type Base44Client = ReturnType<typeof createClientFromRequest>;
 
 const FEEDBACK_TYPES = new Set(["bug", "feature", "general"]);
 const SEVERITIES = new Set(["low", "medium", "high"]);
@@ -9,6 +15,41 @@ const MAX_MESSAGE = 8000;
 const MAX_FIELD = 4000;
 const RATE_MAX = 5;
 const RATE_WINDOW_MS = 60 * 60 * 1000;
+
+const rateBuckets = new Map<string, { count: number; resetAt: number }>();
+
+function serviceEntities(base44: Base44Client) {
+  return base44.asServiceRole?.entities ?? base44.entities;
+}
+
+function getClientIp(req: Request): string {
+  const forwarded = req.headers.get("x-forwarded-for");
+  if (forwarded) {
+    const first = forwarded.split(",")[0]?.trim();
+    if (first) return first.slice(0, 64);
+  }
+  const realIp = req.headers.get("x-real-ip")?.trim();
+  if (realIp) return realIp.slice(0, 64);
+  return "unknown";
+}
+
+function checkRequestRateLimit(key: string, max: number, windowMs: number): boolean {
+  const now = Date.now();
+  const entry = rateBuckets.get(key);
+  if (!entry || now > entry.resetAt) {
+    rateBuckets.set(key, { count: 1, resetAt: now + windowMs });
+    return true;
+  }
+  if (entry.count >= max) return false;
+  entry.count += 1;
+  return true;
+}
+
+function rateLimitKey(scope: string, req: Request, extra?: string) {
+  const ip = getClientIp(req);
+  const suffix = extra ? `:${extra}` : "";
+  return `${scope}:${ip}${suffix}`;
+}
 
 function randomSuffix() {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";

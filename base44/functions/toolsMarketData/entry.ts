@@ -1,10 +1,29 @@
-import { marketDataUserAgent } from "../_shared/marketDataUserAgent.ts";
+/**
+ * toolsMarketData — self-contained Yahoo Finance proxy.
+ *
+ * IMPORTANT (Base44 deploy): Do not import from ../_shared or sibling folders.
+ * Each function deploys as a standalone bundle; relative imports outside this
+ * directory fail at boot time in production.
+ */
 
 const YAHOO_HOSTS = ["https://query1.finance.yahoo.com", "https://query2.finance.yahoo.com"];
+
+const DEFAULT_UA = "Mozilla/5.0 (compatible; Plexity/1.0; +https://plexity.base44.app)";
 
 let sessionCookie = "";
 let sessionCrumb = "";
 let sessionAt = 0;
+
+function marketDataUserAgent(): string {
+  const configured = Deno.env.get("MARKET_DATA_USER_AGENT")?.trim();
+  if (configured) return configured.slice(0, 256);
+
+  const appName = Deno.env.get("APP_NAME")?.trim() || "Plexity";
+  const appVersion = Deno.env.get("APP_VERSION")?.trim() || "1";
+  const contact = Deno.env.get("APP_CONTACT_URL")?.trim() || "https://plexity.base44.app";
+
+  return `Mozilla/5.0 (compatible; ${appName}/${appVersion}; +${contact})`;
+}
 
 function collectCookies(res: Response): string {
   const parts: string[] = [];
@@ -21,7 +40,7 @@ function collectCookies(res: Response): string {
 }
 
 async function refreshYahooSession() {
-  const userAgent = marketDataUserAgent();
+  const userAgent = marketDataUserAgent() || DEFAULT_UA;
   const fcRes = await fetch("https://fc.yahoo.com/", {
     headers: { "User-Agent": userAgent },
     redirect: "follow",
@@ -55,7 +74,8 @@ async function yahooProxy(path: string, method = "GET", body?: unknown) {
     requestPath = `${requestPath}${sep}crumb=${encodeURIComponent(sessionCrumb)}`;
   }
 
-  const headers: Record<string, string> = { "User-Agent": marketDataUserAgent() };
+  const userAgent = marketDataUserAgent() || DEFAULT_UA;
+  const headers: Record<string, string> = { "User-Agent": userAgent };
   if (sessionCookie) headers.Cookie = sessionCookie;
   if (method !== "GET" && body != null) headers["Content-Type"] = "application/json";
 
@@ -74,7 +94,7 @@ async function yahooProxy(path: string, method = "GET", body?: unknown) {
         const retryPath = `${cleanPath}${sep2}crumb=${encodeURIComponent(sessionCrumb)}`;
         const retry = await fetch(`${host}${retryPath}`, {
           method,
-          headers: { ...headers, Cookie: sessionCookie },
+          headers: { ...headers, "User-Agent": userAgent, Cookie: sessionCookie },
           body: method !== "GET" && body != null ? JSON.stringify(body) : undefined,
         });
         if (!retry.ok) throw new Error(`Yahoo request failed (${retry.status})`);
@@ -118,7 +138,6 @@ async function yahooQuote(symbol: string) {
 
 Deno.serve(async (req) => {
   try {
-    // Public Yahoo proxy — market data is read-only; app UI already requires sign-in.
     const body = await req.json().catch(() => ({}));
     const action = body?.action;
 

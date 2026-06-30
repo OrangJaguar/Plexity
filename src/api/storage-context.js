@@ -1,13 +1,7 @@
-import { base44 } from '@/api/base44Client';
+import { requireAuth } from '@/api/requireAuth';
 
-/**
- * @returns {Promise<{ mode: 'cloud', userEmail: string } | { mode: 'guest' }>}
- */
+/** Signed-in cloud storage context (tools require authentication). */
 export async function getStorageContext() {
-  const authed = await base44.auth.isAuthenticated();
-  if (authed) {
-    const user = await base44.auth.me();
-    return { mode: 'cloud', userEmail: user.email };
-  }
-  return { mode: 'guest' };
+  const user = await requireAuth();
+  return { mode: 'cloud', userEmail: user.email };
 }

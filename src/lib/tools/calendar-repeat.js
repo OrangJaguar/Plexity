@@ -13,7 +13,6 @@ export function normalizeCalendarEvent(raw) {
     repeatRule: raw.repeatRule || 'none',
     repeatIntervalWeeks: Math.max(1, Number(raw.repeatIntervalWeeks) || 1),
     repeatDays: Array.isArray(raw.repeatDays) ? raw.repeatDays.map(Number).filter((v) => v >= 0 && v <= 6) : [],
-    linkedJourneyIds: Array.isArray(raw.linkedJourneyIds) ? raw.linkedJourneyIds.filter(Boolean) : [],
     instanceOverrides: Array.isArray(raw.instanceOverrides) ? raw.instanceOverrides : [],
     repeatUntil: raw.repeatUntil || null,
     notes: raw.notes || '',
@@ -69,7 +68,6 @@ export function patchEventAllFuture(evt, dateKey, patch) {
       repeatRule: evt.repeatRule,
       repeatIntervalWeeks: evt.repeatIntervalWeeks,
       repeatDays: evt.repeatDays,
-      linkedJourneyIds: evt.linkedJourneyIds,
       notes: evt.notes,
     },
   };

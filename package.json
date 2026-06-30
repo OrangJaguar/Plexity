@@ -10,6 +10,7 @@
     "lint": "oxlint",
     "typecheck": "tsc -p ./jsconfig.json",
     "test": "vitest run",
+    "test:market-data": "node scripts/test-tools-market-data.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

@@ -9,12 +9,12 @@ export function usePreferences() {
   const { user } = useAuth();
 
   return useQuery({
-    queryKey: queryKeys.preferences(user?.email ?? 'guest'),
+    queryKey: queryKeys.preferences(user?.email),
     queryFn: async () => {
       const server = await getPreferences();
       return mergePreferencesWithLocalToolsSettings(mergePreferencesWithLocalPins(server));
     },
-    enabled: true,
+    enabled: Boolean(user?.email),
     staleTime: 60_000,
   });
 }
