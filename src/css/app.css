@@ -15851,8 +15851,7 @@
       border-radius: 10px;
       border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
       background: color-mix(in srgb, var(--surface) 75%, transparent);
-      overflow: hidden;
-      min-height: 0;
+      overflow: hidden; min-height: 0; flex-shrink: 0;
     }
 
     .stocks-panel-head {
