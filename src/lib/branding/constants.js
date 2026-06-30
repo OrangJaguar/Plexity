@@ -10,9 +10,6 @@ export const LOGO_PATH_DARK_BG = '/plexity-logo-dark-bg.png';
 /** Black P on white square — social / OG fallback */
 export const LOGO_PATH_LIGHT_BG = '/plexity-logo-light-bg.png';
 
-/** @deprecated Prefer {@link logoPathForTheme} in themed UI */
-export const LOGO_PATH = LOGO_PATH_LIGHT;
-
 export function logoPathForTheme(dark) {
   return dark ? LOGO_PATH_DARK : LOGO_PATH_LIGHT;
 }

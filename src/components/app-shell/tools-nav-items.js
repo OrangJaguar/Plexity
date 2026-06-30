@@ -19,8 +19,3 @@ export const TOOLS_CATALOG_NAV_ITEM = {
   label: 'Catalog',
   icon: null,
 };
-
-/** @deprecated use getToolsNavItems(pinnedToolIds) */
-export const TOOLS_NAV_ITEMS = getToolsNavItems(
-  ['dashboard', 'tasks', 'calendar', 'focus', 'journal'],
-);
