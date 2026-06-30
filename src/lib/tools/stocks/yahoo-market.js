@@ -16,6 +16,19 @@ const SUMMARY_MODULES = [
 
 const CORE_MODULES = 'price,summaryDetail,defaultKeyStatistics,assetProfile,financialData,calendarEvents,earningsHistory,earnings,recommendationTrend';
 
+/** Unwrap Yahoo `{ raw, fmt }` wrappers and coerce to a finite number. */
+function yahooNum(value) {
+  if (value == null) return null;
+  if (typeof value === 'number') return Number.isFinite(value) ? value : null;
+  if (typeof value === 'object') {
+    if (value.raw != null) return yahooNum(value.raw);
+    if (value.fmt != null) return yahooNum(value.fmt);
+    return null;
+  }
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
+}
+
 function isDevProxy() {
   return import.meta.env.DEV;
 }
@@ -134,10 +147,10 @@ function parseConsensus(recTrend, financial) {
     neutral,
     total,
     rating: financial?.recommendationKey,
-    targetLow: financial?.targetLowPrice?.raw ?? financial?.targetLowPrice,
-    targetHigh: financial?.targetHighPrice?.raw ?? financial?.targetHighPrice,
-    targetMean: financial?.targetMeanPrice?.raw ?? financial?.targetMeanPrice,
-    analysts: financial?.numberOfAnalystOpinions?.raw ?? financial?.numberOfAnalystOpinions,
+    targetLow: yahooNum(financial?.targetLowPrice),
+    targetHigh: yahooNum(financial?.targetHighPrice),
+    targetMean: yahooNum(financial?.targetMeanPrice),
+    analysts: yahooNum(financial?.numberOfAnalystOpinions),
   };
 }
 
@@ -504,8 +517,8 @@ function parseQuoteSummary(data, sym) {
   const earningsHist = r.earningsHistory?.history || [];
   const earnings = r.earnings?.earningsChart || {};
 
-  const regular = price.regularMarketPrice?.raw ?? price.regularMarketPrice;
-  const prev = price.regularMarketPreviousClose?.raw ?? summary.previousClose?.raw;
+  const regular = yahooNum(price.regularMarketPrice);
+  const prev = yahooNum(price.regularMarketPreviousClose) ?? yahooNum(summary.previousClose);
   const changePct = prev ? ((regular - prev) / prev) * 100 : 0;
 
   return {
@@ -514,14 +527,14 @@ function parseQuoteSummary(data, sym) {
     exchange: price.exchangeName || price.exchange,
     price: regular,
     change: changePct,
-    changeAmount: regular && prev ? regular - prev : null,
+    changeAmount: regular != null && prev != null ? regular - prev : null,
     currency: price.currency,
     marketState: price.marketState,
     updatedAt: price.regularMarketTime,
-    preMarketPrice: price.preMarketPrice?.raw ?? price.preMarketPrice,
-    preMarketChange: price.preMarketChangePercent?.raw ?? price.preMarketChangePercent,
-    postMarketPrice: price.postMarketPrice?.raw ?? price.postMarketPrice,
-    postMarketChange: price.postMarketChangePercent?.raw ?? price.postMarketChangePercent,
+    preMarketPrice: yahooNum(price.preMarketPrice),
+    preMarketChange: yahooNum(price.preMarketChangePercent),
+    postMarketPrice: yahooNum(price.postMarketPrice),
+    postMarketChange: yahooNum(price.postMarketChangePercent),
 
     profile: {
       sector: profile.sector,
@@ -537,35 +550,35 @@ function parseQuoteSummary(data, sym) {
     },
 
     stats: {
-      marketCap: summary.marketCap?.raw ?? stats.marketCap?.raw,
-      enterpriseValue: stats.enterpriseValue?.raw,
-      pe: summary.trailingPE?.raw ?? stats.trailingPE?.raw ?? financial.forwardPE?.raw,
-      forwardPe: summary.forwardPE?.raw,
-      eps: stats.trailingEps?.raw ?? financial.epsTrailingTwelveMonths?.raw,
-      beta: summary.beta?.raw ?? stats.beta?.raw,
-      dividendYield: summary.dividendYield?.raw,
-      fiftyTwoWeekLow: summary.fiftyTwoWeekLow?.raw,
-      fiftyTwoWeekHigh: summary.fiftyTwoWeekHigh?.raw,
-      fiftyDayAverage: summary.fiftyDayAverage?.raw,
-      twoHundredDayAverage: summary.twoHundredDayAverage?.raw,
-      avgVolume: summary.averageVolume?.raw ?? summary.averageVolume10days?.raw,
-      volume: price.regularMarketVolume?.raw,
-      open: price.regularMarketOpen?.raw ?? summary.regularMarketOpen?.raw,
+      marketCap: yahooNum(summary.marketCap) ?? yahooNum(stats.marketCap),
+      enterpriseValue: yahooNum(stats.enterpriseValue),
+      pe: yahooNum(summary.trailingPE) ?? yahooNum(stats.trailingPE) ?? yahooNum(financial.forwardPE),
+      forwardPe: yahooNum(summary.forwardPE),
+      eps: yahooNum(stats.trailingEps) ?? yahooNum(financial.epsTrailingTwelveMonths),
+      beta: yahooNum(summary.beta) ?? yahooNum(stats.beta),
+      dividendYield: yahooNum(summary.dividendYield),
+      fiftyTwoWeekLow: yahooNum(summary.fiftyTwoWeekLow),
+      fiftyTwoWeekHigh: yahooNum(summary.fiftyTwoWeekHigh),
+      fiftyDayAverage: yahooNum(summary.fiftyDayAverage),
+      twoHundredDayAverage: yahooNum(summary.twoHundredDayAverage),
+      avgVolume: yahooNum(summary.averageVolume) ?? yahooNum(summary.averageVolume10days),
+      volume: yahooNum(price.regularMarketVolume),
+      open: yahooNum(price.regularMarketOpen) ?? yahooNum(summary.regularMarketOpen),
       previousClose: prev,
-      dayHigh: price.regularMarketDayHigh?.raw ?? summary.dayHigh?.raw,
-      dayLow: price.regularMarketDayLow?.raw ?? summary.dayLow?.raw,
-      revenue: financial.totalRevenue?.raw,
-      grossMargins: financial.grossMargins?.raw,
-      operatingMargins: financial.operatingMargins?.raw,
-      profitMargins: financial.profitMargins?.raw,
-      revenueGrowth: financial.revenueGrowth?.raw,
-      earningsGrowth: financial.earningsGrowth?.raw,
-      freeCashflow: financial.freeCashflow?.raw,
-      operatingCashflow: financial.operatingCashflow?.raw,
-      totalCash: financial.totalCash?.raw,
-      totalDebt: financial.totalDebt?.raw,
-      returnOnEquity: financial.returnOnEquity?.raw,
-      targetMeanPrice: financial.targetMeanPrice?.raw,
+      dayHigh: yahooNum(price.regularMarketDayHigh) ?? yahooNum(summary.dayHigh),
+      dayLow: yahooNum(price.regularMarketDayLow) ?? yahooNum(summary.dayLow),
+      revenue: yahooNum(financial.totalRevenue),
+      grossMargins: yahooNum(financial.grossMargins),
+      operatingMargins: yahooNum(financial.operatingMargins),
+      profitMargins: yahooNum(financial.profitMargins),
+      revenueGrowth: yahooNum(financial.revenueGrowth),
+      earningsGrowth: yahooNum(financial.earningsGrowth),
+      freeCashflow: yahooNum(financial.freeCashflow),
+      operatingCashflow: yahooNum(financial.operatingCashflow),
+      totalCash: yahooNum(financial.totalCash),
+      totalDebt: yahooNum(financial.totalDebt),
+      returnOnEquity: yahooNum(financial.returnOnEquity),
+      targetMeanPrice: yahooNum(financial.targetMeanPrice),
       recommendationKey: financial.recommendationKey,
     },
 

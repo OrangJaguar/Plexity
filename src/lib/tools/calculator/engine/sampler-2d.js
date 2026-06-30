@@ -8,7 +8,11 @@ const MIN_PIXEL_WIDTH = 2;
  * @typedef {{ segments: SampleSegment[], color?: string, id: string }} SampledCurve
  */
 
-export function sampleFunction(bodyAst, scope, xMin, xMax, pixelWidth, pixelHeight, yMin, yMax) {
+export function sampleFunction(bodyAst, scope, xMin, xMax, pixelWidth, pixelHeight, yMin, yMax, independent = 'x') {
+  if (independent === 'y') {
+    return sampleFunctionByY(bodyAst, scope, xMin, xMax, pixelWidth, pixelHeight, yMin, yMax);
+  }
+
   const segments = [];
   const n = Math.max(64, Math.min(2048, Math.ceil(pixelWidth * 2)));
   let current = [];
@@ -63,6 +67,57 @@ export function sampleFunction(bodyAst, scope, xMin, xMax, pixelWidth, pixelHeig
   return segments;
 }
 
+function sampleFunctionByY(bodyAst, scope, xMin, xMax, pixelWidth, pixelHeight, yMin, yMax) {
+  const segments = [];
+  const n = Math.max(64, Math.min(2048, Math.ceil(pixelHeight * 2)));
+  let current = [];
+
+  const evalAt = (y) => {
+    const ctx = createEvalContext({
+      vars: scope.vars,
+      funcs: scope.funcs,
+      angleMode: scope.angleMode,
+      y,
+    });
+    return tryEvaluate(bodyAst, ctx);
+  };
+
+  const xRange = xMax - xMin;
+  const jumpThreshold = xRange * 0.75;
+
+  for (let i = 0; i <= n; i += 1) {
+    const y = yMin + ((yMax - yMin) * i) / n;
+    const result = evalAt(y);
+
+    if (!result.ok || !Number.isFinite(result.value)) {
+      if (current.length > 1) segments.push(current);
+      current = [];
+      continue;
+    }
+
+    const x = result.value;
+
+    if (current.length > 0) {
+      const prev = current[current.length - 1];
+      if (Math.abs(x - prev.x) > jumpThreshold) {
+        if (current.length > 1) segments.push(current);
+        current = [];
+      }
+    }
+
+    if (x < xMin - xRange || x > xMax + xRange) {
+      if (current.length > 1) segments.push(current);
+      current = [];
+      continue;
+    }
+
+    current.push({ x, y });
+  }
+
+  if (current.length > 1) segments.push(current);
+  return segments;
+}
+
 function refineSegment(points, idx, bodyAst, scope, xMin, xMax, yMin, yMax, depth) {
   if (depth >= MAX_DEPTH) return;
   const a = points[idx];
@@ -102,6 +157,7 @@ export function sampleAllCurves(compiled, scope, viewport, pixelWidth, pixelHeig
       pixelHeight,
       viewport.yMin,
       viewport.yMax,
+      item.graphable.independent || 'x',
     );
     curves.push({ id: item.id, segments, color: expr?.color });
   }

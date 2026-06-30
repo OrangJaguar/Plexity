@@ -19,6 +19,7 @@ export default function ExpressionPanel({
   onConvertToTable,
   onUpdateTableRows,
   onToggleCollapse,
+  onFocusExpression,
   onUndo,
   onRedo,
   canUndo,
@@ -52,14 +53,6 @@ export default function ExpressionPanel({
     setPlusOpen(false);
   };
 
-  const handleListClick = (e) => {
-    if (editMode) return;
-    const list = listRef.current;
-    if (!list) return;
-    const rect = list.getBoundingClientRect();
-    if (e.clientY >= rect.bottom - 56) addBlankRow();
-  };
-
   const focusNextAfter = (id) => {
     const idx = sorted.findIndex((e) => e.id === id);
     if (idx === sorted.length - 1) {
@@ -88,15 +81,20 @@ export default function ExpressionPanel({
           <button type="button" className="calc-panel-icon-btn" onClick={onRedo} disabled={!canRedo} title="Redo"><Redo2 size={16} /></button>
         </div>
         <div className="calc-expr-panel-right">
-          {editMode ? (
-            <button type="button" className="calc-panel-done-btn" onClick={() => onEditModeChange(false)}>Done</button>
-          ) : (
-            <button type="button" className="calc-panel-icon-btn" onClick={() => onEditModeChange(true)} aria-label="Edit list" title="Edit list"><Settings size={16} /></button>
-          )}
+          <button
+            type="button"
+            className={`calc-panel-icon-btn${editMode ? ' is-active' : ''}`}
+            onClick={() => onEditModeChange(!editMode)}
+            aria-label={editMode ? 'Exit edit mode' : 'Edit list'}
+            aria-pressed={editMode}
+            title={editMode ? 'Done editing' : 'Edit list'}
+          >
+            <Settings size={16} />
+          </button>
           <button type="button" className="calc-panel-icon-btn" onClick={onToggleCollapse} aria-label="Hide expressions" title="Hide expressions"><ChevronLeft size={16} /></button>
         </div>
       </div>
-      <div className="calc-expr-list" ref={listRef} onClick={handleListClick}>
+      <div className="calc-expr-list" ref={listRef}>
         {sorted.map((expr, i) => (
           <ExpressionRow
             key={expr.id}
@@ -116,6 +114,7 @@ export default function ExpressionPanel({
             onConvertToTable={() => onConvertToTable(expr.id)}
             onUpdateTableRows={onUpdateTableRows}
             onFocusNext={() => focusNextAfter(expr.id)}
+            onFocus={() => onFocusExpression?.(expr.id)}
           />
         ))}
         <div className="calc-expr-list-tail" onClick={addBlankRow} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && addBlankRow()} aria-label="Add expression" />

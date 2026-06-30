@@ -56,7 +56,11 @@ export default function StocksOverview({ workspace, onOpenSymbol }) {
         })}
       </div>
 
-      <StocksPanel title="Sector performance" action={<span className="stocks-muted">1D via sector ETFs</span>}>
+      <StocksPanel
+        title="Sector performance"
+        className="stocks-panel--sectors"
+        action={<span className="stocks-muted">1D via sector ETFs</span>}
+      >
         <div className="stocks-panel-pad"><StocksSectorHeatmap /></div>
       </StocksPanel>
 

@@ -25,6 +25,7 @@ export default function CalculatorSuite({ data, saveDocument }) {
   const redoStack = useRef([]);
   const [historyTick, setHistoryTick] = useState(0);
   const [viewportEpoch, setViewportEpoch] = useState(0);
+  const [focusedExprId, setFocusedExprId] = useState(null);
   const { action, clearAction } = useCommandBarDraft('action');
 
   const persist = useCallback((next) => {
@@ -212,6 +213,18 @@ export default function CalculatorSuite({ data, saveDocument }) {
     }));
   }, [updateWorkspace]);
 
+  const handleKeyboardInsert = useCallback((snippet) => {
+    const sorted = [...workspace.expressions].sort((a, b) => a.order - b.order);
+    const targetId = focusedExprId || sorted[sorted.length - 1]?.id;
+    if (!targetId || !snippet) return;
+    updateWorkspace((prev) => ({
+      ...prev,
+      expressions: prev.expressions.map((e) => (
+        e.id === targetId ? { ...e, raw: `${e.raw}${snippet}` } : e
+      )),
+    }));
+  }, [focusedExprId, updateWorkspace, workspace.expressions]);
+
   return (
     <div className="calc-suite calc-suite--graph-only">
       <div className="calc-suite-body">
@@ -259,6 +272,7 @@ export default function CalculatorSuite({ data, saveDocument }) {
               })}
               onConvertToTable={handleConvertToTable}
               onUpdateTableRows={handleUpdateTableRows}
+              onFocusExpression={setFocusedExprId}
             />
           </Panel>
           <PanelResizeHandle className="calc-panel-resize" />
@@ -298,6 +312,7 @@ export default function CalculatorSuite({ data, saveDocument }) {
                 onKeyboardTabChange={(tab) => updateWorkspace((prev) => ({ ...prev, keyboard: { ...prev.keyboard, tab } }))}
                 points={graphPoints}
                 onAddPointToList={handleAddPointToList}
+                onKeyboardInsert={handleKeyboardInsert}
               />
             </main>
           </Panel>

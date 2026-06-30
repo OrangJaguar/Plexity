@@ -79,7 +79,7 @@ class Parser {
         this.advance();
         const right = this.parseExpression();
 
-        if (name === 'y' || (right.type === 'Call' && right.name !== undefined)) {
+        if (name === 'y' || name === 'x' || (right.type === 'Call' && right.name !== undefined)) {
           return equation(ident(name, start), right, start);
         }
 

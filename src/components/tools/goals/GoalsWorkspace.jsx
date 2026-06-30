@@ -32,6 +32,7 @@ import {
   alignmentLabel,
 } from '@/lib/tools/goals/goals-model';
 import { ensureWeekKey, formatWeekLabel, getWeekKey } from '@/lib/tools/goals/goals-week';
+import { GOALS_SECTION_GUIDES } from '@/lib/tools/goals/goals-section-guides';
 import { useCommandBarDraft } from '@/hooks/useCommandBarDraft';
 
 const SECTION = {
@@ -212,6 +213,7 @@ export default function GoalsWorkspace({ data, saveDocument }) {
           id="goals-north-star"
           title="North Star"
           hint="What kind of life are you trying to build, and why? Rough is fine."
+          guide={GOALS_SECTION_GUIDES.northStar}
           layer="Strategy"
           editing={editingSection === SECTION.NORTH_STAR}
           onEdit={() => startEdit(SECTION.NORTH_STAR, (d) => ({ ...d.northStar }))}
@@ -251,6 +253,7 @@ export default function GoalsWorkspace({ data, saveDocument }) {
           id="goals-pillars"
           title="Core pillars"
           hint="Major areas of your plan. Order can reflect dependencies — some unlock others."
+          guide={GOALS_SECTION_GUIDES.pillars}
           layer="Strategy"
           editing={editingSection === SECTION.PILLARS}
           onEdit={() => startEdit(SECTION.PILLARS, (d) => (d.pillars.length ? [...d.pillars] : [newPillar()]))}
@@ -356,6 +359,7 @@ export default function GoalsWorkspace({ data, saveDocument }) {
         <GoalsSectionCard
           title="Roadmap"
           hint="Broad phases and next-few-years milestones — a map, not a contract"
+          guide={GOALS_SECTION_GUIDES.roadmap}
           layer="Roadmap"
           editing={editingSection === SECTION.ROADMAP}
           onEdit={() => startEdit(SECTION.ROADMAP, (d) => ({
@@ -536,6 +540,7 @@ export default function GoalsWorkspace({ data, saveDocument }) {
         id="goals-season"
         title="Current season"
         hint="What chapter are you in? What deserves disproportionate attention right now?"
+        guide={GOALS_SECTION_GUIDES.season}
         layer="Active season"
         active
         editing={editingSection === SECTION.SEASON}
@@ -600,6 +605,7 @@ export default function GoalsWorkspace({ data, saveDocument }) {
         id="goals-weekly"
         title="This week"
         hint={`${formatWeekLabel(weekKey)} · Few priorities, intentionally chosen`}
+        guide={GOALS_SECTION_GUIDES.weekly}
         layer="Weekly workspace"
         active
         editing={editingSection === SECTION.WEEKLY}

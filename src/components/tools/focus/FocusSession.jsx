@@ -24,13 +24,25 @@ export default function FocusSession({
   const [clockOpen, setClockOpen] = useState(false);
   const { clock, isPm } = useFocusClock(true);
 
-  useFocusAmbientSound(ambientSound, ambientVolume, true);
+  useFocusAmbientSound(ambientSound, ambientVolume, ambientSound !== 'off');
 
   useEffect(() => {
     if (!soundOpen) return undefined;
     const onKey = (e) => { if (e.key === 'Escape') setSoundOpen(false); };
+    const onPointerDown = (e) => {
+      if (
+        !e.target.closest('.tools-focus-ambient-panel')
+        && !e.target.closest('.tools-focus-topbar-btn')
+      ) {
+        setSoundOpen(false);
+      }
+    };
     window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    document.addEventListener('pointerdown', onPointerDown);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.removeEventListener('pointerdown', onPointerDown);
+    };
   }, [soundOpen]);
 
   const phaseLabel = waitingForResume

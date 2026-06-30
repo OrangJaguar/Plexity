@@ -272,7 +272,7 @@ export default function UnitsContent() {
     historyTimer.current = setTimeout(() => {
       const { category: cat, amount: amt, fromUnit: from, toUnit: to } = conversionRef.current;
       const n = Number(finalizeAmount(amt));
-      if (!Number.isFinite(n)) return;
+      if (!Number.isFinite(n) || n === 0) return;
       addHistoryEntry({ category: cat, amount: String(n), from, to });
       refreshPrefs();
     }, 1800);

@@ -1,4 +1,13 @@
+function coerceNumber(n) {
+  if (n == null) return null;
+  if (typeof n === 'number') return Number.isFinite(n) ? n : null;
+  if (typeof n === 'object' && n.raw != null) return coerceNumber(n.raw);
+  const v = Number(n);
+  return Number.isFinite(v) ? v : null;
+}
+
 export function formatPrice(n) {
+  n = coerceNumber(n);
   if (n == null || Number.isNaN(n)) return '—';
   if (n >= 1000) return `$${n.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
   if (n >= 1) return `$${n.toFixed(2)}`;
@@ -6,12 +15,14 @@ export function formatPrice(n) {
 }
 
 export function formatChange(pct) {
+  pct = coerceNumber(pct);
   if (pct == null || Number.isNaN(pct)) return '—';
   const sign = pct >= 0 ? '+' : '';
   return `${sign}${pct.toFixed(2)}%`;
 }
 
 export function formatChangeAmount(n) {
+  n = coerceNumber(n);
   if (n == null || Number.isNaN(n)) return '—';
   const sign = n >= 0 ? '+' : '';
   return `${sign}$${Math.abs(n).toFixed(2)}`;

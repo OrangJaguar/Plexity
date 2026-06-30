@@ -23,12 +23,13 @@ export default function ToolsAppSidebarMobile() {
         rawIcon
         end={location.pathname === TOOLS_CATALOG_NAV_ITEM.to}
       />
-      {items.map(({ to, label, icon }) => (
+      {items.map(({ to, label, icon, sidebarIconActive }) => (
         <SidebarNavLink
           key={to}
           to={to}
           label={label}
           icon={icon}
+          sidebarIconActive={sidebarIconActive}
           end={location.pathname === to}
         />
       ))}

@@ -207,11 +207,12 @@ export default function FocusContent({ tasks: tasksProp, events }) {
     return () => clearInterval(tickRef.current);
   }, [screen, running]);
 
-  const finishSession = async () => {
+  const finishSession = () => {
     setRunning(false);
-    const todayCount = await countFocusSessionsToday();
-    setSessionsToday(todayCount + 1);
     setScreen('summary');
+    void countFocusSessionsToday().then((todayCount) => {
+      setSessionsToday(todayCount + 1);
+    });
   };
 
   const handlePause = () => {

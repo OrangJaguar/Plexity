@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  ChevronDown, ChevronLeft, ChevronUp, Cloud, Loader2, Plus, Search, Star,
+  ChevronDown, ChevronLeft, ChevronUp, Cloud, Loader2, Plus, Search, Star, Trash2,
 } from 'lucide-react';
 import ListsItemDrawer from '@/components/tools/lists/ListsItemDrawer';
 import { CreateListModal, CreateTopicModal, MoveItemModal } from '@/components/tools/lists/ListsModals';
@@ -244,6 +244,26 @@ export default function ListsWorkspace({ data, saveDocument }) {
     }));
   };
 
+  const deleteList = (listId) => {
+    if (!window.confirm('Delete this list and all items inside it?')) return;
+    updateWorkspace((prev) => {
+      const nextActiveListId = prev.ui.activeListId === listId ? null : prev.ui.activeListId;
+      return {
+        ...prev,
+        lists: prev.lists.filter((l) => l.id !== listId),
+        items: prev.items.filter((i) => i.listId !== listId),
+        ui: {
+          ...prev.ui,
+          activeListId: nextActiveListId,
+        },
+      };
+    });
+    if (selectedItemId && workspace.items.some((i) => i.id === selectedItemId && i.listId === listId)) {
+      setDrawerOpen(false);
+      setSelectedItemId(null);
+    }
+  };
+
   const deleteTopic = (topicId) => {
     const listIds = workspace.lists.filter((l) => l.topicId === topicId).map((l) => l.id);
     updateWorkspace((prev) => {
@@ -332,18 +352,28 @@ export default function ListsWorkspace({ data, saveDocument }) {
                 />
               ) : (
                 topicLists.map((list) => (
-                  <button
-                    key={list.id}
-                    type="button"
-                    className={`lists-list-btn${list.id === activeListId ? ' is-active' : ''}`}
-                    onClick={() => selectList(list.id)}
-                  >
-                    <span className="lists-list-btn-title">{list.title}</span>
-                    {list.description && <span className="lists-list-btn-desc">{list.description}</span>}
-                    <span className="lists-list-btn-meta">
-                      {getTemplate(list.templateId).label} · {countItemsInList(workspace.items, list.id)} items
-                    </span>
-                  </button>
+                  <div key={list.id} className={`lists-list-row${list.id === activeListId ? ' is-active' : ''}`}>
+                    <button
+                      type="button"
+                      className="lists-list-btn"
+                      onClick={() => selectList(list.id)}
+                    >
+                      <span className="lists-list-btn-title">{list.title}</span>
+                      {list.description && <span className="lists-list-btn-desc">{list.description}</span>}
+                      <span className="lists-list-btn-meta">
+                        {getTemplate(list.templateId).label} · {countItemsInList(workspace.items, list.id)} items
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      className="lists-icon-btn lists-list-delete-btn"
+                      onClick={(e) => { e.stopPropagation(); deleteList(list.id); }}
+                      aria-label={`Delete list ${list.title}`}
+                      title="Delete list"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
                 ))
               )}
             </div>

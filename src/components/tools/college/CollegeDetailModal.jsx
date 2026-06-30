@@ -197,21 +197,26 @@ export default function CollegeDetailModal({
                 />
               </div>
               <div className="college-detail-actions">
-                <button type="button" className="college-btn college-btn--sm" onClick={onAddSupplemental}>
-                  Add supplemental
-                </button>
-                <button type="button" className="college-btn college-btn--sm" onClick={onJumpWriting}>
-                  Open supplementals
-                </button>
-                {onRemoveCollege && (
-                  <button
-                    type="button"
-                    className="college-btn college-btn--sm college-btn--ghost"
-                    onClick={() => onRemoveCollege(myCollege.id)}
-                  >
-                    Remove from list
+                <div className="college-detail-actions-start">
+                  <button type="button" className="college-btn college-btn--sm" onClick={onAddSupplemental}>
+                    Add supplemental
                   </button>
-                )}
+                  <button type="button" className="college-btn college-btn--sm" onClick={onJumpWriting}>
+                    Open supplementals
+                  </button>
+                  {onRemoveCollege && (
+                    <button
+                      type="button"
+                      className="college-btn college-btn--sm college-btn--ghost"
+                      onClick={() => onRemoveCollege(myCollege.id)}
+                    >
+                      Remove from list
+                    </button>
+                  )}
+                </div>
+                <button type="button" className="college-btn college-btn--primary college-btn--sm" onClick={onClose}>
+                  Done
+                </button>
               </div>
             </section>
           )}
@@ -221,16 +226,23 @@ export default function CollegeDetailModal({
           <p className="college-modal-source">
             Admissions & outcomes from U.S. College Scorecard. Deadlines & test policies may vary by year.
           </p>
-          {!myCollege && onAdd && (
-            <button
-              type="button"
-              className={`college-btn${added ? ' is-added' : ''}`}
-              disabled={added}
-              onClick={onAdd}
-            >
-              {added ? 'On your list' : 'Add to my list'}
-            </button>
-          )}
+          <div className="college-modal-footer-actions">
+            {!myCollege && onAdd && (
+              <button
+                type="button"
+                className={`college-btn${added ? ' is-added' : ''}`}
+                disabled={added}
+                onClick={onAdd}
+              >
+                {added ? 'On your list' : 'Add to my list'}
+              </button>
+            )}
+            {(myCollege || added) && (
+              <button type="button" className="college-btn college-btn--primary" onClick={onClose}>
+                Done
+              </button>
+            )}
+          </div>
         </footer>
       </div>
     </div>

@@ -1,13 +1,15 @@
 import { Plus, Trash2 } from 'lucide-react';
 import {
-  CollegeCard, CollegeField, CollegeGrid, CollegeInput, CollegePageHeader, CollegeTextarea,
+  CollegeCard, CollegeField, CollegeGrid, CollegeInput, CollegePageHeader, CollegeSelect, CollegeTextarea,
 } from '@/components/tools/college/college-shared';
 import { newId } from '@/lib/tools/college/college-model';
+import { AP_SCORES, getApExamOptions, SCORE_LABELS } from '@/lib/tools/college/college-ap-ib';
 import { computeBestScores } from '@/lib/tools/college/college-stats';
 
 export default function CollegeTesting({ doc, updateDoc }) {
   const t = doc.testing || { satAttempts: [], actAttempts: [], apExams: [], plannedDates: '' };
   const { bestSat, bestAct, superscoreSat } = computeBestScores(t);
+  const apExamOptions = getApExamOptions(undefined, t);
 
   const patchTesting = (patch) => updateDoc({ testing: { ...t, ...patch } });
 
@@ -70,9 +72,40 @@ export default function CollegeTesting({ doc, updateDoc }) {
         {t.apExams.map((a, i) => (
           <div key={a.id} className="college-attempt-row">
             <CollegeGrid>
-              <CollegeField label="Exam"><CollegeInput value={a.exam} onChange={(e) => { const n = [...t.apExams]; n[i] = { ...a, exam: e.target.value }; updateList('apExams', n); }} /></CollegeField>
+              <CollegeField label="Exam">
+                <CollegeSelect
+                  value={a.exam}
+                  onChange={(e) => {
+                    const n = [...t.apExams];
+                    n[i] = { ...a, exam: e.target.value };
+                    updateList('apExams', n);
+                  }}
+                >
+                  <option value="">Select exam…</option>
+                  {apExamOptions.map((exam) => (
+                    <option key={exam} value={exam}>{exam}</option>
+                  ))}
+                  {a.exam && !apExamOptions.includes(a.exam) ? (
+                    <option value={a.exam}>{a.exam}</option>
+                  ) : null}
+                </CollegeSelect>
+              </CollegeField>
               <CollegeField label="Year"><CollegeInput value={a.year} onChange={(e) => { const n = [...t.apExams]; n[i] = { ...a, year: e.target.value }; updateList('apExams', n); }} /></CollegeField>
-              <CollegeField label="Score"><CollegeInput value={a.score} onChange={(e) => { const n = [...t.apExams]; n[i] = { ...a, score: e.target.value }; updateList('apExams', n); }} /></CollegeField>
+              <CollegeField label="Score">
+                <CollegeSelect
+                  value={a.score}
+                  onChange={(e) => {
+                    const n = [...t.apExams];
+                    n[i] = { ...a, score: e.target.value };
+                    updateList('apExams', n);
+                  }}
+                >
+                  <option value="">Score…</option>
+                  {AP_SCORES.map((s) => (
+                    <option key={s} value={s}>{SCORE_LABELS[s] || s}</option>
+                  ))}
+                </CollegeSelect>
+              </CollegeField>
             </CollegeGrid>
             <button type="button" className="college-icon-btn" onClick={() => updateList('apExams', t.apExams.filter((x) => x.id !== a.id))}><Trash2 size={14} /></button>
           </div>

@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Plus, Trash2 } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { GripVertical, Plus, Trash2 } from 'lucide-react';
 import ToolsModal from '@/components/tools/shared/ToolsModal';
 import { ESTIMATED_TIME_PRESETS } from '@/lib/tools/constants';
 
@@ -61,12 +61,54 @@ export default function TaskModal({
 }) {
   const [form, setForm] = useState(emptyForm);
   const [newSubtask, setNewSubtask] = useState('');
+  const subtaskDragRef = useRef(null);
+  const [subtaskOverId, setSubtaskOverId] = useState(null);
 
   useEffect(() => {
     if (open) setForm(taskToForm(task || initialDraft));
   }, [open, task, initialDraft]);
 
   const set = (patch) => setForm((prev) => ({ ...prev, ...patch }));
+
+  const moveSubtask = (fromIndex, toIndex) => {
+    if (fromIndex < 0 || toIndex < 0 || fromIndex === toIndex) return;
+    setForm((prev) => {
+      const next = [...prev.subtasks];
+      const [item] = next.splice(fromIndex, 1);
+      next.splice(toIndex, 0, item);
+      return { ...prev, subtasks: next };
+    });
+  };
+
+  const handleSubtaskGripDown = (e, subtaskId, index) => {
+    if (e.button !== 0) return;
+    e.preventDefault();
+    subtaskDragRef.current = { subtaskId, index, startY: e.clientY, moved: false };
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+
+  const handleSubtaskGripMove = (e) => {
+    const drag = subtaskDragRef.current;
+    if (!drag) return;
+    if (Math.abs(e.clientY - drag.startY) > 4) drag.moved = true;
+    const el = document.elementFromPoint(e.clientX, e.clientY);
+    const row = el?.closest?.('[data-subtask-id]');
+    const overId = row?.getAttribute('data-subtask-id');
+    if (overId) setSubtaskOverId(overId);
+  };
+
+  const handleSubtaskGripUp = (e) => {
+    const drag = subtaskDragRef.current;
+    if (!drag) return;
+    if (drag.moved && subtaskOverId && subtaskOverId !== drag.subtaskId) {
+      const from = form.subtasks.findIndex((s) => s.id === drag.subtaskId);
+      const to = form.subtasks.findIndex((s) => s.id === subtaskOverId);
+      moveSubtask(from, to);
+    }
+    subtaskDragRef.current = null;
+    setSubtaskOverId(null);
+    try { e.currentTarget.releasePointerCapture(e.pointerId); } catch { /* ignore */ }
+  };
 
   const toggleRepeatDay = (dow) => {
     set({
@@ -230,14 +272,29 @@ export default function TaskModal({
         <div className="tools-modal-field">
           <label>Subtasks</label>
           <div className="tools-tasks-subtask-editor">
-            {form.subtasks.map((s) => (
-              <div key={s.id} className="tools-tasks-subtask-editor-row">
+            {form.subtasks.map((s, index) => (
+              <div
+                key={s.id}
+                data-subtask-id={s.id}
+                className={`tools-tasks-subtask-editor-row${subtaskOverId === s.id ? ' is-drop-target' : ''}`}
+              >
+                <button
+                  type="button"
+                  className="tools-tasks-subtask-grip"
+                  aria-label="Drag to reorder subtask"
+                  onPointerDown={(e) => handleSubtaskGripDown(e, s.id, index)}
+                  onPointerMove={handleSubtaskGripMove}
+                  onPointerUp={handleSubtaskGripUp}
+                  onPointerCancel={handleSubtaskGripUp}
+                >
+                  <GripVertical size={14} />
+                </button>
                 <input
                   type="checkbox"
                   checked={!!s.completed}
                   onChange={() => toggleSubtask(s.id)}
                 />
-                <span className={s.completed ? 'done' : ''}>{s.title}</span>
+                <span className={s.completed ? 'done' : ''} title={s.title}>{s.title}</span>
                 <button type="button" className="tools-agenda-icon-btn" onClick={() => removeSubtask(s.id)}>
                   <Trash2 size={13} />
                 </button>

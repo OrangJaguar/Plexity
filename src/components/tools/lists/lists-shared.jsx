@@ -15,6 +15,18 @@ const TOPIC_ICONS = {
   folder: Folder,
 };
 
+export const TOPIC_ICON_OPTIONS = [
+  { id: 'film', label: 'Movies' },
+  { id: 'book', label: 'Books' },
+  { id: 'utensils', label: 'Food & dining' },
+  { id: 'apple', label: 'Foods' },
+  { id: 'sparkles', label: 'Prompts' },
+  { id: 'lightbulb', label: 'Ideas' },
+  { id: 'map-pin', label: 'Places' },
+  { id: 'newspaper', label: 'Articles' },
+  { id: 'folder', label: 'General' },
+];
+
 export function ListsTopicIcon({ icon, size = 16, className = '' }) {
   const Icon = TOPIC_ICONS[icon] || Folder;
   return <Icon size={size} className={className} aria-hidden />;

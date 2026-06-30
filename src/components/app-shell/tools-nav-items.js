@@ -10,6 +10,7 @@ export function getToolsNavItems(pinnedToolIds) {
     label: tool.label,
     icon: tool.icon,
     toolId: tool.id,
+    sidebarIconActive: tool.sidebarIconActive ?? 'fill',
   }));
 }
 

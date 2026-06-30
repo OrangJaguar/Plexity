@@ -29,6 +29,7 @@ export default function GraphCanvas({
   onKeyboardTabChange,
   points = [],
   onAddPointToList,
+  onKeyboardInsert,
 }) {
   const containerRef = useRef(null);
   const canvasRef = useRef(null);
@@ -270,7 +271,7 @@ export default function GraphCanvas({
         floating
         tab={keyboardTab}
         onTabChange={onKeyboardTabChange}
-        onInsert={() => {}}
+        onInsert={(snippet) => onKeyboardInsert?.(snippet)}
         onClose={() => setKeyboardOpen(false)}
       />
     </div>

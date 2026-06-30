@@ -3,7 +3,7 @@ export const MATH_E = Math.E;
 
 export const BUILTIN_FUNCTIONS = [
   'sin', 'cos', 'tan', 'asin', 'acos', 'atan',
-  'sqrt', 'abs', 'log', 'ln', 'exp',
+  'sqrt', 'abs', 'log', 'logb', 'ln', 'exp',
   'floor', 'ceil', 'round', 'min', 'max',
   'factorial', 'nPr', 'nCr',
 ];

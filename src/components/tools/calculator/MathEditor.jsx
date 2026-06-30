@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { getAutocompleteSuggestions } from '@/lib/tools/calculator/parser/shorthand';
+import { expandOnSpace, getAutocompleteSuggestions } from '@/lib/tools/calculator/parser/shorthand';
 import { humanizeError } from '@/lib/tools/calculator/error-messages';
 
 const ERROR_DEBOUNCE_MS = 1000;
@@ -8,6 +8,7 @@ export default function MathEditor({
   value,
   onChange,
   onSubmit,
+  onFocus,
   placeholder = '',
   error,
   definedSymbols = [],
@@ -72,7 +73,40 @@ export default function MathEditor({
     requestAnimationFrame(() => el.focus());
   };
 
+  const replaceWordBeforeCursor = (replacement) => {
+    const el = inputRef.current;
+    if (!el) return;
+    const pos = el.selectionStart || value.length;
+    const before = value.slice(0, pos);
+    const after = value.slice(pos);
+    const match = before.match(/[a-zA-Zπ_][a-zA-Z0-9π_]*$/);
+    if (!match) return;
+    const prefix = before.slice(0, -match[0].length);
+    const next = `${prefix}${replacement}${after}`;
+    onChange(next);
+    setShowSuggestions(false);
+    requestAnimationFrame(() => {
+      el.focus();
+      const caret = prefix.length + replacement.length;
+      el.setSelectionRange(caret, caret);
+    });
+  };
+
   const handleKeyDown = (e) => {
+    if (e.key === ' ') {
+      const el = inputRef.current;
+      const pos = el?.selectionStart ?? value.length;
+      const before = value.slice(0, pos);
+      const match = before.match(/[a-zA-Zπ_][a-zA-Z0-9π_]*$/);
+      if (match) {
+        const expansion = expandOnSpace(match[0]);
+        if (expansion) {
+          e.preventDefault();
+          replaceWordBeforeCursor(expansion);
+          return;
+        }
+      }
+    }
     if (showSuggestions && suggestions.length) {
       if (e.key === 'ArrowDown') { e.preventDefault(); setActiveIdx((i) => (i + 1) % suggestions.length); return; }
       if (e.key === 'ArrowUp') { e.preventDefault(); setActiveIdx((i) => (i - 1 + suggestions.length) % suggestions.length); return; }
@@ -99,13 +133,16 @@ export default function MathEditor({
         value={value}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
+        onFocus={onFocus}
         onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
         placeholder={placeholder}
         spellCheck={false}
         autoComplete="off"
         aria-invalid={Boolean(debouncedError)}
       />
-      {debouncedError ? <div className="calc-math-editor-error">{debouncedError}</div> : null}
+      {debouncedError ? (
+        <div className="calc-math-editor-error" title={debouncedError}>{debouncedError}</div>
+      ) : null}
       {showSuggestions ? (
         <ul className="calc-autocomplete" role="listbox">
           {suggestions.map((item, i) => (

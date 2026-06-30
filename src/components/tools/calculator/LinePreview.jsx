@@ -1,10 +1,11 @@
-export default function LinePreview({ color, kind = 'curve', visible = true, onClick }) {
+export default function LinePreview({ color, kind = 'curve', visible = true, editMode = false, onClick }) {
   return (
     <button
       type="button"
-      className={`calc-line-preview ${visible ? '' : 'is-dimmed'}`}
+      className={`calc-line-preview ${visible ? '' : 'is-dimmed'}${editMode ? ' is-edit-mode' : ''}`}
       onClick={onClick}
-      aria-label={visible ? 'Hide graph' : 'Show graph'}
+      aria-label={editMode ? 'Change color' : (visible ? 'Hide graph' : 'Show graph')}
+      title={editMode ? 'Change color' : (visible ? 'Hide graph' : 'Show graph')}
       style={{ '--preview-color': color }}
     >
       <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden>

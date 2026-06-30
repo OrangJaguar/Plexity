@@ -87,13 +87,16 @@ function ToolsSidebarNavItem({
         }}
         draggable={false}
       >
-        {({ isActive }) => (
-          <Icon
-            size={20}
-            strokeWidth={isActive ? 2 : 1.75}
-            fill={isActive ? 'currentColor' : 'none'}
-          />
-        )}
+        {({ isActive }) => {
+          const strokeActive = item.sidebarIconActive === 'stroke';
+          return (
+            <Icon
+              size={20}
+              strokeWidth={isActive ? (strokeActive ? 2.25 : 2) : 1.75}
+              fill={isActive && !strokeActive ? 'currentColor' : 'none'}
+            />
+          );
+        }}
       </NavLink>
     </div>
   );

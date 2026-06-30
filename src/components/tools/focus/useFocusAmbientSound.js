@@ -89,35 +89,6 @@ function scheduleRainDrops(ctx, destination, timers) {
   scheduleDrop();
 }
 
-function scheduleCafeEvents(ctx, destination, timers) {
-  const scheduleEvent = () => {
-    const delay = 600 + Math.random() * 2800;
-    const id = window.setTimeout(() => {
-      const burst = ctx.createBufferSource();
-      const len = Math.floor(ctx.sampleRate * 0.12);
-      const buf = ctx.createBuffer(1, len, ctx.sampleRate);
-      const data = buf.getChannelData(0);
-      for (let i = 0; i < len; i += 1) {
-        data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (len * 0.15));
-      }
-      burst.buffer = buf;
-      const filter = ctx.createBiquadFilter();
-      filter.type = 'bandpass';
-      filter.frequency.value = 400 + Math.random() * 1200;
-      filter.Q.value = 0.8;
-      const g = ctx.createGain();
-      g.gain.value = 0.04 + Math.random() * 0.05;
-      burst.connect(filter);
-      filter.connect(g);
-      g.connect(destination);
-      burst.start();
-      scheduleEvent();
-    }, delay);
-    timers.push(id);
-  };
-  scheduleEvent();
-}
-
 function createRainSound(ctx) {
   const mix = ctx.createGain();
   mix.gain.value = 1;
@@ -156,35 +127,83 @@ function createRainSound(ctx) {
 function createCafeSound(ctx) {
   const mix = ctx.createGain();
   mix.gain.value = 1;
-  const buffer = buildNoiseBuffer(ctx, 'cafe', 5);
 
-  const rumble = connectFilteredNoise(ctx, buffer, { type: 'lowpass', frequency: 220, Q: 0.6, gain: 0.22 });
-  const murmur = connectFilteredNoise(ctx, buffer, { type: 'bandpass', frequency: 750, Q: 0.45, gain: 0.18 });
-  const air = connectFilteredNoise(ctx, buffer, { type: 'highpass', frequency: 1800, Q: 0.35, gain: 0.06 });
+  const buffer = buildNoiseBuffer(ctx, 'brown', 8);
+  const air = connectFilteredNoise(ctx, buffer, { type: 'lowpass', frequency: 320, Q: 0.4, gain: 0.14 });
+  const room = connectFilteredNoise(ctx, buffer, { type: 'bandpass', frequency: 520, Q: 0.35, gain: 0.1 });
+  const hiss = connectFilteredNoise(ctx, buffer, { type: 'highpass', frequency: 2400, Q: 0.25, gain: 0.025 });
 
-  rumble.output.connect(mix);
-  murmur.output.connect(mix);
   air.output.connect(mix);
+  room.output.connect(mix);
+  hiss.output.connect(mix);
 
-  const chatterLfo = ctx.createOscillator();
-  const chatterDepth = ctx.createGain();
-  chatterLfo.frequency.value = 0.35 + Math.random() * 0.25;
-  chatterDepth.gain.value = 0.12;
-  chatterLfo.connect(chatterDepth);
-  chatterDepth.connect(murmur.output.gain);
-  chatterLfo.start();
+  const murmurLfo = ctx.createOscillator();
+  const murmurDepth = ctx.createGain();
+  murmurLfo.type = 'sine';
+  murmurLfo.frequency.value = 0.18;
+  murmurDepth.gain.value = 0.06;
+  murmurLfo.connect(murmurDepth);
+  murmurDepth.connect(room.output.gain);
+  murmurLfo.start();
 
   const timers = [];
-  scheduleCafeEvents(ctx, mix, timers);
+  const scheduleMurmur = () => {
+    const delay = 900 + Math.random() * 2200;
+    const id = window.setTimeout(() => {
+      const len = Math.floor(ctx.sampleRate * (0.18 + Math.random() * 0.35));
+      const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+      const data = buf.getChannelData(0);
+      for (let i = 0; i < len; i += 1) {
+        const env = Math.sin((i / len) * Math.PI);
+        data[i] = (Math.random() * 2 - 1) * env * 0.35;
+      }
+      const burst = ctx.createBufferSource();
+      burst.buffer = buf;
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.value = 280 + Math.random() * 900;
+      filter.Q.value = 0.55;
+      const g = ctx.createGain();
+      g.gain.value = 0.05 + Math.random() * 0.04;
+      burst.connect(filter);
+      filter.connect(g);
+      g.connect(mix);
+      burst.start();
+      scheduleMurmur();
+    }, delay);
+    timers.push(id);
+  };
+  scheduleMurmur();
+
+  const scheduleClink = () => {
+    const delay = 2800 + Math.random() * 5200;
+    const id = window.setTimeout(() => {
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1800 + Math.random() * 1200, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(900, ctx.currentTime + 0.08);
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.018, ctx.currentTime + 0.004);
+      g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.12);
+      osc.connect(g);
+      g.connect(mix);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.14);
+      scheduleClink();
+    }, delay);
+    timers.push(id);
+  };
+  scheduleClink();
 
   return {
     output: mix,
     stop: () => {
-      timers.forEach((id) => window.clearTimeout(id));
-      rumble.stop();
-      murmur.stop();
+      timers.forEach((timerId) => window.clearTimeout(timerId));
       air.stop();
-      chatterLfo.stop();
+      room.stop();
+      hiss.stop();
+      murmurLfo.stop();
     },
   };
 }
@@ -193,39 +212,61 @@ function createSpaceSound(ctx) {
   const mix = ctx.createGain();
   mix.gain.value = 1;
 
-  const freqs = [52, 78, 104, 130];
+  const noiseBuffer = buildNoiseBuffer(ctx, 'brown', 6);
+  const bed = connectFilteredNoise(ctx, noiseBuffer, { type: 'lowpass', frequency: 180, Q: 0.5, gain: 0.12 });
+  bed.output.connect(mix);
+
+  const freqs = [55, 82.5, 110, 165];
   const oscillators = freqs.map((freq, i) => {
     const osc = ctx.createOscillator();
     osc.type = i % 2 === 0 ? 'sine' : 'triangle';
-    osc.frequency.value = freq + (Math.random() - 0.5) * 2;
+    osc.frequency.value = freq + (Math.random() - 0.5) * 1.5;
     const g = ctx.createGain();
-    g.gain.value = 0.035 / (i + 1);
+    g.gain.value = 0.09 / (i + 1);
     osc.connect(g);
     g.connect(mix);
     osc.start();
     return { osc, g };
   });
 
+  const drift = ctx.createOscillator();
+  const driftDepth = ctx.createGain();
+  drift.type = 'sine';
+  drift.frequency.value = 0.03;
+  driftDepth.gain.value = 6;
+  drift.connect(driftDepth);
+  driftDepth.connect(oscillators[0].osc.frequency);
+  drift.start();
+
   const sweep = ctx.createOscillator();
   const sweepDepth = ctx.createGain();
-  sweep.frequency.value = 0.04;
-  sweepDepth.gain.value = 40;
+  sweep.frequency.value = 0.06;
+  sweepDepth.gain.value = 90;
   sweep.connect(sweepDepth);
-  sweepDepth.connect(oscillators[0].osc.frequency);
+  sweepDepth.connect(oscillators[2].g.gain);
   sweep.start();
+
+  const shimmer = ctx.createOscillator();
+  const shimmerGain = ctx.createGain();
+  shimmer.type = 'sine';
+  shimmer.frequency.value = 880;
+  shimmerGain.gain.value = 0.008;
+  shimmer.connect(shimmerGain);
+  shimmerGain.connect(mix);
+  shimmer.start();
 
   const filter = ctx.createBiquadFilter();
   filter.type = 'lowpass';
-  filter.frequency.value = 280;
-  filter.Q.value = 0.4;
+  filter.frequency.value = 520;
+  filter.Q.value = 0.35;
   mix.connect(filter);
 
-  const delay = ctx.createDelay(2.5);
-  delay.delayTime.value = 0.45;
+  const delay = ctx.createDelay(3);
+  delay.delayTime.value = 0.62;
   const feedback = ctx.createGain();
-  feedback.gain.value = 0.35;
+  feedback.gain.value = 0.42;
   const delayMix = ctx.createGain();
-  delayMix.gain.value = 0.4;
+  delayMix.gain.value = 0.55;
   filter.connect(delay);
   delay.connect(feedback);
   feedback.connect(delay);
@@ -233,7 +274,7 @@ function createSpaceSound(ctx) {
   delayMix.connect(filter);
 
   const out = ctx.createGain();
-  out.gain.value = 0.9;
+  out.gain.value = 1.1;
   filter.connect(out);
   delayMix.connect(out);
 
@@ -241,7 +282,10 @@ function createSpaceSound(ctx) {
     output: out,
     stop: () => {
       oscillators.forEach(({ osc }) => osc.stop());
+      drift.stop();
       sweep.stop();
+      shimmer.stop();
+      bed.stop();
     },
   };
 }

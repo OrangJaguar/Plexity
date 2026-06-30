@@ -197,6 +197,7 @@ export const TOOL_REGISTRY = [
     route: '/stocks',
     label: 'Stocks',
     icon: CandlestickChart,
+    sidebarIconActive: 'stroke',
     description: 'Stock research workspace — screener, watchlist, charts, and company deep dives.',
     longDescription:
       'Market overview, screener, watchlist, earnings calendar, and per-stock pages with charts, financials, analyst consensus, news, and structured research notes. Built for idea discovery — not trading.',

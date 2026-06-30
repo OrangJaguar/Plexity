@@ -10,6 +10,22 @@ import {
 import { queryKeys } from '@/api/query-keys';
 import { spawnNextRecurrenceTask } from '@/lib/tools/task-recurrence';
 
+function applyTaskOrder(rows, orderUpdates) {
+  const orderMap = Object.fromEntries(
+    orderUpdates.map(({ taskId, manualSortOrder, sortOrder }) => [
+      taskId,
+      manualSortOrder ?? sortOrder,
+    ]),
+  );
+  return [...rows]
+    .map((t) => (
+      orderMap[t.taskId] != null
+        ? { ...t, manualSortOrder: orderMap[t.taskId], sortOrder: orderMap[t.taskId] }
+        : t
+    ))
+    .sort((a, b) => (a.manualSortOrder ?? 0) - (b.manualSortOrder ?? 0));
+}
+
 export function useToolsTasks() {
   const queryClient = useQueryClient();
   const query = useQuery({
@@ -25,7 +41,36 @@ export function useToolsTasks() {
 
   const createMutation = useMutation({
     mutationFn: createTask,
-    onSuccess: invalidate,
+    onMutate: async (payload) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.tools.tasks });
+      const prev = queryClient.getQueryData(queryKeys.tools.tasks);
+      const now = Date.now();
+      const taskId = payload.taskId || crypto.randomUUID();
+      const optimistic = {
+        taskId,
+        id: taskId,
+        title: payload.title || 'Untitled',
+        due: payload.due || '',
+        priority: payload.priority || 'medium',
+        className: payload.className || '',
+        notes: payload.notes || '',
+        type: payload.type || 'task',
+        estimatedMinutes: payload.estimatedMinutes ?? null,
+        subtasks: payload.subtasks || [],
+        recurrenceRule: payload.recurrenceRule || null,
+        completed: false,
+        manualSortOrder: payload.manualSortOrder ?? now,
+        sortOrder: payload.manualSortOrder ?? now,
+        createdAt: now,
+        updatedAt: now,
+      };
+      queryClient.setQueryData(queryKeys.tools.tasks, (old) => [...(old || []), optimistic]);
+      return { prev };
+    },
+    onError: (_err, _vars, ctx) => {
+      if (ctx?.prev) queryClient.setQueryData(queryKeys.tools.tasks, ctx.prev);
+    },
+    onSettled: invalidate,
   });
 
   const updateMutation = useMutation({
@@ -46,7 +91,18 @@ export function useToolsTasks() {
 
   const deleteMutation = useMutation({
     mutationFn: deleteTask,
-    onSuccess: invalidate,
+    onMutate: async (taskId) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.tools.tasks });
+      const prev = queryClient.getQueryData(queryKeys.tools.tasks);
+      queryClient.setQueryData(queryKeys.tools.tasks, (old) =>
+        (old || []).filter((t) => t.taskId !== taskId),
+      );
+      return { prev };
+    },
+    onError: (_err, _vars, ctx) => {
+      if (ctx?.prev) queryClient.setQueryData(queryKeys.tools.tasks, ctx.prev);
+    },
+    onSettled: invalidate,
   });
 
   const deleteRecurringMutation = useMutation({
@@ -56,7 +112,16 @@ export function useToolsTasks() {
 
   const reorderMutation = useMutation({
     mutationFn: reorderTasks,
-    onSuccess: invalidate,
+    onMutate: async (orderUpdates) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.tools.tasks });
+      const prev = queryClient.getQueryData(queryKeys.tools.tasks);
+      queryClient.setQueryData(queryKeys.tools.tasks, (old) => applyTaskOrder(old || [], orderUpdates));
+      return { prev };
+    },
+    onError: (_err, _vars, ctx) => {
+      if (ctx?.prev) queryClient.setQueryData(queryKeys.tools.tasks, ctx.prev);
+    },
+    onSettled: invalidate,
   });
 
   const completeTask = async (task, complete, { subtasks } = {}) => {

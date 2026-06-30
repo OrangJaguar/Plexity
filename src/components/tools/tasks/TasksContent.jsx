@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronDown, ChevronRight, Pencil, Plus, Trash2 } from 'lucide-react';
+import { ChevronDown, ChevronRight, GripVertical, Pencil, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import ToolsTabs from '@/components/tools/shared/ToolsTabs';
 import TaskModal from '@/components/tools/tasks/TaskModal';
@@ -62,6 +62,8 @@ function TaskRow({
   const hasSubtasks = (task.subtasks || []).length > 0;
   const dotClass = task.priority === 'high' ? 'red' : task.priority === 'low' ? 'green' : 'yellow';
 
+  const stopRowDrag = (e) => e.stopPropagation();
+
   const handleCheck = async (e) => {
     if (task.completed) {
       onComplete(task, false);
@@ -107,25 +109,40 @@ function TaskRow({
 
   return (
     <div
-      className={`tools-agenda-item${task.completed ? ' completed' : ''}${flashing ? ' tools-complete-flash' : ''}${draggable ? ' draggable' : ''}${overdue ? ' overdue' : ''}`}
-      draggable={draggable}
-      onDragStart={(e) => onDragStart?.(e, task.taskId)}
-      onDragEnd={onDragEnd}
+      className={`tools-agenda-item${task.completed ? ' completed' : ''}${flashing ? ' tools-complete-flash' : ''}${overdue ? ' overdue' : ''}`}
       onDragOver={onDragOver}
       onDrop={(e) => onDrop?.(e, task.taskId)}
       data-task-id={task.taskId}
     >
+      {draggable ? (
+        <span
+          className="tools-agenda-drag-handle"
+          draggable
+          title="Drag to reorder"
+          aria-label="Drag to reorder"
+          role="button"
+          tabIndex={0}
+          onDragStart={(e) => onDragStart?.(e, task.taskId)}
+          onDragEnd={onDragEnd}
+        >
+          <GripVertical size={14} />
+        </span>
+      ) : (
+        <span className="tools-agenda-drag-spacer" aria-hidden="true" />
+      )}
       <input
         type="checkbox"
         className="tools-agenda-check-input"
         checked={!!task.completed}
         onChange={handleCheck}
+        onMouseDown={stopRowDrag}
       />
       {hasSubtasks ? (
         <button
           type="button"
           className="tools-tasks-expand-btn"
           onClick={() => setExpanded((v) => !v)}
+          onMouseDown={stopRowDrag}
           aria-expanded={expanded}
         >
           {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
@@ -133,7 +150,7 @@ function TaskRow({
       ) : (
         <span className="tools-tasks-expand-spacer" />
       )}
-      <div className="tools-agenda-main">
+      <div className="tools-agenda-main" onMouseDown={stopRowDrag}>
         <div className="tools-agenda-title-row">
           <span className="tools-agenda-title">{task.title}</span>
         </div>
@@ -153,7 +170,7 @@ function TaskRow({
           ) : null}
         </div>
         {expanded && hasSubtasks ? (
-          <ul className="tools-tasks-subtask-list">
+          <ul className="tools-tasks-subtask-list" onMouseDown={stopRowDrag}>
             {(task.subtasks || []).map((s) => (
               <li key={s.id}>
                 <input
@@ -172,7 +189,7 @@ function TaskRow({
       ) : (
         <span className="tools-agenda-dot-spacer" aria-hidden="true" />
       )}
-      <div className="tools-agenda-right">
+      <div className="tools-agenda-right" onMouseDown={stopRowDrag}>
         <button type="button" className="tools-agenda-icon-btn" title="Edit" onClick={() => onEdit(task)}>
           <Pencil size={14} />
         </button>
@@ -303,15 +320,22 @@ export default function TasksContent({
   const handleDragStart = (e, taskId) => {
     setDragId(taskId);
     e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', taskId);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
   };
 
   const handleDrop = async (e, targetId, sectionTasks) => {
     e.preventDefault();
-    if (!dragId || dragId === targetId || sortMode !== 'manual') return;
-    const updates = buildManualReorder(sectionTasks, dragId, targetId);
+    const sourceId = e.dataTransfer.getData('text/plain') || dragId;
+    if (!sourceId || sourceId === targetId || sortMode !== 'manual') return;
+    const updates = buildManualReorder(sectionTasks, sourceId, targetId);
     if (!updates) return;
-    await reorderTasks(updates);
     setDragId(null);
+    await reorderTasks(updates);
   };
 
   const rowProps = {
@@ -321,7 +345,7 @@ export default function TasksContent({
     onToggleSubtask: handleToggleSubtask,
     onDragStart: (e, id) => handleDragStart(e, id),
     onDragEnd: () => setDragId(null),
-    onDragOver: (e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; },
+    onDragOver: handleDragOver,
   };
 
   const canDrag = sortMode === 'manual';
@@ -391,7 +415,10 @@ export default function TasksContent({
         ) : null}
       </div>
 
-      <div className="tools-agenda-list">
+      <div
+        className="tools-agenda-list"
+        onDragOver={canDrag ? handleDragOver : undefined}
+      >
         {tab === 'tasks' ? (
           !overdue.length && !regular.length ? (
             <div className="tools-empty-hint">No tasks yet</div>

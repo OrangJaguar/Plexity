@@ -7,18 +7,44 @@ import {
   suggestTemplate,
   topicTemplateHint,
 } from '@/lib/tools/lists/lists-model';
+import { ListsTopicIcon, TOPIC_ICON_OPTIONS } from '@/components/tools/lists/lists-shared';
+
+function suggestIconForTopicName(name) {
+  const lower = name.trim().toLowerCase();
+  const match = TOPIC_ICON_OPTIONS.find((opt) => lower.includes(opt.id.replace('-', ' '))
+    || lower.includes(opt.label.toLowerCase().split(' ')[0]));
+  if (match) return match.id;
+  if (/\b(movie|film)\b/i.test(name)) return 'film';
+  if (/\b(book|read)\b/i.test(name)) return 'book';
+  if (/\b(restaurant|dining)\b/i.test(name)) return 'utensils';
+  if (/\b(food|snack)\b/i.test(name)) return 'apple';
+  if (/\b(prompt)\b/i.test(name)) return 'sparkles';
+  if (/\b(idea)\b/i.test(name)) return 'lightbulb';
+  if (/\b(place|travel)\b/i.test(name)) return 'map-pin';
+  if (/\b(article|news)\b/i.test(name)) return 'newspaper';
+  return 'folder';
+}
 
 export function CreateTopicModal({ open, onOpenChange, onCreate }) {
   const [name, setName] = useState('');
+  const [icon, setIcon] = useState('folder');
 
   useEffect(() => {
-    if (open) setName('');
+    if (open) {
+      setName('');
+      setIcon('folder');
+    }
   }, [open]);
+
+  useEffect(() => {
+    if (!open || !name.trim()) return;
+    setIcon(suggestIconForTopicName(name));
+  }, [name, open]);
 
   const submit = () => {
     const trimmed = name.trim();
     if (!trimmed) return;
-    onCreate(newTopic(trimmed));
+    onCreate(newTopic(trimmed, { icon }));
     onOpenChange(false);
   };
 
@@ -28,6 +54,24 @@ export function CreateTopicModal({ open, onOpenChange, onCreate }) {
         <span>Topic name</span>
         <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Movies, Ideas, Tools…" onKeyDown={(e) => e.key === 'Enter' && submit()} />
       </label>
+      <div className="lists-field">
+        <span className="lists-field-label">Icon</span>
+        <div className="lists-icon-picker" role="group" aria-label="Topic icon">
+          {TOPIC_ICON_OPTIONS.map((opt) => (
+            <button
+              key={opt.id}
+              type="button"
+              className={`lists-icon-picker-btn${icon === opt.id ? ' is-active' : ''}`}
+              onClick={() => setIcon(opt.id)}
+              title={opt.label}
+              aria-label={opt.label}
+              aria-pressed={icon === opt.id}
+            >
+              <ListsTopicIcon icon={opt.id} size={18} />
+            </button>
+          ))}
+        </div>
+      </div>
       <p className="lists-modal-hint">Topics are broad domains — Movies, Books, Prompts, Places, and anything else you collect.</p>
       <div className="lists-modal-actions">
         <button type="button" className="lists-btn" onClick={() => onOpenChange(false)}>Cancel</button>

@@ -134,6 +134,7 @@ export default function JournalContent({ todayKey, todayEntry, entries, upsertEn
     }
   }, [action, clearAction, saveNow]);
 
+  // Hydrate editor when the day changes — full replace.
   useEffect(() => {
     const content = todayEntry?.content || '';
     if (editorRef.current) {
@@ -142,7 +143,19 @@ export default function JournalContent({ todayKey, todayEntry, entries, upsertEn
     setMood(todayEntry?.mood || '');
     setWordCount(todayEntry?.wordCount ?? wordCountFromHtml(content));
     setSaveStatus('saved');
-  }, [todayKey, todayEntry?.content, todayEntry?.updatedAt, todayEntry?.mood, todayEntry?.wordCount]);
+  }, [todayKey]);
+
+  // Sync remote changes only when the editor is not focused (avoid clobbering cursor).
+  useEffect(() => {
+    const content = todayEntry?.content || '';
+    if (!editorRef.current) return;
+    if (document.activeElement === editorRef.current) return;
+    if (editorRef.current.innerHTML !== content) {
+      editorRef.current.innerHTML = content;
+    }
+    setMood(todayEntry?.mood || '');
+    setWordCount(todayEntry?.wordCount ?? wordCountFromHtml(content));
+  }, [todayEntry?.content, todayEntry?.mood, todayEntry?.wordCount]);
 
   useEffect(() => {
     const flush = () => {

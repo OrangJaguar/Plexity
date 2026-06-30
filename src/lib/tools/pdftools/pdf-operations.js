@@ -218,11 +218,35 @@ export function rangesAtBreaks(totalPages, breakAfter) {
  */
 
 /**
+ * @typedef {Object} PageLayout
+ * @property {number} displayWidth
+ * @property {number} displayHeight
+ * @property {number} pdfWidth
+ * @property {number} pdfHeight
+ */
+
+function scaleAnnotation(ann, layout) {
+  if (!layout?.displayWidth || !layout?.pdfWidth) return ann;
+  const sx = layout.pdfWidth / layout.displayWidth;
+  const sy = layout.pdfHeight / layout.displayHeight;
+  return {
+    ...ann,
+    x: ann.x * sx,
+    y: ann.y * sy,
+    width: ann.width != null ? ann.width * sx : undefined,
+    height: ann.height != null ? ann.height * sy : undefined,
+    strokeWidth: ann.strokeWidth != null ? ann.strokeWidth * sx : undefined,
+    points: ann.points?.map((p) => ({ x: p.x * sx, y: p.y * sy })),
+  };
+}
+
+/**
  * @param {Uint8Array} data
  * @param {Record<number, Annotation[]>} annotationsByPage 0-based page index
+ * @param {Record<number, PageLayout>} [layoutsByPage]
  * @returns {Promise<Uint8Array>}
  */
-export async function applyAnnotations(data, annotationsByPage) {
+export async function applyAnnotations(data, annotationsByPage, layoutsByPage = {}) {
   const pdf = await loadDoc(data);
   const font = await pdf.embedFont(StandardFonts.Helvetica);
   const pages = pdf.getPages();
@@ -232,26 +256,31 @@ export async function applyAnnotations(data, annotationsByPage) {
     const page = pages[pageIndex];
     if (!page || !annotations?.length) continue;
 
-    const { height } = page.getSize();
+    const { width, height } = page.getSize();
+    const layout = layoutsByPage[pageIndex];
+    const sx = layout?.displayWidth ? layout.pdfWidth / layout.displayWidth : 1;
 
-    for (const ann of annotations) {
-      const y = height - ann.y - (ann.height ?? 0);
+    for (const raw of annotations) {
+      const ann = scaleAnnotation(raw, layout);
 
       if (ann.type === 'text' && ann.text) {
-        const size = 14;
+        const size = 14 * sx;
         page.drawText(ann.text, {
           x: ann.x,
-          y: y,
+          y: height - ann.y - size,
           size,
           font,
           color: rgb(0.1, 0.1, 0.1),
         });
+        continue;
       }
+
+      const boxY = height - ann.y - (ann.height ?? 0);
 
       if (ann.type === 'highlight' && ann.width && ann.height) {
         page.drawRectangle({
           x: ann.x,
-          y: y,
+          y: boxY,
           width: ann.width,
           height: ann.height,
           color: rgb(1, 0.92, 0.23),
@@ -262,7 +291,7 @@ export async function applyAnnotations(data, annotationsByPage) {
       if (ann.type === 'whiteout' && ann.width && ann.height) {
         page.drawRectangle({
           x: ann.x,
-          y: y,
+          y: boxY,
           width: ann.width,
           height: ann.height,
           color: rgb(1, 1, 1),
@@ -273,22 +302,23 @@ export async function applyAnnotations(data, annotationsByPage) {
       if (ann.type === 'rect' && ann.width && ann.height) {
         page.drawRectangle({
           x: ann.x,
-          y: y,
+          y: boxY,
           width: ann.width,
           height: ann.height,
           borderColor: rgb(0.2, 0.45, 0.95),
-          borderWidth: 2,
+          borderWidth: 2 * sx,
         });
       }
 
       if (ann.type === 'draw' && ann.points?.length > 1) {
+        const thickness = ann.strokeWidth ?? 2 * sx;
         for (let i = 1; i < ann.points.length; i += 1) {
           const a = ann.points[i - 1];
           const b = ann.points[i];
           page.drawLine({
             start: { x: ann.x + a.x, y: height - ann.y - a.y },
             end: { x: ann.x + b.x, y: height - ann.y - b.y },
-            thickness: ann.strokeWidth ?? 2,
+            thickness,
             color: rgb(0.9, 0.2, 0.2),
           });
         }
@@ -300,7 +330,7 @@ export async function applyAnnotations(data, annotationsByPage) {
         const img = await pdf.embedPng(imgBytes);
         page.drawImage(img, {
           x: ann.x,
-          y: y,
+          y: boxY,
           width: ann.width,
           height: ann.height,
         });
@@ -334,11 +364,11 @@ export async function extractPageText(data, pageIndex, cacheId = 'text-search') 
 /**
  * @param {VirtualPageRef[]} pageRefs
  * @param {Record<string, Uint8Array>} fileDataMap
- * @param {{ rotations?: Record<string, number>, annotationsByKey?: Record<string, import('./pdf-operations').Annotation[]> }} [opts]
+ * @param {{ rotations?: Record<string, number>, annotationsByKey?: Record<string, import('./pdf-operations').Annotation[]>, layoutsByKey?: Record<string, PageLayout> }} [opts]
  * @returns {Promise<Uint8Array>}
  */
 export async function buildPdfFromVirtualPages(pageRefs, fileDataMap, opts = {}) {
-  const { rotations = {}, annotationsByKey = {} } = opts;
+  const { rotations = {}, annotationsByKey = {}, layoutsByKey = {} } = opts;
   const merged = await PDFDocument.create();
   const srcCache = {};
 
@@ -352,12 +382,15 @@ export async function buildPdfFromVirtualPages(pageRefs, fileDataMap, opts = {})
 
   let data = await merged.save();
   const annotByIndex = {};
+  const layoutByIndex = {};
   pageRefs.forEach((ref, i) => {
     const anns = annotationsByKey[ref.key];
     if (anns?.length) annotByIndex[i] = anns;
+    const layout = layoutsByKey[ref.key];
+    if (layout) layoutByIndex[i] = layout;
   });
   if (Object.keys(annotByIndex).length) {
-    data = await applyAnnotations(data, annotByIndex);
+    data = await applyAnnotations(data, annotByIndex, layoutByIndex);
   }
   return data;
 }

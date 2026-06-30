@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { Copy, Table2, X } from 'lucide-react';
 import MathEditor from '@/components/tools/calculator/MathEditor';
 import LinePreview from '@/components/tools/calculator/LinePreview';
@@ -20,8 +21,19 @@ export default function ExpressionRow({
   onFocusNext,
   onUpdateTableRows,
   autoFocus,
+  onFocus,
 }) {
+  const colorInputRef = useRef(null);
   const isTable = expression.meta?.rowType === 'table';
+
+  const handlePreviewClick = (e) => {
+    e.stopPropagation();
+    if (editMode) {
+      colorInputRef.current?.click();
+      return;
+    }
+    onToggleVisible();
+  };
 
   if (isTable) {
     const sourceExpression = expressions.find((e) => e.id === expression.meta?.sourceId);
@@ -47,12 +59,25 @@ export default function ExpressionRow({
   const previewKind = compiled?.kind === 'point' ? 'point' : 'curve';
 
   return (
-    <div className={`calc-expr-row ${expression.visible ? '' : 'is-hidden'} ${editMode ? 'is-edit-mode' : ''}`}>
+    <div
+      className={`calc-expr-row ${expression.visible ? '' : 'is-hidden'} ${editMode ? 'is-edit-mode' : ''}`}
+      onMouseDown={(e) => e.stopPropagation()}
+    >
+      <input
+        ref={colorInputRef}
+        type="color"
+        className="calc-expr-color-input"
+        value={expression.color}
+        onChange={(e) => onChange({ color: e.target.value })}
+        tabIndex={-1}
+        aria-hidden
+      />
       <LinePreview
         color={expression.color}
         kind={previewKind}
         visible={expression.visible}
-        onClick={onToggleVisible}
+        editMode={editMode}
+        onClick={handlePreviewClick}
       />
       <div className="calc-expr-row-body">
         <MathEditor
@@ -62,6 +87,7 @@ export default function ExpressionRow({
           error={error}
           definedSymbols={definedSymbols}
           autoFocus={autoFocus}
+          onFocus={onFocus}
           rowIndex={editMode ? rowIndex : null}
         />
       </div>

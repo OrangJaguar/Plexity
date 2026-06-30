@@ -5,6 +5,7 @@ import {
 import { usePdfEditor } from '@/hooks/usePdfEditor';
 import { buildPdfFromVirtualPages } from '@/lib/tools/pdftools/pdf-operations';
 import { downloadPdf } from '@/lib/tools/pdftools/pdf-download';
+import { ensurePdfJs } from '@/lib/tools/pdftools/pdfjs-setup';
 import { getPageCount } from '@/lib/tools/pdftools/pdf-render';
 import PdfUploadZone from '@/components/tools/pdftools/PdfUploadZone';
 import PdfPageStrip from '@/components/tools/pdftools/PdfPageStrip';
@@ -27,10 +28,15 @@ export default function PdfEditor() {
   const [partNames, setPartNames] = useState(/** @type {Record<number, string>} */({}));
   const hasFiles = ws.files.length > 0;
 
+  useEffect(() => {
+    void ensurePdfJs();
+  }, []);
+
   const buildOpts = useMemo(() => ({
     rotations: ws.rotationsMap,
     annotationsByKey: ws.annotations,
-  }), [ws.rotationsMap, ws.annotations]);
+    layoutsByKey: ws.pageLayouts,
+  }), [ws.rotationsMap, ws.annotations, ws.pageLayouts]);
 
   useEffect(() => {
     if (ws.files.length === 1) {
@@ -217,6 +223,7 @@ export default function PdfEditor() {
               onScrollDone={() => setScrollToKey(null)}
               annotations={ws.annotations}
               onAnnotationsChange={(key, anns) => ws.setAnnotations((prev) => ({ ...prev, [key]: anns }))}
+              onPageLayout={ws.setPageLayout}
             />
           ) : (
             <PdfPageStrip

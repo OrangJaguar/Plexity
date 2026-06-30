@@ -81,11 +81,14 @@ export default function PdfPageStrip({
               type="button"
               className="pdf-page-thumb-placeholder pdf-page-thumb-placeholder--error"
               onClick={() => onRetryThumb?.(key)}
+              title={page.thumbError || 'Preview unavailable'}
             >
-              Tap to retry preview
+              Preview unavailable — tap to retry
             </button>
           ) : (
-            <div className="pdf-page-thumb-placeholder" aria-busy="true" />
+            <div className="pdf-page-thumb-placeholder pdf-page-thumb-placeholder--loading" aria-busy="true">
+              <span className="pdf-page-thumb-loading-label">Loading…</span>
+            </div>
           )}
         </div>
         <div className="pdf-page-thumb-footer">

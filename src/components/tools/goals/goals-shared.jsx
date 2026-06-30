@@ -1,6 +1,46 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, Pencil, Plus, X } from 'lucide-react';
+import { ChevronDown, ChevronUp, HelpCircle, Pencil, Plus, X } from 'lucide-react';
 import AppCheckbox from '@/components/shared/form/AppCheckbox';
+import ToolsModal from '@/components/tools/shared/ToolsModal';
+
+export function GoalsSectionGuide({ guide }) {
+  const [open, setOpen] = useState(false);
+  if (!guide) return null;
+
+  return (
+    <>
+      <button
+        type="button"
+        className="goals-guide-btn"
+        onClick={() => setOpen(true)}
+        aria-label={`Help: ${guide.title}`}
+        title={`Guide: ${guide.title}`}
+      >
+        <HelpCircle size={15} aria-hidden />
+      </button>
+      <ToolsModal open={open} onOpenChange={setOpen} title={guide.title} maxWidth="520px">
+        <div className="goals-guide-modal">
+          <p className="goals-guide-modal-body">{guide.body}</p>
+          {guide.examples?.length ? (
+            <div className="goals-guide-modal-examples">
+              <strong>Examples</strong>
+              <ul>
+                {guide.examples.map((ex) => <li key={ex}>{ex}</li>)}
+              </ul>
+            </div>
+          ) : null}
+          {guide.tip ? (
+            <p className="goals-guide-modal-tip">
+              <strong>Stuck?</strong>
+              {' '}
+              {guide.tip}
+            </p>
+          ) : null}
+        </div>
+      </ToolsModal>
+    </>
+  );
+}
 
 export function GoalsLayerLabel({ children, active = false }) {
   return (
@@ -28,6 +68,7 @@ export function GoalsSectionCard({
   editChildren,
   className = '',
   extraActions = null,
+  guide = null,
 }) {
   return (
     <section
@@ -37,7 +78,10 @@ export function GoalsSectionCard({
       <header className="goals-section-card-header">
         <div className="goals-section-card-heading">
           {layer ? <GoalsLayerLabel active={active}>{layer}</GoalsLayerLabel> : null}
-          <h2>{title}</h2>
+          <div className="goals-section-title-row">
+            <h2>{title}</h2>
+            <GoalsSectionGuide guide={guide} />
+          </div>
           {hint ? <p>{hint}</p> : null}
         </div>
         <div className="goals-section-card-actions">

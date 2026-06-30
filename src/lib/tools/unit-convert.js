@@ -89,48 +89,49 @@ const LINEAR = {
     decade: 315576000,
     century: 3155760000,
   },
+  /** Units of each currency per 1 USD (mid-market reference rates). */
   currency: {
     USD: 1,
-    EUR: 0.92,
-    GBP: 0.79,
-    JPY: 157,
-    CAD: 1.36,
-    AUD: 1.52,
-    CHF: 0.88,
-    CNY: 7.24,
-    INR: 83.5,
-    MXN: 17.2,
-    BRL: 5.05,
-    KRW: 1340,
-    SGD: 1.34,
-    HKD: 7.82,
-    NOK: 10.6,
-    SEK: 10.4,
-    NZD: 1.64,
-    ZAR: 18.2,
-    TRY: 32.5,
-    PLN: 3.95,
-    THB: 35.8,
-    IDR: 15800,
-    AED: 3.67,
+    EUR: 0.8754,
+    GBP: 0.7546,
+    JPY: 161.93,
+    CAD: 1.4212,
+    AUD: 1.4526,
+    CHF: 0.8082,
+    CNY: 6.7983,
+    INR: 94.55,
+    MXN: 17.518,
+    BRL: 5.1845,
+    KRW: 1542.41,
+    SGD: 1.2925,
+    HKD: 7.8431,
+    NOK: 9.9271,
+    SEK: 9.7212,
+    NZD: 1.7706,
+    ZAR: 16.4319,
+    TRY: 46.641,
+    PLN: 3.7542,
+    THB: 33.265,
+    IDR: 17865,
+    AED: 3.6725,
     SAR: 3.75,
-    ILS: 3.65,
-    PHP: 56.5,
-    MYR: 4.72,
-    TWD: 32.1,
-    DKK: 6.87,
-    CZK: 23.1,
-    HUF: 360,
-    RON: 4.57,
-    PKR: 278,
-    EGP: 48.5,
-    NGN: 1550,
-    ARS: 880,
-    CLP: 940,
-    COP: 3950,
-    VND: 24800,
-    UAH: 41.2,
-    RUB: 92,
+    ILS: 2.9861,
+    PHP: 61.212,
+    MYR: 4.0711,
+    TWD: 31.871,
+    DKK: 6.5432,
+    CZK: 21.236,
+    HUF: 310.34,
+    RON: 4.5894,
+    PKR: 278.07,
+    EGP: 49.304,
+    NGN: 1380.42,
+    ARS: 1482.3,
+    CLP: 921.58,
+    COP: 3447.8,
+    VND: 26258,
+    UAH: 44.908,
+    RUB: 88.5,
   },
 };
 
@@ -201,6 +202,13 @@ function convertTemperature(value, from, to) {
   return c + 273.15;
 }
 
+function convertCurrency(value, from, to) {
+  const rates = LINEAR.currency;
+  if (!rates[from] || !rates[to]) return null;
+  const usd = from === 'USD' ? value : value / rates[from];
+  return to === 'USD' ? usd : usd * rates[to];
+}
+
 export function convertUnits(value, from, to, category) {
   const n = Number(value);
   if (!Number.isFinite(n)) return null;
@@ -208,6 +216,10 @@ export function convertUnits(value, from, to, category) {
 
   if (category === 'temperature') {
     return convertTemperature(n, from, to);
+  }
+
+  if (category === 'currency') {
+    return convertCurrency(n, from, to);
   }
 
   const table = LINEAR[category];
@@ -250,6 +262,15 @@ export function getConversionFormula(category, from, to, amount = 0) {
     return `${fromLabel} → ${toLabel}`;
   }
 
+  if (category === 'currency') {
+    const result = convertUnits(safeAmount, from, to, category);
+    const oneToOne = convertUnits(1, from, to, category);
+    return [
+      `1 ${fromLabel} = ${formatFactor(oneToOne)} ${toLabel}`,
+      `${safeAmount} ${fromLabel} = ${formatConverted(result)} ${toLabel}`,
+    ].join('\n');
+  }
+
   const table = LINEAR[category];
   if (!table?.[from] || !table?.[to]) return `${fromLabel} → ${toLabel}`;
 
@@ -275,9 +296,13 @@ export function normalizeAmountInput(raw) {
   if (raw === '.') return '0.';
   if (/^0\.$/.test(raw)) return raw;
   if (/^\d*\.?\d*$/.test(raw)) {
-    const n = parseFloat(raw);
+    let next = raw;
+    if (next !== '0' && next !== '0.' && !next.startsWith('0.')) {
+      next = next.replace(/^0+(?=\d)/, '') || '0';
+    }
+    const n = parseFloat(next);
     if (Number.isFinite(n) && n < 0) return '0';
-    return raw;
+    return next;
   }
   return '0';
 }

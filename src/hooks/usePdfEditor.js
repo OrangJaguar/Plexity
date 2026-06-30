@@ -10,6 +10,7 @@ import { filesToSession, pageKey, parsePageKey } from '@/lib/tools/pdftools/pdf-
  * @property {number} rotation
  * @property {string|null} thumb
  * @property {boolean} thumbFailed
+ * @property {string|null} [thumbError]
  */
 
 /** @typedef {'grid' | 'expanded'} PdfViewMode */
@@ -45,6 +46,7 @@ export function usePdfEditor() {
   const [viewMode, setViewMode] = useState(/** @type {PdfViewMode} */('grid'));
   const [activePageKey, setActivePageKey] = useState(/** @type {string|null} */(null));
   const [annotations, setAnnotations] = useState(/** @type {Record<string, import('@/lib/tools/pdftools/pdf-operations').Annotation[]>} */({}));
+  const [pageLayouts, setPageLayouts] = useState(/** @type {Record<string, import('@/lib/tools/pdftools/pdf-render').PageLayout>} */({}));
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(/** @type {string|null} */(null));
   const [processing, setProcessing] = useState(false);
@@ -106,15 +108,25 @@ export function usePdfEditor() {
     for (let i = 0; i < pending.length; i += batchSize) {
       const batch = pending.slice(i, i + batchSize);
       await Promise.all(batch.map(async (p) => {
-        if (thumbCache.current.has(p.key)) return;
+        const cached = thumbCache.current.get(p.key);
+        if (cached) {
+          setPages((prev) => prev.map((x) => (
+            x.key === p.key && !x.thumb ? { ...x, thumb: cached, thumbFailed: false } : x
+          )));
+          return;
+        }
         const data = dataMap[p.fileId];
-        if (!data) return;
+        if (!data) {
+          setPages((prev) => prev.map((x) => (x.key === p.key ? { ...x, thumbFailed: true } : x)));
+          return;
+        }
         try {
           const thumb = await renderPageThumbnail(data, p.fileId, p.pageIndex, p.rotation);
           thumbCache.current.set(p.key, thumb);
-          setPages((prev) => prev.map((x) => (x.key === p.key ? { ...x, thumb, thumbFailed: false } : x)));
-        } catch {
-          setPages((prev) => prev.map((x) => (x.key === p.key ? { ...x, thumbFailed: true } : x)));
+          setPages((prev) => prev.map((x) => (x.key === p.key ? { ...x, thumb, thumbFailed: false, thumbError: null } : x)));
+        } catch (err) {
+          const message = err instanceof Error ? err.message : 'Preview failed';
+          setPages((prev) => prev.map((x) => (x.key === p.key ? { ...x, thumbFailed: true, thumbError: message } : x)));
         }
       }));
     }
@@ -176,6 +188,7 @@ export function usePdfEditor() {
     setViewMode('grid');
     setActivePageKey(null);
     setAnnotations({});
+    setPageLayouts({});
     setError(null);
     setResult(null);
     setLoading(false);
@@ -352,6 +365,8 @@ export function usePdfEditor() {
     setActivePageKey,
     annotations,
     setAnnotations,
+    pageLayouts,
+    setPageLayout: (key, layout) => setPageLayouts((prev) => ({ ...prev, [key]: layout })),
     rotationsMap,
     loading,
     error,

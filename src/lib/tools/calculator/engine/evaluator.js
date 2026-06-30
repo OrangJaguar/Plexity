@@ -49,6 +49,7 @@ export function createEvalContext(overrides = {}) {
     funcs: { ...overrides.funcs },
     angleMode: overrides.angleMode === 'DEG' ? 'DEG' : 'RAD',
     x: overrides.x,
+    y: overrides.y,
   };
 }
 
@@ -63,6 +64,7 @@ function evalNode(node, ctx) {
       return node.value;
     case 'Identifier': {
       if (node.name === 'x' && ctx.x !== undefined) return ctx.x;
+      if (node.name === 'y' && ctx.y !== undefined) return ctx.y;
       if (node.name in BUILTIN_CONSTANTS) return BUILTIN_CONSTANTS[node.name];
       if (node.name in ctx.vars) return ctx.vars[node.name];
       throw new EvalError(`Undefined variable: ${node.name}`);
@@ -130,6 +132,7 @@ function evalCall(name, args, ctx) {
       funcs: ctx.funcs,
       angleMode: ctx.angleMode,
       x: ctx.x,
+      y: ctx.y,
     });
     fn.params.forEach((p, i) => { child.vars[p] = evaluatedArgs[i]; });
     return evaluate(fn.body, child);
@@ -147,7 +150,20 @@ function evalCall(name, args, ctx) {
       return Math.sqrt(evaluatedArgs[0]);
     }
     case 'abs': return Math.abs(evaluatedArgs[0]);
-    case 'log': return Math.log10(evaluatedArgs[0]);
+    case 'log':
+      if (evaluatedArgs.length === 2) {
+        if (evaluatedArgs[0] <= 0 || evaluatedArgs[0] === 1 || evaluatedArgs[1] <= 0) {
+          throw new EvalError('Invalid log base or argument');
+        }
+        return Math.log(evaluatedArgs[1]) / Math.log(evaluatedArgs[0]);
+      }
+      return Math.log10(evaluatedArgs[0]);
+    case 'logb':
+      if (evaluatedArgs.length < 2) throw new EvalError('logb requires base and value');
+      if (evaluatedArgs[0] <= 0 || evaluatedArgs[0] === 1 || evaluatedArgs[1] <= 0) {
+        throw new EvalError('Invalid log base or argument');
+      }
+      return Math.log(evaluatedArgs[1]) / Math.log(evaluatedArgs[0]);
     case 'ln': return Math.log(evaluatedArgs[0]);
     case 'exp': return Math.exp(evaluatedArgs[0]);
     case 'floor': return Math.floor(evaluatedArgs[0]);
@@ -201,17 +217,23 @@ export function extractDefinitions(ast) {
 export function getGraphableBody(ast) {
   const def = extractDefinitions(ast);
   if (!def) return null;
-  if (def.kind === 'function') return { body: def.body, param: def.params[0] || 'x' };
+  if (def.kind === 'function') return { body: def.body, param: def.params[0] || 'x', independent: 'x' };
   if (def.kind === 'equation') {
     if (def.left.type === 'Identifier' && (def.left.name === 'y' || def.left.name === 'f')) {
-      return { body: def.right, param: 'x' };
+      return { body: def.right, param: 'x', independent: 'x' };
     }
     if (def.right.type === 'Identifier' && def.right.name === 'y') {
-      return { body: def.left, param: 'x' };
+      return { body: def.left, param: 'x', independent: 'x' };
+    }
+    if (def.left.type === 'Identifier' && def.left.name === 'x') {
+      return { body: def.right, param: 'y', independent: 'y' };
+    }
+    if (def.right.type === 'Identifier' && def.right.name === 'x') {
+      return { body: def.left, param: 'y', independent: 'y' };
     }
   }
   if (def.kind === 'expression') {
-    return { body: def.expr, param: 'x' };
+    return { body: def.expr, param: 'x', independent: 'x' };
   }
   return null;
 }

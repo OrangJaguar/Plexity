@@ -2,9 +2,9 @@ import { X } from 'lucide-react';
 
 const TABS = {
   numbers: ['7', '8', '9', '4', '5', '6', '1', '2', '3', '0', '.', '(', ')'],
-  functions: ['sin(', 'cos(', 'tan(', 'sqrt(', 'log(', 'ln(', 'abs(', 'exp('],
+  functions: ['sin(', 'cos(', 'tan(', 'sqrt(', 'log(', 'logb(2,', 'ln(', 'abs(', 'exp('],
   symbols: ['+', '-', '*', '/', '^', 'π', 'e', '=', '<', '>', ','],
-  advanced: ['integral( , x)', 'derivative( , x)', 'limit( , x, 0)', 'nPr(, )', 'nCr(, )'],
+  advanced: ['∫_{0}^{1} x^2 dx', '∫ x^2 dx', 'd/dx( )', 'lim_{x→0}( )', 'log(2, x)', 'nPr(, )', 'nCr(, )'],
 };
 
 export default function MathKeyboard({ visible, tab, onTabChange, onInsert, onClose, floating = false }) {

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { renderPageThumbnail } from '@/lib/tools/pdftools/pdf-render';
+import { ensurePdfJs } from '@/lib/tools/pdftools/pdfjs-setup';
 import {
   filesToSession, pageKey, parsePageKey,
 } from '@/lib/tools/pdftools/pdf-session';
@@ -67,7 +68,7 @@ export function usePdfWorkspace(toolId) {
       const data = fileDataMap[p.fileId];
       if (!data) continue;
       try {
-        const thumb = await renderPageThumbnail(data, p.pageIndex, p.rotation);
+        const thumb = await renderPageThumbnail(data, p.fileId, p.pageIndex, p.rotation);
         thumbCache.current.set(p.key, thumb);
         setPages((prev) => prev.map((x) => (x.key === p.key ? { ...x, thumb } : x)));
       } catch {
@@ -142,6 +143,10 @@ export function usePdfWorkspace(toolId) {
 
   useEffect(() => () => {
     thumbCache.current.clear();
+  }, []);
+
+  useEffect(() => {
+    void ensurePdfJs();
   }, []);
 
   const togglePage = useCallback((key) => {

@@ -81,3 +81,11 @@ export const IB_SCORES = ['1', '2', '3', '4', '5', '6', '7', 'pending'];
 export const SCORE_LABELS = {
   pending: "Don't have score yet",
 };
+
+/** AP exams for Testing dropdown — full College Board catalog. */
+export function getApExamOptions(_academics = {}, testing = {}) {
+  const fromTesting = (testing.apExams || [])
+    .map((entry) => entry.exam)
+    .filter((exam) => exam && !AP_COURSES.includes(exam));
+  return [...AP_COURSES, ...fromTesting];
+}

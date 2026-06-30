@@ -7,6 +7,7 @@ export default function SidebarNavLink({
   end = false,
   className = 'app-sidebar-link',
   rawIcon = false,
+  sidebarIconActive = 'fill',
 }) {
   return (
     <NavLink
@@ -15,17 +16,17 @@ export default function SidebarNavLink({
       data-tooltip={label}
       className={({ isActive }) => `${className}${isActive ? ' active' : ''}`}
     >
-      {({ isActive }) => (
-        rawIcon ? (
-          <Icon />
-        ) : (
+      {({ isActive }) => {
+        if (rawIcon) return <Icon />;
+        const strokeActive = sidebarIconActive === 'stroke';
+        return (
           <Icon
             size={20}
-            strokeWidth={isActive ? 2 : 1.75}
-            fill={isActive ? 'currentColor' : 'none'}
+            strokeWidth={isActive ? (strokeActive ? 2.25 : 2) : 1.75}
+            fill={isActive && !strokeActive ? 'currentColor' : 'none'}
           />
-        )
-      )}
+        );
+      }}
     </NavLink>
   );
 }

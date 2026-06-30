@@ -1,14 +1,16 @@
 import React from 'react';
 import { logClientError } from '@/api/errors/logClientError';
+import ErrorFallback from '@/components/errors/ErrorFallback';
 
 export default class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { hasError: false };
+    this.state = { hasError: false, error: null };
+    this.reset = this.reset.bind(this);
   }
 
-  static getDerivedStateFromError() {
-    return { hasError: true };
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
   }
 
   componentDidCatch(error, info) {
@@ -18,26 +20,32 @@ export default class ErrorBoundary extends React.Component {
       context: {
         componentStack: info?.componentStack,
         boundary: 'ErrorBoundary',
+        path: this.props.path,
       },
     });
   }
 
+  componentDidUpdate(prevProps) {
+    if (this.state.hasError && prevProps.resetKey !== this.props.resetKey) {
+      this.setState({ hasError: false, error: null });
+    }
+  }
+
+  reset() {
+    this.setState({ hasError: false, error: null });
+  }
+
   render() {
     if (this.state.hasError) {
+      const { title, message, compact } = this.props;
       return (
-        <div className="error-fallback" role="alert">
-          <h1 className="error-fallback-title">Something went wrong</h1>
-          <p className="error-fallback-text">
-            We&apos;ve logged this issue. Try refreshing the page.
-          </p>
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={() => window.location.reload()}
-          >
-            Refresh
-          </button>
-        </div>
+        <ErrorFallback
+          title={title}
+          message={message ?? "We've logged this issue. Try again or head back to the dashboard."}
+          onRetry={this.reset}
+          retryLabel="Try again"
+          compact={compact}
+        />
       );
     }
 

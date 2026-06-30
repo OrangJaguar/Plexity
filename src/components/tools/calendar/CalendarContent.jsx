@@ -20,6 +20,7 @@ import {
   isRepeatingEvent,
   patchEventThisInstance,
   patchEventAllFuture,
+  parseLocalDateKey,
 } from '@/lib/tools/calendar-repeat';
 import {
   computeDayOverlapLayout,
@@ -32,14 +33,45 @@ import { useCommandBarDraft } from '@/hooks/useCommandBarDraft';
 import { eventFormToTaskDraft } from '@/lib/tools/command-bar-draft';
 import { getToolRoute } from '@/lib/tools/tool-routes';
 
-const RESIZE_EDGE_PX = 7;
+const RESIZE_EDGE_PX = 12;
+const MOVE_ZONE_RATIO = 0.35;
 
 function getEventInteractionMode(relY, height) {
   if (relY <= RESIZE_EDGE_PX) return 'resize-start';
   if (relY >= height - RESIZE_EDGE_PX) return 'resize-end';
-  if (relY <= height / 3) return 'move';
-  if (relY >= (height * 2) / 3) return 'edit';
-  return 'move';
+  if (relY <= Math.max(height * MOVE_ZONE_RATIO, RESIZE_EDGE_PX * 2)) return 'move';
+  return 'edit';
+}
+
+function eventCursorForMode(mode) {
+  if (mode === 'move') return 'grab';
+  if (mode === 'resize-start' || mode === 'resize-end') return 'ns-resize';
+  return 'pointer';
+}
+
+function applyDragPreview(dayKey, dayEvents, dragPreview) {
+  if (!dragPreview) return dayEvents;
+  const filtered = dayEvents.filter((evt) => {
+    const evtKey = `${evt.eventId}-${evt.instanceDateKey || dayKey}`;
+    return !(evtKey === dragPreview.eventKey && dayKey === dragPreview.sourceDayKey);
+  });
+  if (dayKey !== dragPreview.dayKey) return filtered;
+  const next = [
+    ...filtered,
+    {
+      ...dragPreview.evt,
+      displayStart: dragPreview.displayStart,
+      displayEnd: dragPreview.displayEnd,
+      instanceDateKey: dayKey,
+    },
+  ];
+  next.sort((a, b) => a.displayStart - b.displayStart);
+  return next;
+}
+
+function findLaneAtPoint(clientX, clientY) {
+  const el = document.elementFromPoint(clientX, clientY);
+  return el?.closest?.('.tools-calendar-day-lane') ?? null;
 }
 
 function SeriesScopeDialog({ open, onOpenChange, action, onChoose }) {
@@ -75,9 +107,11 @@ function CalendarEventDialog({ open, onOpenChange, event, initial, onSave, onDel
   useEffect(() => {
     if (!open) return;
     const e = event || initial || {};
+    const startSrc = e.displayStart || e.start;
+    const endSrc = e.displayEnd || e.end;
     setTitle(e.title || '');
-    setStart(e.start ? e.start.slice(0, 16) : '');
-    setEnd(e.end ? e.end.slice(0, 16) : '');
+    setStart(startSrc ? toDateTimeLocalKey(new Date(startSrc)) : '');
+    setEnd(endSrc ? toDateTimeLocalKey(new Date(endSrc)) : '');
     setAllDay(!!e.allDay);
     setColor(e.color || DEFAULT_EVENT_COLOR);
     setRepeatRule(e.repeatRule || 'none');
@@ -255,6 +289,7 @@ export default function CalendarContent({ events, createEvent, updateEvent, dele
   const [dayView, setDayView] = useState(null);
   const [monthOpen, setMonthOpen] = useState(false);
   const [dragGhost, setDragGhost] = useState(null);
+  const [dragPreview, setDragPreview] = useState(null);
   const [seriesPrompt, setSeriesPrompt] = useState(null);
   const scrollWrapRef = useRef(null);
   const dragRef = useRef(null);
@@ -379,6 +414,7 @@ export default function CalendarContent({ events, createEvent, updateEvent, dele
 
   const handleEventMouseDown = (e, evt, day) => {
     e.stopPropagation();
+    e.preventDefault();
     const block = e.currentTarget;
     const rect = block.getBoundingClientRect();
     const relY = e.clientY - rect.top;
@@ -388,54 +424,77 @@ export default function CalendarContent({ events, createEvent, updateEvent, dele
 
     const origStart = new Date(evt.displayStart);
     const origEnd = new Date(evt.displayEnd);
-    const origTop = parseFloat(block.style.top) || getTopFromMinutes(getMinutesSinceCalendarStart(origStart));
-    const origHeight = parseFloat(block.style.height) || Math.max(getTopFromMinutes(getMinutesSinceCalendarStart(origEnd)) - origTop, 20);
+    const origStartMin = getMinutesSinceCalendarStart(origStart);
+    const origEndMin = getMinutesSinceCalendarStart(origEnd);
+    const sourceDayKey = toLocalDateKey(day);
+    const eventKey = `${evt.eventId}-${evt.instanceDateKey || sourceDayKey}`;
+    const durationMs = Math.max(15 * 60 * 1000, origEnd.getTime() - origStart.getTime());
 
-    block.classList.add(
-      mode === 'move' ? 'is-moving' : mode === 'resize-start' ? 'is-resize-start' : 'is-resize-end',
-    );
+    document.body.classList.add('tools-calendar-is-dragging');
+    block.style.cursor = mode === 'move' ? 'grabbing' : 'ns-resize';
 
-    const onMove = (ev) => {
-      const lane = block.parentElement;
-      const min = softSnapCalendarMinute(getCalendarMinuteFromPointer(lane, ev.clientY));
-      const d = new Date(day);
-      d.setHours(0, 0, 0, 0);
-      d.setMinutes(min + 60);
-      if (mode === 'move') {
-        const dur = origEnd - origStart;
-        block.style.top = `${getTopFromMinutes(min)}px`;
-        block.dataset.pendingStart = toDateTimeLocalKey(d);
-        block.dataset.pendingEnd = toDateTimeLocalKey(new Date(d.getTime() + dur));
-      } else if (mode === 'resize-start') {
-        const endMin = getMinutesSinceCalendarStart(origEnd);
-        const nextMin = Math.min(min, endMin - 5);
-        block.style.top = `${getTopFromMinutes(nextMin)}px`;
-        block.style.height = `${Math.max(getTopFromMinutes(endMin) - getTopFromMinutes(nextMin), 20)}px`;
-        d.setMinutes(nextMin + 60);
-        block.dataset.pendingStart = toDateTimeLocalKey(d);
-      } else {
-        const startMin = getMinutesSinceCalendarStart(origStart);
-        const nextMin = Math.max(min, startMin + 5);
-        block.style.height = `${Math.max(getTopFromMinutes(nextMin) - origTop, 20)}px`;
-        d.setMinutes(nextMin + 60);
-        block.dataset.pendingEnd = toDateTimeLocalKey(d);
-      }
+    const resolveLaneDay = (laneEl, fallbackDay) => {
+      const key = laneEl?.dataset?.dayKey;
+      return key ? parseLocalDateKey(key) : fallbackDay;
     };
 
-    const onUp = async () => {
+    const dateFromMinute = (activeDay, minute) => {
+      const d = new Date(activeDay);
+      d.setHours(0, 0, 0, 0);
+      d.setMinutes(minute + 60);
+      return d;
+    };
+
+    const onMove = (ev) => {
+      const lane = mode === 'move'
+        ? (findLaneAtPoint(ev.clientX, ev.clientY) || block.parentElement)
+        : block.parentElement;
+      const activeDay = resolveLaneDay(lane, day);
+      const dayKey = toLocalDateKey(activeDay);
+      const min = softSnapCalendarMinute(getCalendarMinuteFromPointer(lane, ev.clientY));
+
+      let displayStart;
+      let displayEnd;
+
+      if (mode === 'move') {
+        displayStart = dateFromMinute(activeDay, min);
+        displayEnd = new Date(displayStart.getTime() + durationMs);
+      } else if (mode === 'resize-start') {
+        const nextMin = Math.min(min, origEndMin - 5);
+        displayStart = dateFromMinute(activeDay, nextMin);
+        displayEnd = new Date(origEnd);
+      } else {
+        const nextMin = Math.max(min, origStartMin + 5);
+        displayStart = new Date(origStart);
+        displayEnd = dateFromMinute(activeDay, nextMin);
+      }
+
+      setDragPreview({
+        eventKey,
+        sourceDayKey,
+        dayKey,
+        displayStart,
+        displayEnd,
+        evt,
+      });
+    };
+
+    const onUp = () => {
       document.removeEventListener('mousemove', onMove);
       document.removeEventListener('mouseup', onUp);
-      block.classList.remove('is-moving', 'is-resize-start', 'is-resize-end');
-      const ps = block.dataset.pendingStart;
-      const pe = block.dataset.pendingEnd;
-      delete block.dataset.pendingStart;
-      delete block.dataset.pendingEnd;
-      if (!ps && !pe) return;
-      const patch = {
-        start: ps || evt.start,
-        end: pe || evt.end,
-      };
-      requestSeriesAction('move', evt, patch);
+      document.body.classList.remove('tools-calendar-is-dragging');
+      block.style.cursor = '';
+
+      setDragPreview((preview) => {
+        if (preview) {
+          const patch = {
+            start: toDateTimeLocalKey(preview.displayStart),
+            end: toDateTimeLocalKey(preview.displayEnd),
+          };
+          requestSeriesAction('move', evt, patch);
+        }
+        return null;
+      });
     };
 
     document.addEventListener('mousemove', onMove);
@@ -444,7 +503,12 @@ export default function CalendarContent({ events, createEvent, updateEvent, dele
 
   const handleSave = async (data) => {
     if (editing) {
-      await updateEvent(editing.eventId, data);
+      if (isRepeatingEvent(editing)) {
+        const dateKey = editing.instanceDateKey || toLocalDateKey(editing.displayStart || editing.start);
+        await updateEvent(editing.eventId, patchEventThisInstance(editing, dateKey, data));
+      } else {
+        await updateEvent(editing.eventId, data);
+      }
     } else {
       await createEvent(data);
     }
@@ -496,7 +560,7 @@ export default function CalendarContent({ events, createEvent, updateEvent, dele
           </div>
           {weekDays.map((day, idx) => {
             const key = toLocalDateKey(day);
-            const dayEvents = eventsByDay[key] || [];
+            const dayEvents = applyDragPreview(key, eventsByDay[key] || [], dragPreview);
             const overlapLayout = computeDayOverlapLayout(dayEvents);
             const isToday = key === todayKey;
             const nowMin = isToday ? getMinutesSinceCalendarStart(now) : null;
@@ -505,6 +569,7 @@ export default function CalendarContent({ events, createEvent, updateEvent, dele
               <div
                 key={key}
                 className="tools-calendar-day-lane"
+                data-day-key={key}
                 style={{ gridColumn: idx + 2, gridRow: 2 }}
                 onMouseDown={(e) => {
                   if (e.target.classList.contains('tools-calendar-day-lane')) {
@@ -545,11 +610,12 @@ export default function CalendarContent({ events, createEvent, updateEvent, dele
                   const overlapStyle = layout ? getOverlapInlineStyle(layout) : {};
                   const notesPreview = truncateNotes(evt.notes);
                   const tooltip = [evt.title, formatCalendarEventTime(evt), evt.notes].filter(Boolean).join('\n');
+                  const isDragging = dragPreview?.eventKey === `${evt.eventId}-${evt.instanceDateKey || key}`;
                   return (
                     <button
                       key={`${evt.eventId}-${key}`}
                       type="button"
-                      className="tools-calendar-event"
+                      className={`tools-calendar-event${isAllDay ? ' tools-calendar-event--all-day' : ''}${isDragging ? ' is-dragging' : ''}`}
                       title={tooltip}
                       style={{
                         top: `${top}px`,
@@ -558,7 +624,23 @@ export default function CalendarContent({ events, createEvent, updateEvent, dele
                         borderColor: evt.color,
                         ...overlapStyle,
                       }}
+                      onMouseMove={(e) => {
+                        if (isAllDay) return;
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        const mode = getEventInteractionMode(e.clientY - rect.top, rect.height);
+                        e.currentTarget.style.cursor = eventCursorForMode(mode);
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.cursor = '';
+                      }}
                       onMouseDown={(e) => {
+                        if (isAllDay) {
+                          e.stopPropagation();
+                          setEditing(evt);
+                          setInitial(null);
+                          setEventOpen(true);
+                          return;
+                        }
                         const relY = e.clientY - e.currentTarget.getBoundingClientRect().top;
                         const blockH = e.currentTarget.getBoundingClientRect().height;
                         const mode = getEventInteractionMode(relY, blockH);

@@ -64,6 +64,11 @@ export default function CollegeWriting({ doc, updateDoc, focusCollegeId }) {
     setSubTab('supplementals');
   };
 
+  const deleteSupplemental = (id) => {
+    updateDoc({ supplementals: supplementals.filter((s) => s.id !== id) });
+    if (selectedSuppId === id) setSelectedSuppId(null);
+  };
+
   return (
     <div className="college-section college-section--editor">
       <CollegePageHeader
@@ -196,6 +201,20 @@ export default function CollegeWriting({ doc, updateDoc, focusCollegeId }) {
                 <CollegeField label="Reused from / notes">
                   <CollegeTextarea rows={2} value={selectedSupp.notes} onChange={(e) => updateSupp(selectedSupp.id, { notes: e.target.value })} />
                 </CollegeField>
+                <div className="college-editor-detail-actions">
+                  <button
+                    type="button"
+                    className="college-btn college-btn--sm college-btn--ghost"
+                    onClick={() => {
+                      if (window.confirm('Delete this supplemental essay?')) {
+                        deleteSupplemental(selectedSupp.id);
+                      }
+                    }}
+                  >
+                    <Trash2 size={14} />
+                    Delete supplemental
+                  </button>
+                </div>
               </div>
             ) : (
               <CollegeCard title="No supplemental selected">
