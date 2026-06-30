@@ -1,13 +1,11 @@
 import { base44 } from '@/api/base44Client';
 import { requireAuth } from '@/api/requireAuth';
+import { unwrapFunctionInvoke } from '@/api/tools/invoke-response';
 
 export async function submitFeedback(payload) {
   await requireAuth();
   const res = await base44.functions.invoke('submitFeedback', payload);
-  if (res?.error?.message) {
-    throw new Error(res.error.message);
-  }
-  return res;
+  return unwrapFunctionInvoke(res);
 }
 
 export async function listFeedback() {

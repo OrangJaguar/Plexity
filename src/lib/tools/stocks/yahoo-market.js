@@ -2,6 +2,7 @@
  * Yahoo Finance market data (unofficial). Dev uses Vite proxy; production uses toolsMarketData.
  */
 import { base44 } from '@/api/base44Client';
+import { unwrapFunctionInvoke } from '@/api/tools/invoke-response';
 
 const UA = 'Mozilla/5.0 (compatible; Plexity/1.0)';
 
@@ -46,8 +47,8 @@ async function yahooFetchRemote(path, { method = 'GET', body } = {}) {
     method,
     body,
   });
-  if (res?.error) throw new Error(res.error.message || 'Market data unavailable');
-  return res.data;
+  const payload = unwrapFunctionInvoke(res);
+  return payload.data;
 }
 
 async function yahooGet(path) {

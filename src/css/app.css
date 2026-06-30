@@ -5234,9 +5234,32 @@
       box-sizing: border-box;
     }
 
+    .tools-settings-page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
     .tools-settings-page-header h1 {
-      margin: 0 0 0.35rem;
+      margin: 0;
       font-size: 1.5rem;
+    }
+
+    .tools-settings-sign-out {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-shrink: 0;
+      color: var(--wrong-border);
+      border-color: color-mix(in srgb, var(--wrong-border) 35%, var(--border));
+    }
+
+    .tools-settings-sign-out:hover {
+      color: var(--wrong-border);
+      border-color: var(--wrong-border);
+      background: color-mix(in srgb, var(--wrong-border) 8%, transparent);
     }
 
     .tools-settings-page-header p,
@@ -19758,6 +19781,23 @@
     }
 
     /* ── Tools auth gate (signed-out /tools/*) ── */
+    .app-shell--unsigned .app-shell-main {
+      width: 100%;
+    }
+
+    .tools-auth-gate-logo {
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      z-index: 20;
+      display: inline-flex;
+      opacity: 0.85;
+    }
+
+    .tools-auth-gate-logo:hover {
+      opacity: 1;
+    }
+
     .tools-auth-gate {
       flex: 1;
       display: flex;

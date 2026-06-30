@@ -62,7 +62,7 @@ const PRINCIPLES = [
   {
     icon: Box,
     title: 'Your data, bounded',
-    text: 'No account needed — tools save locally. Sign in only if you want sync across devices.',
+    text: 'Sign in to use the workspace. Tasks, calendar, and preferences sync to your account; the vault stays encrypted on your device.',
   },
 ];
 
@@ -72,12 +72,8 @@ const COMMAND_DEMO = [
   { cmd: 'What is free tomorrow afternoon?', tag: 'Query', label: 'Schedule' },
 ];
 
-const SYNC_NO_ACCOUNT = [
-  'All tools work without an account',
-  'Data saved locally on this device only',
-  'Nothing syncs across browsers until you sign in',
-];
-const SYNC_CLOUD = [
+const SYNC_SIGNED_IN = [
+  'All tools require a free account',
   'Tasks, calendar, journal, focus',
   'Goals, lists, grades, profile',
   'College planner, calculator, stocks workspace',
@@ -368,21 +364,15 @@ export default function ToolsLandingPage() {
         <div className="tools-landing-section-intro">
           <h2>Data, honestly</h2>
           <p>
-            You don&apos;t need an account to use the tools. Sign in only when you want a cloud copy
-            that follows you across devices.
+            Create a free account to open any tool. Your workspace syncs across devices;
+            a few features (vault, PDF edits) always stay on this browser.
           </p>
         </div>
         <div className="tools-landing-sync-grid tools-landing-sync-grid--three">
           <div className="tools-landing-sync-card">
-            <h3>Without account</h3>
-            <ul>
-              {SYNC_NO_ACCOUNT.map((item) => <li key={item}>{item}</li>)}
-            </ul>
-          </div>
-          <div className="tools-landing-sync-card">
             <h3>Signed in</h3>
             <ul>
-              {SYNC_CLOUD.map((item) => <li key={item}>{item}</li>)}
+              {SYNC_SIGNED_IN.map((item) => <li key={item}>{item}</li>)}
             </ul>
           </div>
           <div className="tools-landing-sync-card">
@@ -395,7 +385,7 @@ export default function ToolsLandingPage() {
         <p className="tools-landing-sync-note">
           <Link to="/privacy">Privacy policy</Link>
           {' '}
-          — short version: cloud rows are scoped to your account; guest data never leaves this browser.
+          — cloud rows are scoped to your account; vault keys never leave this device.
         </p>
       </section>
 

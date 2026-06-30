@@ -1,3 +1,4 @@
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
 import { marketDataUserAgent } from "../_shared/marketDataUserAgent.ts";
 
 const YAHOO_HOSTS = ["https://query1.finance.yahoo.com", "https://query2.finance.yahoo.com"];
@@ -118,7 +119,12 @@ async function yahooQuote(symbol: string) {
 
 Deno.serve(async (req) => {
   try {
-    // Public read-only Yahoo proxy — guests must be able to browse stocks without signing in.
+    const base44 = createClientFromRequest(req);
+    const user = await base44.auth.me();
+    if (!user?.email) {
+      return Response.json({ error: { message: "Unauthorized" } }, { status: 401 });
+    }
+
     const body = await req.json().catch(() => ({}));
     const action = body?.action;
 

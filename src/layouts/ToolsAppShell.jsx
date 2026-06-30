@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useHubToggleShortcut } from '@/hooks/useHubToggleShortcut';
+import { useAuth } from '@/hooks/useAuth';
 import { useUiStore } from '@/store/uiStore';
 import ToolsAppSidebar from '@/components/app-shell/ToolsAppSidebar';
 import ToolsAppSidebarMobile from '@/components/app-shell/ToolsAppSidebarMobile';
@@ -12,14 +13,15 @@ import ThemeSync from '@/components/ThemeSync';
 import SyncUserDisplayName from '@/components/auth/SyncUserDisplayName';
 import { applyThemeFromStorage } from '@/lib/theme';
 import ToolsChromeToggle from '@/components/tools/chrome/ToolsChromeToggle';
-import GuestLocalNotice from '@/components/guest/GuestLocalNotice';
-import LocalOnlyBanner from '@/components/guest/LocalOnlyBanner';
 
 export default function ToolsAppShell() {
   const isMobile = useIsMobile();
+  const { user, isLoading: authLoading } = useAuth();
   useHubToggleShortcut();
   const toolsChromeCollapsed = useUiStore((s) => s.toolsChromeCollapsed);
   const hideChrome = toolsChromeCollapsed;
+  const signedIn = Boolean(user);
+  const showChrome = signedIn && !hideChrome;
 
   useEffect(() => {
     applyThemeFromStorage();
@@ -29,6 +31,7 @@ export default function ToolsAppShell() {
     'app-shell',
     isMobile ? 'app-shell--mobile' : '',
     hideChrome ? 'app-shell--tools-immersive' : '',
+    !signedIn && !authLoading ? 'app-shell--unsigned' : '',
   ].filter(Boolean).join(' ');
 
   return (
@@ -36,28 +39,31 @@ export default function ToolsAppShell() {
       <div className={shellClass}>
         <ThemeSync />
         <SyncUserDisplayName />
-        <GuestLocalNotice />
-        {!hideChrome && !isMobile && <ToolsAppSidebar />}
+        {showChrome && !isMobile && <ToolsAppSidebar />}
+        {!signedIn && !authLoading && !isMobile && (
+          <Link to="/" className="tools-auth-gate-logo" title="Plexity home">
+            <PlexityLogo size={32} />
+          </Link>
+        )}
         <div className="app-shell-main">
-          {!hideChrome && isMobile && (
+          {showChrome && isMobile && (
             <header className="site-header app-shell-mobile-header">
               <Link to="/" className="app-sidebar-logo-link" title="Plexity home">
                 <PlexityLogo size={32} />
               </Link>
             </header>
           )}
-          <LocalOnlyBanner />
           <main className="app-shell-content">
             <Outlet />
           </main>
-          {!hideChrome && (
+          {showChrome && (
             <div className="app-shell-bottom-chrome">
               <AppFooter />
               {isMobile && <ToolsAppSidebarMobile />}
             </div>
           )}
         </div>
-        <ToolsChromeToggle isMobile={isMobile} />
+        {signedIn && <ToolsChromeToggle isMobile={isMobile} />}
       </div>
     </CommandBarProvider>
   );

@@ -1,4 +1,5 @@
 import { base44 } from '@/api/base44Client';
+import { unwrapFunctionInvoke } from '@/api/tools/invoke-response';
 
 function extractResults(res) {
   if (Array.isArray(res?.results)) return res.results;
@@ -12,8 +13,7 @@ export async function searchStockSymbolsRemote(query) {
     action: 'search',
     query: query?.trim() || '',
   });
-  if (res?.error) throw new Error(res.error.message || 'Search failed');
-  return extractResults(res);
+  return extractResults(unwrapFunctionInvoke(res));
 }
 
 /** Fetch quotes for up to 3 symbols via server proxy. */
@@ -22,6 +22,5 @@ export async function fetchStockQuotesRemote(symbols = []) {
     action: 'quotes',
     symbols,
   });
-  if (res?.error) throw new Error(res.error.message || 'Quotes failed');
-  return extractResults(res);
+  return extractResults(unwrapFunctionInvoke(res));
 }

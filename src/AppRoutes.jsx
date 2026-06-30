@@ -29,6 +29,7 @@ import ToolsCatalogPage from '@/pages/tools/ToolsCatalogPage';
 import ToolsSettingsPage from '@/pages/tools/ToolsSettingsPage';
 import LegacyToolsRedirect from '@/components/routing/LegacyToolsRedirect';
 import RequireAdmin from '@/components/routing/RequireAdmin';
+import RequireAuth from '@/components/routing/RequireAuth';
 import AdminLayout from '@/layouts/AdminLayout';
 import FeedbackPage from '@/pages/feedback/FeedbackPage';
 import AdminFeedbackPage from '@/pages/admin/AdminFeedbackPage';
@@ -55,28 +56,30 @@ export default function AppRoutes() {
       </Route>
 
       <Route element={<ToolsAppShell />}>
-        <Route path="/dashboard" element={<ToolsDashboardPage />} />
-        <Route path="/tasks" element={<ToolsTasksPage />} />
-        <Route path="/calendar" element={<ToolsCalendarPage />} />
-        <Route path="/focus" element={<ToolsFocusPage />} />
-        <Route path="/grades" element={<ToolsGradesPage />} />
-        <Route path="/pdf/*" element={<ToolsPdfToolsPage />} />
-        <Route path="/stocks/*" element={<ToolsStocksPage />} />
-        <Route path="/typing" element={<ToolsTypingPage />} />
-        <Route path="/college" element={<ToolsCollegePage />} />
-        <Route path="/units" element={<ToolsUnitsPage />} />
-        <Route path="/journal" element={<ToolsJournalPage />} />
-        <Route path="/goals" element={<ToolsGoalsPage />} />
-        <Route path="/profile" element={<ToolsProfileToolPage />} />
-        <Route path="/lists" element={<ToolsListsPage />} />
-        <Route path="/passwords" element={<ToolsPasswordsPage />} />
-        <Route path="/calculator" element={<ToolsCalculatorPage />} />
-        <Route path="/catalog" element={<ToolsCatalogPage />} />
-        <Route path="/settings" element={<ToolsSettingsPage />} />
+        <Route element={<RequireAuth />}>
+          <Route path="/dashboard" element={<ToolsDashboardPage />} />
+          <Route path="/tasks" element={<ToolsTasksPage />} />
+          <Route path="/calendar" element={<ToolsCalendarPage />} />
+          <Route path="/focus" element={<ToolsFocusPage />} />
+          <Route path="/grades" element={<ToolsGradesPage />} />
+          <Route path="/pdf/*" element={<ToolsPdfToolsPage />} />
+          <Route path="/stocks/*" element={<ToolsStocksPage />} />
+          <Route path="/typing" element={<ToolsTypingPage />} />
+          <Route path="/college" element={<ToolsCollegePage />} />
+          <Route path="/units" element={<ToolsUnitsPage />} />
+          <Route path="/journal" element={<ToolsJournalPage />} />
+          <Route path="/goals" element={<ToolsGoalsPage />} />
+          <Route path="/profile" element={<ToolsProfileToolPage />} />
+          <Route path="/lists" element={<ToolsListsPage />} />
+          <Route path="/passwords" element={<ToolsPasswordsPage />} />
+          <Route path="/calculator" element={<ToolsCalculatorPage />} />
+          <Route path="/catalog" element={<ToolsCatalogPage />} />
+          <Route path="/settings" element={<ToolsSettingsPage />} />
 
-        {/* Legacy /tools/* redirects — keeps old links working */}
-        <Route path="/tools" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/tools/*" element={<LegacyToolsRedirect />} />
+          {/* Legacy /tools/* redirects — keeps old links working */}
+          <Route path="/tools" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/tools/*" element={<LegacyToolsRedirect />} />
+        </Route>
       </Route>
 
       <Route element={<MarketingLayout />}>
