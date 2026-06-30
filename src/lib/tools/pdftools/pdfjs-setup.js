@@ -1,11 +1,10 @@
 import * as pdfjs from 'pdfjs-dist/legacy/build/pdf.mjs';
-import workerUrl from 'pdfjs-dist/legacy/build/pdf.worker.min.mjs?url';
 
 const base = import.meta.env.BASE_URL || '/';
 const withTrailing = base.endsWith('/') ? base : `${base}/`;
 
-// Legacy build ships Map/WeakMap polyfills; worker must load the matching legacy worker file.
-pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
+// Served from public/ (see scripts/copy-pdfjs-assets.mjs) — avoids ?url imports that break on some hosts.
+pdfjs.GlobalWorkerOptions.workerSrc = `${withTrailing}pdf.worker.min.mjs`;
 
 let readyPromise = null;
 

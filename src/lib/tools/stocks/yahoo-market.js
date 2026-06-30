@@ -1,5 +1,5 @@
 /**
- * Yahoo Finance market data (unofficial). Dev proxy for public endpoints; authenticated via toolsMarketData.
+ * Yahoo Finance market data (unofficial). Dev uses Vite proxy; production uses toolsMarketData.
  */
 import { base44 } from '@/api/base44Client';
 
@@ -163,32 +163,56 @@ function profileFromChartMeta(meta) {
   };
 }
 
+/** Price/change from chart meta, including pre- and after-hours when Yahoo exposes them. */
+function quoteFromMeta(meta) {
+  if (!meta) return null;
+
+  const prevClose = meta.chartPreviousClose ?? meta.previousClose ?? meta.regularMarketPreviousClose;
+  const regular = meta.regularMarketPrice ?? prevClose;
+  const state = String(meta.marketState || '').toUpperCase();
+
+  let price = regular ?? prevClose;
+  if (state === 'PRE' && meta.preMarketPrice != null) price = meta.preMarketPrice;
+  else if (state === 'POST' && meta.postMarketPrice != null) price = meta.postMarketPrice;
+
+  if (price == null) return null;
+
+  const basis = (state === 'PRE' || state === 'POST') ? (regular ?? prevClose) : prevClose;
+  const change = basis ? ((price - basis) / basis) * 100 : 0;
+  const changeAmount = basis ? price - basis : 0;
+
+  return {
+    price,
+    change,
+    changeAmount,
+    previousClose: basis ?? prevClose,
+    dayOpen: meta.regularMarketOpen,
+  };
+}
+
 function parseChartQuote(data, symbol) {
   const result = data?.chart?.result?.[0];
   const meta = result?.meta;
-  if (!meta) return null;
+  const quote = quoteFromMeta(meta);
+  if (!quote) return null;
 
-  const price = meta.regularMarketPrice ?? meta.previousClose;
-  const prev = meta.chartPreviousClose ?? meta.previousClose;
-  const change = prev ? ((price - prev) / prev) * 100 : 0;
-  const changeAmount = prev ? price - prev : 0;
   const quotes = result?.indicators?.quote?.[0] || {};
   const opens = quotes.open || [];
-  const dayOpen = meta.regularMarketOpen ?? opens.find((o) => o != null);
+  const dayOpen = quote.dayOpen ?? opens.find((o) => o != null);
 
   return {
     symbol: symbol.toUpperCase(),
     name: meta.shortName || meta.longName || symbol,
-    price,
-    change,
-    changeAmount,
+    price: quote.price,
+    change: quote.change,
+    changeAmount: quote.changeAmount,
     volume: meta.regularMarketVolume,
     exchange: meta.exchangeName || meta.fullExchangeName,
     currency: meta.currency,
     marketState: meta.marketState,
     updatedAt: meta.regularMarketTime || Date.now() / 1000,
     dayOpen,
-    previousClose: prev,
+    previousClose: quote.previousClose,
     fiftyTwoWeekHigh: meta.fiftyTwoWeekHigh,
     fiftyTwoWeekLow: meta.fiftyTwoWeekLow,
     stats: metaStatsFromChart(meta),
@@ -199,25 +223,23 @@ function parseChartQuote(data, symbol) {
 function parseSparkRow(row) {
   const resp = row?.response?.[0];
   const meta = resp?.meta;
-  if (!meta?.regularMarketPrice) return null;
+  const quote = quoteFromMeta(meta);
+  if (!quote) return null;
 
-  const price = meta.regularMarketPrice;
-  const prev = meta.chartPreviousClose ?? meta.previousClose;
-  const change = prev ? ((price - prev) / prev) * 100 : 0;
   const quotes = resp?.indicators?.quote?.[0] || {};
   const closes = (quotes.close || []).filter((c) => c != null);
   const opens = quotes.open || [];
-  const dayOpen = meta.regularMarketOpen ?? opens.find((o) => o != null);
+  const dayOpen = quote.dayOpen ?? opens.find((o) => o != null);
 
   return {
     symbol: (row.symbol || meta.symbol || '').toUpperCase(),
     name: meta.shortName || meta.longName || row.symbol,
-    price,
-    change,
-    changeAmount: prev ? price - prev : null,
+    price: quote.price,
+    change: quote.change,
+    changeAmount: quote.changeAmount,
     volume: meta.regularMarketVolume,
     dayOpen,
-    previousClose: prev,
+    previousClose: quote.previousClose,
     fiftyTwoWeekHigh: meta.fiftyTwoWeekHigh,
     fiftyTwoWeekLow: meta.fiftyTwoWeekLow,
     dayHigh: meta.regularMarketDayHigh,

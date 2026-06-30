@@ -15,3 +15,8 @@ for (const folder of ['cmaps', 'standard_fonts', 'wasm']) {
   cpSync(src, dest, { recursive: true });
   console.log(`[pdfjs] copied ${folder} -> public/${folder}`);
 }
+
+const workerSrc = path.join(pdfjsDist, 'legacy/build/pdf.worker.min.mjs');
+const workerDest = path.join(publicDir, 'pdf.worker.min.mjs');
+cpSync(workerSrc, workerDest);
+console.log('[pdfjs] copied pdf.worker.min.mjs -> public/pdf.worker.min.mjs');
