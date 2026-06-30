@@ -25,35 +25,89 @@ function marketDataUserAgent(): string {
   return `Mozilla/5.0 (compatible; ${appName}/${appVersion}; +${contact})`;
 }
 
-function collectCookies(res: Response): string {
-  const parts: string[] = [];
+/** Merge Set-Cookie headers from a response into a name→value cookie jar. */
+function mergeCookiesIntoJar(res: Response, jar: Record<string, string>) {
+  let rawCookies: string[] = [];
   if (typeof res.headers.getSetCookie === "function") {
-    for (const c of res.headers.getSetCookie()) {
-      const bit = c.split(";")[0]?.trim();
-      if (bit) parts.push(bit);
-    }
+    rawCookies = res.headers.getSetCookie();
   } else {
     const raw = res.headers.get("set-cookie");
-    if (raw) parts.push(raw.split(";")[0]?.trim() || "");
+    if (raw) rawCookies = [raw];
   }
-  return parts.filter(Boolean).join("; ");
+  for (const c of rawCookies) {
+    const bit = c.split(";")[0]?.trim();
+    if (!bit) continue;
+    const eqIdx = bit.indexOf("=");
+    if (eqIdx === -1) continue;
+    const name = bit.slice(0, eqIdx).trim();
+    const value = bit.slice(eqIdx + 1).trim();
+    if (name) jar[name] = value;
+  }
 }
 
+function jarToString(jar: Record<string, string>): string {
+  return Object.entries(jar).map(([k, v]) => `${k}=${v}`).join("; ");
+}
+
+/**
+ * Acquire a Yahoo crumb by visiting the Yahoo Finance homepage first.
+ * The homepage sets the A1/A3/GUC cookies that the crumb endpoint requires;
+ * fetching fc.yahoo.com alone does not, which is why crumb issuance fails
+ * from cloud IPs.
+ */
 async function refreshYahooSession() {
   const userAgent = marketDataUserAgent() || DEFAULT_UA;
-  const fcRes = await fetch("https://fc.yahoo.com/", {
-    headers: { "User-Agent": userAgent },
-    redirect: "follow",
-  });
-  const fcCookies = collectCookies(fcRes);
-  if (fcCookies) sessionCookie = fcCookies;
+  const browserHeaders: Record<string, string> = {
+    "User-Agent": userAgent,
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Upgrade-Insecure-Requests": "1",
+  };
 
-  const crumbRes = await fetch("https://query1.finance.yahoo.com/v1/test/getcrumb", {
-    headers: { "User-Agent": userAgent, Cookie: sessionCookie },
-  });
-  if (!crumbRes.ok) throw new Error("Failed to obtain market data session");
-  sessionCrumb = (await crumbRes.text()).trim();
-  sessionAt = Date.now();
+  const cookieJar: Record<string, string> = {};
+
+  // Step 1: Visit the Yahoo Finance homepage — collects cookies AND the page
+  // HTML contains the crumb embedded in a <script> tag, letting us avoid the
+  // rate-limited getcrumb endpoint entirely.
+  let pageHtml = "";
+  try {
+    const homeRes = await fetch("https://finance.yahoo.com/", {
+      headers: browserHeaders,
+      redirect: "follow",
+    });
+    mergeCookiesIntoJar(homeRes, cookieJar);
+    pageHtml = await homeRes.text();
+  } catch {
+    /* homepage may be slow — continue with getcrumb fallback */
+  }
+
+  sessionCookie = jarToString(cookieJar);
+
+  // Step 2: Try extracting the crumb directly from the homepage HTML.
+  const crumbMatch = pageHtml.match(/"crumb"\s*:\s*"([^"]+)"/);
+  if (crumbMatch) {
+    sessionCrumb = crumbMatch[1];
+    sessionAt = Date.now();
+    return;
+  }
+
+  // Step 3: Fall back to the getcrumb endpoint on both hosts.
+  for (const host of ["query2", "query1"]) {
+    try {
+      const crumbRes = await fetch(`https://${host}.finance.yahoo.com/v1/test/getcrumb`, {
+        headers: { ...browserHeaders, Cookie: sessionCookie },
+      });
+      if (crumbRes.ok) {
+        sessionCrumb = (await crumbRes.text()).trim();
+        sessionAt = Date.now();
+        return;
+      }
+    } catch {
+      /* try next host */
+    }
+  }
+
+  throw new Error("Failed to obtain market data session");
 }
 
 function needsCrumb(path: string, method = "GET") {
