@@ -1,7 +1,5 @@
-import { searchStockSymbolsRemote, fetchStockQuotesRemote } from '@/api/tools/marketData';
+import { fetchQuotes, searchSymbols } from '@/lib/tools/stocks/stocks-provider';
 import { POPULAR_TICKERS } from '@/lib/tools/popular-tickers';
-
-const UA = 'Mozilla/5.0 (compatible; Plexity/1.0)';
 
 function localSymbolSearch(query) {
   const q = query?.trim().toUpperCase();
@@ -11,33 +9,16 @@ function localSymbolSearch(query) {
     .slice(0, 8);
 }
 
-function parseYahooChartPayload(data, sym) {
-  const meta = data?.chart?.result?.[0]?.meta;
-  if (!meta?.regularMarketPrice) return { symbol: sym, price: null, change: null };
-  const price = meta.regularMarketPrice;
-  const prev = meta.chartPreviousClose ?? meta.previousClose;
-  const change = prev ? ((price - prev) / prev) * 100 : 0;
-  return { symbol: sym, price, change };
-}
-
-/** Dev / fallback proxy path (see vite.config.js). */
-async function fetchYahooQuoteViaProxy(symbol) {
-  const sym = symbol.trim().toUpperCase();
-  const url = `/yahoo-finance/v8/finance/chart/${encodeURIComponent(sym)}?interval=1d&range=1d`;
-  const res = await fetch(url, { headers: { 'User-Agent': UA } });
-  if (!res.ok) throw new Error(`Quote proxy failed (${res.status})`);
-  const data = await res.json();
-  return parseYahooChartPayload(data, sym);
-}
-
 /** @param {string} query @returns {Promise<Array<{ symbol: string, name: string }>>} */
 export async function searchStockSymbols(query) {
   const q = query?.trim();
   if (!q || q.length < 1) return [];
 
   try {
-    const remote = await searchStockSymbolsRemote(q);
-    if (remote.length) return remote;
+    const remote = await searchSymbols(q);
+    if (remote.length) {
+      return remote.map(({ symbol, name }) => ({ symbol, name }));
+    }
   } catch {
     /* fall through to local list */
   }
@@ -45,7 +26,6 @@ export async function searchStockSymbols(query) {
   const local = localSymbolSearch(q);
   if (local.length) return local;
 
-  /* Exact symbol typed — allow manual entry even if search API unavailable */
   if (/^[A-Z][A-Z0-9.\-]{0,9}$/i.test(q)) {
     return [{ symbol: q.toUpperCase(), name: q.toUpperCase() }];
   }
@@ -63,29 +43,15 @@ export async function fetchStockQuotes(symbols = []) {
   if (!unique.length) return [];
 
   try {
-    const remote = await fetchStockQuotesRemote(unique);
-    const hasPrices = remote.some((row) => row?.price != null);
-    if (hasPrices) return remote;
+    const quotes = await fetchQuotes(unique);
+    return quotes.map((q) => ({
+      symbol: q.symbol,
+      price: q.price ?? null,
+      change: q.change ?? null,
+    }));
   } catch {
-    /* try proxy fallback */
+    return unique.map((sym) => ({ symbol: sym, price: null, change: null }));
   }
-
-  try {
-    const proxied = await Promise.all(
-      unique.map(async (sym) => {
-        try {
-          return await fetchYahooQuoteViaProxy(sym);
-        } catch {
-          return { symbol: sym, price: null, change: null };
-        }
-      }),
-    );
-    if (proxied.some((row) => row.price != null)) return proxied;
-  } catch {
-    /* no quotes available */
-  }
-
-  return unique.map((sym) => ({ symbol: sym, price: null, change: null }));
 }
 
 /** Normalize prefs array to exactly 3 slots. */

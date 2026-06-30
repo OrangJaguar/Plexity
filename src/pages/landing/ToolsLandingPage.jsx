@@ -80,6 +80,11 @@ const SYNC_SIGNED_IN = [
   'Schedule & preferences',
 ];
 const SYNC_LOCAL = ['Password vault (encrypted on device)', 'PDF edits (in-browser only)'];
+const TOOLS_COLLECTION_ID = 'tools-collection';
+
+function scrollToToolsCollection() {
+  document.getElementById(TOOLS_COLLECTION_ID)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
 
 function useScrollReveal() {
   useEffect(() => {
@@ -177,9 +182,13 @@ export default function ToolsLandingPage() {
                     Create account
                     <ArrowRight size={16} aria-hidden />
                   </Link>
-                  <Link to="/dashboard" className="btn tools-landing-btn-secondary">
-                    Use without account
-                  </Link>
+                  <button
+                    type="button"
+                    className="btn tools-landing-btn-secondary"
+                    onClick={scrollToToolsCollection}
+                  >
+                    Browse tools
+                  </button>
                 </>
               )}
             </div>
@@ -330,7 +339,7 @@ export default function ToolsLandingPage() {
         </div>
       </section>
 
-      <section className="tools-landing-section tools-landing-scroll-reveal">
+      <section id={TOOLS_COLLECTION_ID} className="tools-landing-section tools-landing-scroll-reveal">
         <div className="tools-landing-section-head">
           <div>
             <h2 className="tools-landing-section-title">The collection</h2>
@@ -339,10 +348,17 @@ export default function ToolsLandingPage() {
               of fighting. Pin favorites from the catalog.
             </p>
           </div>
-          <Link to="/catalog" className="tools-landing-link">
-            Open catalog
-            <ArrowRight size={14} aria-hidden />
-          </Link>
+          {user ? (
+            <Link to="/catalog" className="tools-landing-link">
+              Open catalog
+              <ArrowRight size={14} aria-hidden />
+            </Link>
+          ) : (
+            <button type="button" className="tools-landing-link" onClick={scrollToToolsCollection}>
+              Browse tools
+              <ArrowRight size={14} aria-hidden />
+            </button>
+          )}
         </div>
         <div className="tools-landing-tool-grid">
           {TOOL_REGISTRY.map((tool) => {

@@ -28,7 +28,7 @@ If you only see 8, you are missing entities that the app already uses in code. D
 | Function | Purpose |
 |----------|---------|
 | **submitFeedback** | Auth-gated feedback submission with rate limit and request ID generation |
-| **toolsMarketData** | Yahoo market data proxy (requires sign-in) |
+| **toolsMarketData** | Yahoo market data proxy (public read-only; deploy required for stocks) |
 
 ### ToolsFeedback RLS
 

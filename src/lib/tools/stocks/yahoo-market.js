@@ -1,5 +1,7 @@
 /**
- * Yahoo Finance market data (unofficial). Dev uses Vite proxy; production uses toolsMarketData.
+ * Yahoo Finance market data (unofficial).
+ * Production and dev both use the toolsMarketData function (same code path).
+ * Local `npm run dev` only falls back to the Vite /yahoo-finance proxy if the function is unreachable.
  */
 import { base44 } from '@/api/base44Client';
 import { unwrapFunctionInvoke } from '@/api/tools/invoke-response';
@@ -30,47 +32,51 @@ function yahooNum(value) {
   return Number.isFinite(n) ? n : null;
 }
 
-function isDevProxy() {
-  return import.meta.env.DEV;
-}
-
-function needsYahooAuth(path, method = 'GET') {
-  if (path.includes('/quoteSummary/')) return true;
-  if (method === 'POST' && path.includes('/screener') && !path.includes('/predefined/')) return true;
-  return false;
+async function yahooFetchDevProxy(path, { method = 'GET', body } = {}) {
+  const res = await fetch(`/yahoo-finance${path}`, {
+    method,
+    headers: {
+      'User-Agent': UA,
+      ...(method !== 'GET' ? { 'Content-Type': 'application/json' } : {}),
+    },
+    ...(method !== 'GET' && body != null ? { body: JSON.stringify(body) } : {}),
+  });
+  if (!res.ok) throw new Error(`Market data unavailable (${res.status})`);
+  return res.json();
 }
 
 async function yahooFetchRemote(path, { method = 'GET', body } = {}) {
-  const res = await base44.functions.invoke('toolsMarketData', {
-    action: 'yahoo',
-    path,
-    method,
-    body,
-  });
-  const payload = unwrapFunctionInvoke(res);
-  return payload.data;
+  try {
+    const res = await base44.functions.invoke('toolsMarketData', {
+      action: 'yahoo',
+      path,
+      method,
+      body,
+    });
+    const payload = unwrapFunctionInvoke(res);
+    if (payload?.data == null) throw new Error('Market data unavailable');
+    return payload.data;
+  } catch (err) {
+    const nested = err?.data?.error?.message ?? err?.data?.message;
+    throw new Error(nested || err?.message || 'Market data unavailable');
+  }
+}
+
+async function yahooRequest(path, { method = 'GET', body } = {}) {
+  try {
+    return await yahooFetchRemote(path, { method, body });
+  } catch (err) {
+    if (!import.meta.env.DEV) throw err;
+    return yahooFetchDevProxy(path, { method, body });
+  }
 }
 
 async function yahooGet(path) {
-  if (isDevProxy()) {
-    const res = await fetch(`/yahoo-finance${path}`, { headers: { 'User-Agent': UA } });
-    if (!res.ok) throw new Error(`Market data unavailable (${res.status})`);
-    return res.json();
-  }
-  return yahooFetchRemote(path, { method: 'GET' });
+  return yahooRequest(path, { method: 'GET' });
 }
 
 async function yahooPost(path, body) {
-  if (isDevProxy()) {
-    const res = await fetch(`/yahoo-finance${path}`, {
-      method: 'POST',
-      headers: { 'User-Agent': UA, 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-    if (!res.ok) throw new Error(`Market data unavailable (${res.status})`);
-    return res.json();
-  }
-  return yahooFetchRemote(path, { method: 'POST', body });
+  return yahooRequest(path, { method: 'POST', body });
 }
 
 function metaStatsFromChart(meta) {

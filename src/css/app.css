@@ -19431,6 +19431,15 @@
       color: var(--text-muted);
       text-decoration: none;
       transition: color 0.15s, gap 0.15s;
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    #tools-collection {
+      scroll-margin-top: 5rem;
     }
 
     .tools-landing-link:hover {
