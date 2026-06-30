@@ -8,7 +8,7 @@
 
 ## What it is
 
-Plexity is a full-stack personal productivity shell. Instead of bouncing between five different apps for tasks, grades, notes, a calculator, and a PDF tool, everything lives in one dark, minimal interface built exactly the way I want it.
+Plexity is a full-stack personal productivity shell. Instead of bouncing between five different apps for tasks, grades, notes, a calculator, and a PDF tool, everything lives in one dark, minimal interface built exactly the way I want it. It even comes with its own assistant to navigate and leverage any tool — try ctrl/cmd + K.
 
 It started as scratching my own itches. It became a real app.
 
@@ -18,7 +18,7 @@ It started as scratching my own itches. It became a real app.
 
 | Tool | What it does |
 |------|-------------|
-| **Tasks** | Add, manage, and track to-dos with natural language date parsing |
+| **Tasks** | Add, manage, and track to-dos |
 | **Calendar** | View and manage your schedule in one place |
 | **Goals** | Set and track long-term goals |
 | **Lists** | Simple, fast list-making |
@@ -27,10 +27,10 @@ It started as scratching my own itches. It became a real app.
 | **Focus** | Distraction-free focus timer |
 | **Calculator** | Clean calculator with math rendering (KaTeX) |
 | **PDF Tools** | View, edit, and manipulate PDFs in-browser |
-| **Stocks** | Quick stock lookups |
+| **Stocks** | Stock research workspace |
 | **Typing** | Typing speed practice |
 | **Units** | Unit converter |
-| **Passwords** | Local password manager |
+| **Passwords** | Encrypted password manager |
 | **College** | College-specific planning tools |
 | **Catalog** | Browse and launch all tools from one place |
 
