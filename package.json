@@ -14,7 +14,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@base44/sdk": "^0.8.39",
+    "@base44/sdk": "^0.8.40",
     "@base44/vite-plugin": "^1.0.30",
     "@radix-ui/react-dialog": "^1.1.6",
     "@tanstack/react-query": "^5.101.0",
