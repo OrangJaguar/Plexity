@@ -7,10 +7,12 @@ const TOOL_TITLES = {
   '/calculator': 'Calculator',
   '/tasks': 'Tasks',
   '/calendar': 'Calendar',
+  '/convert': 'Converter',
 };
 
 function toolTitleForPath(pathname) {
-  const match = Object.entries(TOOL_TITLES).find(([prefix]) => pathname.startsWith(prefix));
+  const route = pathname.startsWith('/admin/') ? pathname.slice('/admin'.length) : pathname;
+  const match = Object.entries(TOOL_TITLES).find(([prefix]) => route === prefix || route.startsWith(`${prefix}/`));
   return match ? match[1] : null;
 }
 

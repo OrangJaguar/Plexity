@@ -1,5 +1,5 @@
 import { TOOL_REGISTRY } from '@/lib/tools/registry';
-import { STORAGE_KEYS } from '@/lib/storage/storage-keys';
+import { STORAGE_KEYS, migrateLegacyPinnedToolIdsKey } from '@/lib/storage/storage-keys';
 
 export const PINNED_TOOLS_STORAGE_KEY = STORAGE_KEYS.pinnedToolIds;
 
@@ -19,6 +19,7 @@ export function sanitizePinnedToolIds(raw) {
 
 /** @returns {string[]|null} null if never stored */
 export function readPinnedToolIdsFromStorage() {
+  migrateLegacyPinnedToolIdsKey();
   try {
     const raw = localStorage.getItem(PINNED_TOOLS_STORAGE_KEY);
     if (raw === null) return null;

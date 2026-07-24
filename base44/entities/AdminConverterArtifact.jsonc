@@ -1,0 +1,25 @@
+{
+  "name": "AdminConverterArtifact",
+  "type": "object",
+  "properties": {
+    "artifactId": { "type": "string" },
+    "jobId": { "type": "string" },
+    "packageId": { "type": "string" },
+    "outputKind": {
+      "type": "string",
+      "description": "primary | report | package | thumbnail | subtitle | sidecar | transcript | subtitle-ai | ocr-text | alt-text | ai-summary"
+    },
+    "sizeBucket": { "type": "string", "description": "Coarse size bucket, never exact bytes" },
+    "mimeCategory": { "type": "string", "description": "image | audio | video | data | archive | unknown" },
+    "expiresAt": { "type": "number" },
+    "downloadCount": { "type": "number" },
+    "createdAt": { "type": "number" }
+  },
+  "required": ["artifactId", "outputKind", "createdAt"],
+  "rls": {
+    "create": { "user_condition": { "role": "admin" } },
+    "read": { "user_condition": { "role": "admin" } },
+    "update": { "user_condition": { "role": "admin" } },
+    "delete": { "user_condition": { "role": "admin" } }
+  }
+}

@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { RESEARCH_TAGS } from '@/lib/tools/stocks/stocks-model';
 import { formatDateTime } from '@/lib/tools/stocks/stocks-format';
 import { StocksDataNotice } from '@/components/tools/stocks/stocks-shared';
-import { stocksSymbolRoute } from '@/lib/tools/tool-routes';
+import { useScopedToolRoutes } from '@/hooks/useScopedToolRoutes';
 
 export default function StocksResearch({ workspace, saveWorkspace }) {
   const navigate = useNavigate();
+  const { stocksSymbolRoute } = useScopedToolRoutes();
   const research = workspace?.research || {};
   const [selected, setSelected] = useState(null);
   const [tagFilter, setTagFilter] = useState('all');

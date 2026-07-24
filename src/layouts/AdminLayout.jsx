@@ -1,5 +1,6 @@
 import { Link, Outlet } from 'react-router-dom';
 import PlexityLogo from '@/components/layout/PlexityLogo';
+import { ADMIN_HOME, ADMIN_FEEDBACK_ROUTE } from '@/lib/tools/tool-surface';
 
 export default function AdminLayout() {
   return (
@@ -10,7 +11,8 @@ export default function AdminLayout() {
           <span>Plexity Admin</span>
         </Link>
         <nav className="admin-layout-nav" aria-label="Admin">
-          <Link to="/admin/feedback" className="admin-layout-nav-link">Feedback</Link>
+          <Link to={ADMIN_HOME} className="admin-layout-nav-link">Tools</Link>
+          <Link to={ADMIN_FEEDBACK_ROUTE} className="admin-layout-nav-link">Feedback</Link>
         </nav>
       </header>
       <main className="admin-layout-main">

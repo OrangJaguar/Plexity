@@ -13,6 +13,7 @@ import { Mic, MicOff, Square, ArrowUp } from 'lucide-react';
 import { toast } from 'sonner';
 import PlexityLogo from '@/components/layout/PlexityLogo';
 import { useAuth } from '@/hooks/useAuth';
+import { useOptionalToolSurface } from '@/hooks/useToolSurface';
 import { useToolsTasks } from '@/hooks/queries/useToolsTasks';
 import { useToolsCalendarEvents } from '@/hooks/queries/useToolsCalendarEvents';
 import { useToolsSchedule } from '@/hooks/queries/useToolsSchedule';
@@ -90,6 +91,8 @@ export function CommandBarProvider({ children }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated } = useAuth();
+  const { surface, basePath } = useOptionalToolSurface();
+  const routeOpts = useMemo(() => ({ surface, basePath }), [surface, basePath]);
   const { tasks } = useToolsTasks();
   const { events } = useToolsCalendarEvents();
   const { data: schedule } = useToolsSchedule();
@@ -146,12 +149,12 @@ export function CommandBarProvider({ children }) {
   }, []);
 
   const openDraftEditor = useCallback((confirmResult, draftKind) => {
-    const { route, state } = buildCommandBarNavigation(confirmResult, draftKind);
+    const { route, state } = buildCommandBarNavigation(confirmResult, draftKind, routeOpts);
     const label = draftKind === 'event' ? 'calendar event' : 'task';
     toast.message(`Opening ${label} editor…`, { duration: 2200 });
     navigate(route, { state });
     close();
-  }, [close, navigate]);
+  }, [close, navigate, routeOpts]);
 
   const applySlashSelection = useCallback((cmd) => {
     const next = `${cmd.label} `;
@@ -176,19 +179,22 @@ export function CommandBarProvider({ children }) {
   }, [close, navigate]);
 
   const handleActionResult = useCallback((out) => {
-    const { route, state } = buildCommandBarAction(out);
+    const { route, state } = buildCommandBarAction(out, routeOpts);
     toast.message('Running command…', { duration: 1800 });
     navigate(route, { state });
     close();
-  }, [close, navigate]);
+  }, [close, navigate, routeOpts]);
 
   useEffect(() => {
     const onKey = (e) => {
       const mod = e.metaKey || e.ctrlKey;
-      if (mod && e.shiftKey && e.code === 'Space') {
+      const isCmdK = mod && !e.shiftKey && !e.altKey && e.key.toLowerCase() === 'k';
+      const isCmdShiftSpace = mod && e.shiftKey && e.code === 'Space';
+      if (isCmdK || isCmdShiftSpace) {
         e.preventDefault();
         if (open) close();
         else openBar();
+        return;
       }
       if (e.key === 'Escape' && open) {
         if (slashVisible && input.startsWith('/')) {
@@ -269,6 +275,7 @@ export function CommandBarProvider({ children }) {
         events,
         schedule,
         pageContext,
+        routeOpts,
         signal: abortRef.current.signal,
       });
       setResult(out);

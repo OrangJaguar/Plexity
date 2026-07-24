@@ -1,0 +1,25 @@
+{
+  "name": "AdminConverterAiJob",
+  "type": "object",
+  "properties": {
+    "jobId": { "type": "string" },
+    "actorEmail": { "type": "string" },
+    "actorId": { "type": "string" },
+    "kind": { "type": "string", "description": "ocr | transcribe | translate | assist" },
+    "status": { "type": "string" },
+    "progressPhase": { "type": "string" },
+    "progressFraction": { "type": "number" },
+    "errorCode": { "type": "string" },
+    "provider": { "type": "string" },
+    "expiresAt": { "type": "number" },
+    "createdAt": { "type": "number" },
+    "updatedAt": { "type": "number" }
+  },
+  "required": ["jobId", "actorEmail", "kind", "status", "createdAt"],
+  "rls": {
+    "create": { "user_condition": { "role": "admin" } },
+    "read": { "user_condition": { "role": "admin" } },
+    "update": { "user_condition": { "role": "admin" } },
+    "delete": { "user_condition": { "role": "admin" } }
+  }
+}

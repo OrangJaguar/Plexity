@@ -7,10 +7,11 @@ import StocksSectorHeatmap from '@/components/tools/stocks/StocksSectorHeatmap';
 import {
   StocksChange, StocksDataNotice, StocksError, StocksKpi, StocksLoader, StocksPanel,
 } from '@/components/tools/stocks/stocks-shared';
-import { stocksRoute, stocksSymbolRoute } from '@/lib/tools/tool-routes';
+import { useScopedToolRoutes } from '@/hooks/useScopedToolRoutes';
 
 export default function StocksOverview({ workspace, onOpenSymbol }) {
   const navigate = useNavigate();
+  const { stocksRoute, stocksSymbolRoute } = useScopedToolRoutes();
   const indices = useIndexQuotes();
   const movers = useMovers();
   const news = useMarketNews();

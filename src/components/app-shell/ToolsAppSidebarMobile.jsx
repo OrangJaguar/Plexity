@@ -1,43 +1,58 @@
 import { useLocation } from 'react-router-dom';
-import { Settings } from 'lucide-react';
+import { Settings, Command } from 'lucide-react';
 import {
   getToolsNavItems,
   TOOLS_CATALOG_NAV_ITEM,
-  TOOLS_SETTINGS_ROUTE,
 } from '@/components/app-shell/tools-nav-items';
 import SidebarNavLink from '@/components/app-shell/SidebarNavLink';
 import ToolsCatalogNavIcon from '@/components/app-shell/ToolsCatalogNavIcon';
 import { usePinnedTools } from '@/hooks/queries/usePinnedTools';
+import { useCommandBar } from '@/components/command-bar/CommandBarProvider';
+import { useScopedToolRoutes } from '@/hooks/useScopedToolRoutes';
+import { normalizeToolPathname } from '@/lib/tools/tool-routes';
 
 export default function ToolsAppSidebarMobile() {
   const location = useLocation();
   const { pinnedToolIds } = usePinnedTools();
-  const items = getToolsNavItems(pinnedToolIds);
+  const { openBar } = useCommandBar();
+  const { catalogRoute, settingsRoute, toolRoute } = useScopedToolRoutes();
+  const items = getToolsNavItems(pinnedToolIds, { toolRoute, excludeDesktopOnly: true });
+  const catalogTo = catalogRoute();
+  const settingsTo = settingsRoute();
+  const canonicalPath = normalizeToolPathname(location.pathname);
 
   return (
     <nav className="app-sidebar-mobile app-sidebar-mobile--tools">
       <SidebarNavLink
-        to={TOOLS_CATALOG_NAV_ITEM.to}
+        to={catalogTo}
         label="Catalog"
         icon={ToolsCatalogNavIcon}
         rawIcon
-        end={location.pathname === TOOLS_CATALOG_NAV_ITEM.to}
+        end={canonicalPath === TOOLS_CATALOG_NAV_ITEM.to}
       />
-      {items.map(({ to, label, icon, sidebarIconActive }) => (
+      {items.map(({ to, label, icon, sidebarIconActive, canonicalRoute }) => (
         <SidebarNavLink
           key={to}
           to={to}
           label={label}
           icon={icon}
           sidebarIconActive={sidebarIconActive}
-          end={location.pathname === to}
+          end={canonicalRoute === '/dashboard'}
         />
       ))}
+      <button
+        type="button"
+        className="app-sidebar-link app-sidebar-mobile-command"
+        onClick={openBar}
+        aria-label="Open command bar"
+      >
+        <Command size={20} strokeWidth={1.75} />
+      </button>
       <SidebarNavLink
-        to={TOOLS_SETTINGS_ROUTE}
+        to={settingsTo}
         label="Settings"
         icon={Settings}
-        end={location.pathname === TOOLS_SETTINGS_ROUTE}
+        end={canonicalPath === '/settings'}
       />
     </nav>
   );

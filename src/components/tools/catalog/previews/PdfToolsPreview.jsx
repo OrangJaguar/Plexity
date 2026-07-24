@@ -6,11 +6,7 @@ export default function PdfToolsPreview() {
   return (
     <div className="tools-preview-scale tools-preview-pdf">
       <div className="pdf-editor pdf-editor--active tools-preview-pdf-editor">
-        <header className="pdf-editor-header">
-          <div>
-            <h1 className="pdf-editor-title">PDF</h1>
-            <p className="pdf-editor-subtitle">Merge, split, rearrange, and annotate PDFs</p>
-          </div>
+        <header className="pdf-editor-header pdf-editor-header--actions-only">
           <div className="pdf-editor-header-actions">
             <button type="button" className="pdf-btn pdf-btn--ghost pdf-btn--sm" tabIndex={-1}>
               <Search size={14} /> Search

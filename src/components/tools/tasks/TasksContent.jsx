@@ -19,7 +19,7 @@ import { formatAgendaDateTime } from '@/lib/tools/time-format';
 import { buildManualReorder } from '@/api/entities/toolsTasks';
 import { useCommandBarDraft } from '@/hooks/useCommandBarDraft';
 import { taskFormToEventDraft } from '@/lib/tools/command-bar-draft';
-import { getToolRoute } from '@/lib/tools/tool-routes';
+import { useScopedToolRoutes } from '@/hooks/useScopedToolRoutes';
 
 const SORT_MODE_KEY = 'plexity.tasksSortMode';
 
@@ -224,6 +224,7 @@ export default function TasksContent({
   completeTask,
 }) {
   const navigate = useNavigate();
+  const { toolRoute } = useScopedToolRoutes();
   const { draft: commandDraft, clearDraft, action, clearAction } = useCommandBarDraft(['task', 'action']);
   const [tab, setTab] = useState('tasks');
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -261,7 +262,7 @@ export default function TasksContent({
   const handleSwitchToEvent = (form) => {
     setDialogOpen(false);
     clearDraft();
-    navigate(getToolRoute('calendar'), {
+    navigate(toolRoute('calendar'), {
       state: { commandBar: { type: 'event', draft: taskFormToEventDraft(form) } },
     });
   };

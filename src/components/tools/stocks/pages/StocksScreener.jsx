@@ -8,7 +8,7 @@ import { loadScreenerPresets, newWatchlistItem } from '@/lib/tools/stocks/stocks
 import {
   StocksChange, StocksDataNotice, StocksError, StocksLoader, StocksTable,
 } from '@/components/tools/stocks/stocks-shared';
-import { stocksSymbolRoute } from '@/lib/tools/tool-routes';
+import { useScopedToolRoutes } from '@/hooks/useScopedToolRoutes';
 
 const DEFAULT_FILTERS = {
   sector: 'all',
@@ -41,6 +41,7 @@ function sortRows(rows, sortKey, sortDir) {
 
 export default function StocksScreener({ workspace, saveWorkspace, compare }) {
   const navigate = useNavigate();
+  const { stocksSymbolRoute } = useScopedToolRoutes();
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
   const [applied, setApplied] = useState(() => ({ ...DEFAULT_FILTERS }));
   const [tableSort, setTableSort] = useState({ key: null, dir: 'desc' });

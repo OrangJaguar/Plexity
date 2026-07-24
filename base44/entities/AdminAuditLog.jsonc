@@ -1,0 +1,30 @@
+{
+  "name": "AdminAuditLog",
+  "type": "object",
+  "properties": {
+    "actorEmail": { "type": "string" },
+    "actorId": { "type": "string" },
+    "action": { "type": "string" },
+    "targetType": { "type": "string" },
+    "targetId": { "type": "string" },
+    "outcome": { "type": "string", "description": "success | failure" },
+    "requestId": { "type": "string" },
+    "detail": { "type": "string", "description": "Sanitized short detail — never secrets, URLs, or full payloads" },
+    "createdAt": { "type": "number" }
+  },
+  "required": ["actorEmail", "action", "outcome", "requestId", "createdAt"],
+  "rls": {
+    "create": {
+      "user_condition": { "role": "admin" }
+    },
+    "read": {
+      "user_condition": { "role": "admin" }
+    },
+    "update": {
+      "user_condition": { "role": "__service_only__" }
+    },
+    "delete": {
+      "user_condition": { "role": "__service_only__" }
+    }
+  }
+}

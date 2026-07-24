@@ -8,6 +8,7 @@ describe('resolvePageContext', () => {
     expect(resolvePageContext('/focus').pageId).toBe('focus');
     expect(resolvePageContext('/dashboard').pageId).toBe('dashboard');
     expect(resolvePageContext('/pdf').pageId).toBe('pdftools');
+    expect(resolvePageContext('/convert').pageId).toBe('converter');
     expect(resolvePageContext('/stocks/screener').pageId).toBe('stocks');
   });
 
@@ -15,6 +16,20 @@ describe('resolvePageContext', () => {
     expect(resolvePageContext('/tools/calendar').pageId).toBe('calendar');
     expect(resolvePageContext('/tools/tasks').pageId).toBe('tasks');
     expect(resolvePageContext('/tools/pdf').pageId).toBe('pdftools');
+  });
+
+  it('maps admin mirrored paths to the same page ids', () => {
+    expect(resolvePageContext('/admin/calendar').pageId).toBe('calendar');
+    expect(resolvePageContext('/admin/tasks').pageId).toBe('tasks');
+    expect(resolvePageContext('/admin/stocks/screener').pageId).toBe('stocks');
+    expect(resolvePageContext('/admin/pdf').pageId).toBe('pdftools');
+    expect(resolvePageContext('/admin/convert').pageId).toBe('converter');
+    expect(resolvePageContext('/admin/catalog').pageId).toBe('catalog');
+    expect(resolvePageContext('/admin/settings').pageId).toBe('settings');
+  });
+
+  it('does not treat admin feedback as a tool page', () => {
+    expect(resolvePageContext('/admin/feedback').pageId).toBe('global');
   });
 
   it('returns global for unknown paths', () => {

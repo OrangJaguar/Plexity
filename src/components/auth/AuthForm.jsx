@@ -6,15 +6,12 @@ import { queryClient } from '@/lib/query-client';
 import { clearInMemoryUserQueries, clearLegacyPersistedCache } from '@/lib/query-persist';
 import { trackProductEvent } from '@/lib/analytics';
 import { syncAuthUserFullName, refreshAuthUser } from '@/api/auth/userProfile';
-import { useUsernameAvailability } from '@/hooks/useUsernameAvailability';
-import { isValidUsernameFormat, normalizeUsername } from '@/utils/schemas/preferences';
 import { isValidSignupPassword, passwordsMatch } from '@/utils/schemas/password';
 import {
   AuthFieldRules,
   allRulesPass,
   buildConfirmPasswordRules,
   buildPasswordRules,
-  buildUsernameRules,
 } from '@/components/auth/AuthFieldRules';
 
 function EyeIcon({ visible }) {
@@ -27,12 +24,9 @@ function EyeIcon({ visible }) {
   );
 }
 
-function UsernameStatus({ status }) {
-  if (status === 'checking') return <span className="auth-username-status checking">Checking…</span>;
-  if (status === 'available') return <span className="auth-username-status available">✓ Available</span>;
-  if (status === 'taken') return <span className="auth-username-status taken">✗ Taken</span>;
-  if (status === 'invalid') return <span className="auth-username-status taken">Invalid format</span>;
-  return null;
+function displayNameFromEmail(value) {
+  const local = String(value || '').split('@')[0]?.trim();
+  return local || 'User';
 }
 
 export default function AuthForm({
@@ -47,8 +41,6 @@ export default function AuthForm({
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [username, setUsername] = useState('');
-  const [usernameFocused, setUsernameFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
   const [confirmPasswordFocused, setConfirmPasswordFocused] = useState(false);
   const [legalAgreed, setLegalAgreed] = useState(false);
@@ -57,18 +49,12 @@ export default function AuthForm({
   const [error, setError] = useState('');
   const [info, setInfo] = useState('');
   const inputRefs = useRef([]);
-  const pendingUsernameRef = useRef('');
 
   const activeTab = allowTabSwitch ? tab : defaultTab;
   const isSignup = activeTab === 'signup';
-  const usernameStatus = useUsernameAvailability(username, {
-    enabled: isSignup && step === 'form',
-  });
 
-  const usernameRules = buildUsernameRules(username, usernameFocused);
   const passwordRules = buildPasswordRules(password, passwordFocused);
   const confirmRules = buildConfirmPasswordRules(password, confirmPassword, confirmPasswordFocused);
-  const showUsernameRules = isSignup && (usernameFocused || username.length > 0);
   const showPasswordRules = isSignup && (passwordFocused || password.length > 0);
   const showConfirmRules = isSignup && (confirmPasswordFocused || confirmPassword.length > 0);
 
@@ -105,14 +91,12 @@ export default function AuthForm({
   const otpCode = digits.join('');
 
   const signupReady = isSignup
-    && allRulesPass(usernameRules)
-    && isValidUsernameFormat(username)
-    && usernameStatus === 'available'
     && allRulesPass(passwordRules)
     && isValidSignupPassword(password)
     && allRulesPass(confirmRules)
     && passwordsMatch(password, confirmPassword)
-    && legalAgreed;
+    && legalAgreed
+    && Boolean(email.trim());
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -129,9 +113,8 @@ export default function AuthForm({
           setLoading(false);
           return;
         }
-        const normalized = normalizeUsername(username);
-        pendingUsernameRef.current = normalized;
-        await base44.auth.register({ email, password, full_name: normalized });
+        const displayName = displayNameFromEmail(email);
+        await base44.auth.register({ email, password, full_name: displayName });
         setInfo('Code sent! Check your email.');
         setStep('verify');
       }
@@ -159,24 +142,19 @@ export default function AuthForm({
       const token = response?.access_token || response?.token || response?.data?.access_token;
       if (token) base44.auth.setToken(token);
       const user = await base44.auth.me();
-      const chosenUsername = pendingUsernameRef.current || normalizeUsername(username);
-      if (chosenUsername) {
-        try {
-          await createUserPreferencesOnSignup({
-            username: chosenUsername,
-            userEmail: user.email,
-          });
-        } catch (prefErr) {
-          const prefMsg = prefErr?.message || 'Could not save your username. Try again or contact support.';
-          setError(prefMsg);
-          setLoading(false);
-          return;
-        }
-        try {
-          await syncAuthUserFullName(chosenUsername);
-        } catch {
-          // UserPreferences.username still saved; SyncUserDisplayName repairs on next load
-        }
+      const displayName = displayNameFromEmail(user.email || email);
+      try {
+        await createUserPreferencesOnSignup({ userEmail: user.email });
+      } catch (prefErr) {
+        const prefMsg = prefErr?.message || 'Could not finish setting up your account. Try again or contact support.';
+        setError(prefMsg);
+        setLoading(false);
+        return;
+      }
+      try {
+        await syncAuthUserFullName(displayName);
+      } catch {
+        // Preferences still saved; display name sync can retry later
       }
       clearInMemoryUserQueries(queryClient);
       clearLegacyPersistedCache();
@@ -208,8 +186,10 @@ export default function AuthForm({
   }
 
   function resetSignupFields() {
+    setPassword('');
     setConfirmPassword('');
-    setUsernameFocused(false);
+    setShowPassword(false);
+    setShowConfirmPassword(false);
     setPasswordFocused(false);
     setConfirmPasswordFocused(false);
     setLegalAgreed(false);
@@ -280,28 +260,6 @@ export default function AuthForm({
           )}
 
           <form onSubmit={handleSubmit} className="auth-form-fields">
-            {isSignup && (
-              <div className="app-form-field auth-field-block" style={{ margin: 0 }}>
-                <label htmlFor="auth-username">Username</label>
-                <input
-                  id="auth-username"
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(normalizeUsername(e.target.value))}
-                  onFocus={() => setUsernameFocused(true)}
-                  onBlur={() => setUsernameFocused(false)}
-                  placeholder="your_username"
-                  required
-                  autoFocus
-                  autoComplete="username"
-                  spellCheck={false}
-                />
-                {showUsernameRules && (
-                  <AuthFieldRules rules={usernameRules} columns={1} />
-                )}
-                <UsernameStatus status={usernameStatus} />
-              </div>
-            )}
             <div className="app-form-field auth-field-block" style={{ margin: 0 }}>
               <label htmlFor="auth-email">Email</label>
               <input
@@ -311,7 +269,7 @@ export default function AuthForm({
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 required
-                autoFocus={!isSignup}
+                autoFocus
                 autoComplete="email"
               />
             </div>
@@ -387,25 +345,15 @@ export default function AuthForm({
             )}
             <button
               type="submit"
-              className="btn btn-primary auth-submit-btn"
+              className="btn btn-primary auth-submit"
               disabled={loading || (isSignup && !signupReady)}
             >
-              {loading ? 'Please wait…' : activeTab === 'login' ? 'Sign In' : 'Create Account'}
+              {loading ? 'Please wait…' : isSignup ? 'Create account' : 'Sign in'}
             </button>
           </form>
-
-          {!allowTabSwitch && (
-            <p style={{ marginTop: '1rem', textAlign: 'center', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-              {activeTab === 'login' ? "Don't have an account? " : 'Already have an account? '}
-              <Link to={activeTab === 'login' ? '/signup' : '/signin'} style={{ color: 'var(--text-main)', fontWeight: 600, fontSize: '0.75rem', textDecoration: 'underline' }}>
-                {activeTab === 'login' ? 'Sign up' : 'Sign in'}
-              </Link>
-            </p>
-          )}
-
           {allowTabSwitch && (
-            <p style={{ marginTop: '1rem', textAlign: 'center', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-              {tab === 'login' ? "Don't have an account? " : 'Already have an account? '}
+            <p className="auth-switch-tab">
+              {tab === 'login' ? 'Need an account?' : 'Already have an account?'}{' '}
               <button type="button" onClick={() => { setTab(tab === 'login' ? 'signup' : 'login'); resetMessages(); resetSignupFields(); }} style={{ background: 'none', border: 'none', color: 'var(--text-main)', cursor: 'pointer', fontWeight: 600, fontSize: '0.75rem', padding: 0, textDecoration: 'underline' }}>
                 {tab === 'login' ? 'Sign up' : 'Sign in'}
               </button>

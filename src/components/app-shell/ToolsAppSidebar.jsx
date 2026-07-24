@@ -4,17 +4,25 @@ import PlexityLogo from '@/components/layout/PlexityLogo';
 import {
   getToolsNavItems,
   TOOLS_CATALOG_NAV_ITEM,
-  TOOLS_SETTINGS_ROUTE,
 } from '@/components/app-shell/tools-nav-items';
 import SidebarNavLink from '@/components/app-shell/SidebarNavLink';
 import ToolsSidebarNav from '@/components/app-shell/ToolsSidebarNav';
 import ToolsCatalogNavIcon from '@/components/app-shell/ToolsCatalogNavIcon';
 import { usePinnedTools } from '@/hooks/queries/usePinnedTools';
+import { useScopedToolRoutes } from '@/hooks/useScopedToolRoutes';
+import { useOptionalToolSurface } from '@/hooks/useToolSurface';
+import AdminSurfaceBadge from '@/components/admin/AdminSurfaceBadge';
+import { normalizeToolPathname } from '@/lib/tools/tool-routes';
 
 export default function ToolsAppSidebar() {
   const location = useLocation();
   const { pinnedToolIds } = usePinnedTools();
-  const items = getToolsNavItems(pinnedToolIds);
+  const { catalogRoute, settingsRoute, toolRoute } = useScopedToolRoutes();
+  const { isAdminSurface } = useOptionalToolSurface();
+  const items = getToolsNavItems(pinnedToolIds, { toolRoute });
+  const catalogTo = catalogRoute();
+  const settingsTo = settingsRoute();
+  const canonicalPath = normalizeToolPathname(location.pathname);
 
   return (
     <aside className="app-sidebar">
@@ -23,23 +31,28 @@ export default function ToolsAppSidebar() {
           <PlexityLogo size={28} />
         </Link>
       </div>
+      {isAdminSurface && (
+        <div className="app-sidebar-admin-badge-slot">
+          <AdminSurfaceBadge />
+        </div>
+      )}
       <div className="tools-sidebar-catalog-slot">
         <SidebarNavLink
-          to={TOOLS_CATALOG_NAV_ITEM.to}
+          to={catalogTo}
           label="Catalog"
           icon={ToolsCatalogNavIcon}
           rawIcon
-          end={location.pathname === TOOLS_CATALOG_NAV_ITEM.to}
+          end={canonicalPath === TOOLS_CATALOG_NAV_ITEM.to}
           className="app-sidebar-link tools-sidebar-catalog-link"
         />
       </div>
       <ToolsSidebarNav items={items} />
       <div className="app-sidebar-footer">
         <SidebarNavLink
-          to={TOOLS_SETTINGS_ROUTE}
+          to={settingsTo}
           label="Settings"
           icon={Settings}
-          end={location.pathname === TOOLS_SETTINGS_ROUTE}
+          end={canonicalPath === '/settings'}
         />
       </div>
     </aside>

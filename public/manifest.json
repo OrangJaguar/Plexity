@@ -1,0 +1,26 @@
+{
+  "name": "Plexity",
+  "short_name": "Plexity",
+  "description": "A free student workspace — tasks, calendar, focus, grades, journal, and more in one place.",
+  "id": "/",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#000000",
+  "theme_color": "#0a0a0b",
+  "icons": [
+    {
+      "src": "/plexity-logo-dark-bg.png",
+      "sizes": "500x500",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/plexity-logo-dark-bg.png",
+      "sizes": "500x500",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

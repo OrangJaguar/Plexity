@@ -1,0 +1,29 @@
+{
+  "name": "AdminConverterPackage",
+  "type": "object",
+  "properties": {
+    "packageId": { "type": "string" },
+    "batchId": { "type": "string" },
+    "actorEmail": { "type": "string" },
+    "actorId": { "type": "string" },
+    "status": { "type": "string" },
+    "entryCount": { "type": "number" },
+    "sizeBucket": { "type": "string" },
+    "errorCode": { "type": "string" },
+    "includeThumbnails": { "type": "boolean" },
+    "includeSubtitles": { "type": "boolean" },
+    "includeMetadata": { "type": "boolean" },
+    "readySubsetOnly": { "type": "boolean" },
+    "expiresAt": { "type": "number" },
+    "downloadCount": { "type": "number" },
+    "createdAt": { "type": "number" },
+    "updatedAt": { "type": "number" }
+  },
+  "required": ["packageId", "batchId", "actorEmail", "status", "createdAt"],
+  "rls": {
+    "create": { "user_condition": { "role": "admin" } },
+    "read": { "user_condition": { "role": "admin" } },
+    "update": { "user_condition": { "role": "admin" } },
+    "delete": { "user_condition": { "role": "admin" } }
+  }
+}

@@ -1,5 +1,5 @@
 import { toDateTimeLocalKey } from '@/lib/tools/date';
-import { getToolRoute, TOOLS_HOME } from '@/lib/tools/tool-routes';
+import { getToolRoute, getToolsHome } from '@/lib/tools/tool-routes';
 
 export function defaultEndFromStart(start) {
   if (!start) return '';
@@ -34,29 +34,44 @@ export function eventFormToTaskDraft({ title, start }) {
   return eventDraftToTaskDraft({ title, start });
 }
 
-/** @returns {{ route: string, state: { commandBar: object } }} */
-export function buildCommandBarNavigation(result, kind) {
+/**
+ * @param {object} result
+ * @param {string} kind
+ * @param {{ basePath?: string, surface?: string }} [routeOpts]
+ * @returns {{ route: string, state: { commandBar: object } }}
+ */
+export function buildCommandBarNavigation(result, kind, routeOpts = {}) {
   const asEvent = kind === 'event' || result.intent === 'create_events';
 
   if (asEvent) {
     const draft = result.events?.[0] || taskDraftToEventDraft(result.task);
     return {
-      route: getToolRoute('calendar'),
+      route: getToolRoute('calendar', routeOpts),
       state: { commandBar: { type: 'event', draft } },
     };
   }
 
   const draft = result.task || eventDraftToTaskDraft(result.events?.[0]);
   return {
-    route: getToolRoute('tasks'),
+    route: getToolRoute('tasks', routeOpts),
     state: { commandBar: { type: 'task', draft } },
   };
 }
 
-/** @returns {{ route: string, state: { commandBar: object } }} */
-export function buildCommandBarAction(result) {
+/**
+ * @param {object} result
+ * @param {{ basePath?: string, surface?: string }} [routeOpts]
+ * @returns {{ route: string, state: { commandBar: object } }}
+ */
+export function buildCommandBarAction(result, routeOpts = {}) {
+  const fallback = getToolsHome(routeOpts);
+  let route = result.route || fallback;
+  // If a caller already produced a scoped route, keep it; otherwise scope a public path.
+  if (routeOpts.basePath && route.startsWith('/') && !route.startsWith(routeOpts.basePath)) {
+    route = `${routeOpts.basePath}${route}`;
+  }
   return {
-    route: result.route || TOOLS_HOME,
+    route,
     state: {
       commandBar: {
         type: 'action',

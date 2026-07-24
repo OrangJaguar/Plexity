@@ -2,10 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useToolsSchedule } from '@/hooks/queries/useToolsSchedule';
-import { useToolsSettings } from '@/hooks/queries/useToolsSettings';
-import { useUpdatePreferences } from '@/hooks/mutations/usePreferencesMutations';
 import { updateSchedule } from '@/api/entities/toolsSchedule';
-import { TOOLS_SETTINGS_DEFAULTS } from '@/lib/tools/tools-settings';
 import ScheduleDaysPicker from '@/components/tools/settings/ScheduleDaysPicker';
 
 function emptyBlock() {
@@ -30,8 +27,6 @@ export default function ScheduleEditor() {
   const [searchParams] = useSearchParams();
   const sectionRef = useRef(null);
   const { data: schedule, refetch } = useToolsSchedule();
-  const { settings } = useToolsSettings();
-  const updatePrefs = useUpdatePreferences();
   const [blocks, setBlocks] = useState(() => schedule?.recurringBlocks || []);
   const [expanded, setExpanded] = useState(() => searchParams.get('setup') === 'schedule');
   const [saving, setSaving] = useState(false);
@@ -71,9 +66,9 @@ export default function ScheduleEditor() {
   };
 
   return (
-    <section ref={sectionRef} className="tools-settings-section">
+    <div ref={sectionRef} className="tools-settings-schedule">
       <div className="tools-settings-section-heading-row">
-        <h2>Recurring schedule</h2>
+        <h3>Recurring schedule</h3>
         <button
           type="button"
           className="tools-settings-collapse-btn"
@@ -85,7 +80,7 @@ export default function ScheduleEditor() {
         </button>
       </div>
       <p className="tools-settings-lead tools-settings-lead--schedule">
-        School, work, and classes that repeat weekly. One-off events belong in Calendar.
+        School, work, and classes that repeat weekly. One-off events belong on the Calendar grid.
       </p>
       {!expanded && (
         <p className="tools-settings-schedule-summary">{summarizeBlocks(blocks)}</p>
@@ -134,30 +129,6 @@ export default function ScheduleEditor() {
         </div>
       )}
       {expanded && msg && <p className="tools-settings-hint">{msg}</p>}
-
-      <div className="tools-settings-subsection">
-        <h3>Dashboard buffers</h3>
-        <div className="tools-settings-buffer-grid">
-          <label className="tools-settings-field">
-            <span className="tools-settings-label">Sleep buffer (minutes)</span>
-            <input
-              className="tools-settings-input"
-              type="number"
-              defaultValue={settings.toolsSleepBufferMin ?? TOOLS_SETTINGS_DEFAULTS.toolsSleepBufferMin}
-              onBlur={(e) => updatePrefs.mutate({ toolsSleepBufferMin: Number(e.target.value) })}
-            />
-          </label>
-          <label className="tools-settings-field">
-            <span className="tools-settings-label">Travel buffer (minutes)</span>
-            <input
-              className="tools-settings-input"
-              type="number"
-              defaultValue={settings.toolsTravelBufferMin ?? TOOLS_SETTINGS_DEFAULTS.toolsTravelBufferMin}
-              onBlur={(e) => updatePrefs.mutate({ toolsTravelBufferMin: Number(e.target.value) })}
-            />
-          </label>
-        </div>
-      </div>
-    </section>
+    </div>
   );
 }

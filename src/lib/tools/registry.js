@@ -15,9 +15,12 @@ import {
   Scale,
   KeyRound,
   Calculator,
+  ArrowLeftRight,
+  Clapperboard,
+  Image,
 } from 'lucide-react';
 
-/** @typedef {'dashboard'|'tasks'|'calendar'|'focus'|'goals'|'grades'|'journal'|'profile'|'lists'|'passwords'|'calculator'|'pdftools'|'stocks'|'typing'|'college'|'units'} ToolId */
+/** @typedef {'dashboard'|'tasks'|'calendar'|'focus'|'goals'|'grades'|'journal'|'profile'|'lists'|'passwords'|'calculator'|'pdftools'|'stocks'|'typing'|'college'|'units'|'converter'|'video'|'image'} ToolId */
 
 /**
  * @typedef {Object} ToolDefinition
@@ -30,6 +33,8 @@ import {
  * @property {string} createdAt ISO date
  * @property {number} popularityRank lower = more popular
  * @property {boolean} defaultPinned
+ * @property {boolean} [comingSoon]
+ * @property {boolean} [desktopOnly] When true, tool UI is blocked on narrow/mobile viewports
  * @property {() => Promise<{ default: import('react').ComponentType }>} loadPreview
  */
 
@@ -244,6 +249,49 @@ export const TOOL_REGISTRY = [
     popularityRank: 11,
     defaultPinned: false,
     loadPreview: () => import('@/components/tools/catalog/previews/UnitsPreview'),
+  },
+  {
+    id: 'converter',
+    route: '/convert',
+    label: 'Converter',
+    icon: ArrowLeftRight,
+    description: 'Convert images, audio, video, and data files locally in your browser.',
+    longDescription:
+      'Pick image, audio, video, or spreadsheet files and convert them on-device. Processing stays in your browser — nothing is uploaded to Plexity servers.',
+    createdAt: '2026-07-18',
+    popularityRank: 12,
+    defaultPinned: false,
+    loadPreview: () => import('@/components/tools/catalog/previews/ConverterPreview'),
+  },
+  {
+    id: 'video',
+    route: '/video',
+    label: 'Video',
+    icon: Clapperboard,
+    description: 'Trim, cut, and export video and audio on a simple timeline.',
+    longDescription:
+      'A focused video and audio editor for trimming clips, cutting sections, adding basic captions, and exporting compressed files — built for school projects and personal media, not a full NLE.',
+    createdAt: '2026-07-20',
+    popularityRank: 13,
+    defaultPinned: false,
+    comingSoon: false,
+    desktopOnly: true,
+    loadPreview: () => import('@/components/tools/catalog/previews/VideoPreview'),
+  },
+  {
+    id: 'image',
+    route: '/image',
+    label: 'Image',
+    icon: Image,
+    description: 'Crop, annotate, and enhance images for school and projects.',
+    longDescription:
+      'Edit photos and screenshots with crop, rotate, filters, annotation, and light enhancement. Separate from Converter — this is for editing, not format-only conversion.',
+    createdAt: '2026-07-20',
+    popularityRank: 14,
+    defaultPinned: false,
+    comingSoon: false,
+    desktopOnly: true,
+    loadPreview: () => import('@/components/tools/catalog/previews/ImagePreview'),
   },
 ];
 

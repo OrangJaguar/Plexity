@@ -4,10 +4,11 @@ import { ChevronRight, Clock, Search } from 'lucide-react';
 import { searchSymbolsWithQuotes } from '@/lib/tools/stocks/stocks-provider';
 import { clearRecentStocks, loadRecentStocks, trackRecentStock } from '@/lib/tools/stocks/stocks-model';
 import { changeClass, formatChange, formatPrice } from '@/lib/tools/stocks/stocks-format';
-import { stocksSymbolRoute } from '@/lib/tools/tool-routes';
+import { useScopedToolRoutes } from '@/hooks/useScopedToolRoutes';
 
 export default function StocksSearch({ className = '' }) {
   const navigate = useNavigate();
+  const { stocksSymbolRoute } = useScopedToolRoutes();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [recent, setRecent] = useState(loadRecentStocks);

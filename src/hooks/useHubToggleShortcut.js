@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { TOOLS_HOME, isToolsRoute } from '@/lib/tools/tool-routes';
+import { getToolsHome, isToolsRoute } from '@/lib/tools/tool-routes';
+import { useOptionalToolSurface } from '@/hooks/useToolSurface';
 
 const APP_HOME = '/';
 
@@ -11,11 +12,14 @@ function isEditableTarget(target) {
 }
 
 /**
- * Cmd/Ctrl+Shift+K toggles between the marketing landing page and Tools dashboard.
+ * Cmd/Ctrl+Shift+K toggles between the marketing landing page and Tools home.
+ * From an admin tool surface, returns to the public tools home (exits admin shell).
+ * Does not navigate between tools while staying in-admin — use the sidebar for that.
  */
 export function useHubToggleShortcut() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { isAdminSurface } = useOptionalToolSurface();
 
   useEffect(() => {
     const onKeyDown = (e) => {
@@ -25,10 +29,14 @@ export function useHubToggleShortcut() {
       e.preventDefault();
 
       const inTools = isToolsRoute(location.pathname);
-      navigate(inTools ? APP_HOME : TOOLS_HOME);
+      if (inTools) {
+        navigate(APP_HOME);
+        return;
+      }
+      navigate(getToolsHome(isAdminSurface ? { surface: 'admin' } : { surface: 'public' }));
     };
 
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [location.pathname, navigate]);
+  }, [location.pathname, navigate, isAdminSurface]);
 }

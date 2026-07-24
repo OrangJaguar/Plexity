@@ -1,6 +1,7 @@
-import { base44 } from '@/api/base44Client';
 import { requireAuth } from '@/api/requireAuth';
 import { unwrapFunctionInvoke } from '@/api/tools/invoke-response';
+import { base44 } from '@/api/base44Client';
+import { adminListFeedback, adminUpdateFeedback } from '@/api/admin/admin-api';
 
 export async function submitFeedback(payload) {
   await requireAuth();
@@ -8,22 +9,20 @@ export async function submitFeedback(payload) {
   return unwrapFunctionInvoke(res);
 }
 
+/** Admin-only — routed through the Base44 adminApi gateway. */
 export async function listFeedback() {
   const user = await requireAuth();
   if (user.role !== 'admin') {
     throw new Error('Admin access required');
   }
-  const rows = await base44.entities.ToolsFeedback.list('-createdAt', 500);
-  return rows ?? [];
+  return adminListFeedback();
 }
 
+/** Admin-only — routed through the Base44 adminApi gateway. */
 export async function updateFeedback(id, patch) {
   const user = await requireAuth();
   if (user.role !== 'admin') {
     throw new Error('Admin access required');
   }
-  return base44.entities.ToolsFeedback.update(id, {
-    ...patch,
-    updatedAt: Date.now(),
-  });
+  return adminUpdateFeedback(id, patch);
 }

@@ -14,10 +14,11 @@ import StocksAnalystConsensus from '@/components/tools/stocks/StocksAnalystConse
 import {
   StocksChange, StocksDataNotice, StocksError, StocksLoader, StocksPanel,
 } from '@/components/tools/stocks/stocks-shared';
-import { stocksRoute, stocksSymbolRoute } from '@/lib/tools/tool-routes';
+import { useScopedToolRoutes } from '@/hooks/useScopedToolRoutes';
 
 export default function StockDetailPage({ symbol, workspace, saveWorkspace, compare }) {
   const navigate = useNavigate();
+  const { stocksRoute, stocksSymbolRoute } = useScopedToolRoutes();
   const [searchParams, setSearchParams] = useSearchParams();
   const tab = searchParams.get('tab') || 'overview';
   const [chartRange, setChartRange] = useState('1d');

@@ -31,7 +31,7 @@ import { toDateTimeLocalKey } from '@/lib/tools/date';
 import { CALENDAR_COLOR_SWATCHES, DEFAULT_EVENT_COLOR } from '@/lib/tools/constants';
 import { useCommandBarDraft } from '@/hooks/useCommandBarDraft';
 import { eventFormToTaskDraft } from '@/lib/tools/command-bar-draft';
-import { getToolRoute } from '@/lib/tools/tool-routes';
+import { useScopedToolRoutes } from '@/hooks/useScopedToolRoutes';
 
 const RESIZE_EDGE_PX = 12;
 const MOVE_ZONE_RATIO = 0.35;
@@ -278,6 +278,7 @@ function DayViewDialog({ open, onOpenChange, day, events }) {
 
 export default function CalendarContent({ events, createEvent, updateEvent, deleteEvent }) {
   const navigate = useNavigate();
+  const { toolRoute } = useScopedToolRoutes();
   const { draft: commandDraft, clearDraft } = useCommandBarDraft('event');
   const [anchor, setAnchor] = useState(() => new Date());
   const [now, setNow] = useState(() => new Date());
@@ -310,7 +311,7 @@ export default function CalendarContent({ events, createEvent, updateEvent, dele
     setEventOpen(false);
     clearDraft();
     setInitial(null);
-    navigate(getToolRoute('tasks'), {
+    navigate(toolRoute('tasks'), {
       state: { commandBar: { type: 'task', draft: eventFormToTaskDraft({ title, start }) } },
     });
   };

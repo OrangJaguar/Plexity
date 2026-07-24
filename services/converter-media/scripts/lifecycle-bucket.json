@@ -1,0 +1,28 @@
+{
+  "Rules": [
+    {
+      "ID": "abort-incomplete-multipart",
+      "Status": "Enabled",
+      "Filter": { "Prefix": "" },
+      "AbortIncompleteMultipartUpload": { "DaysAfterInitiation": 1 }
+    },
+    {
+      "ID": "expire-scratch-prefix",
+      "Status": "Enabled",
+      "Filter": { "Prefix": "scratch/" },
+      "Expiration": { "Days": 7 }
+    },
+    {
+      "ID": "expire-inputs-after-job-ttl",
+      "Status": "Enabled",
+      "Filter": { "Prefix": "inputs/" },
+      "Expiration": { "Days": 3 }
+    },
+    {
+      "ID": "expire-outputs-after-ready-ttl",
+      "Status": "Enabled",
+      "Filter": { "Prefix": "outputs/" },
+      "Expiration": { "Days": 2 }
+    }
+  ]
+}

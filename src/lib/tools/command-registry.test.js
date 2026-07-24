@@ -84,6 +84,25 @@ describe('command-registry', () => {
     expect(out?.route).toBe('/calendar');
   });
 
+  it('executeSlashCommand goto respects admin routeOpts', () => {
+    const out = executeSlashCommand('goto', 'calendar', {
+      tasks: [],
+      events: [],
+      routeOpts: { surface: 'admin', basePath: '/admin' },
+    });
+    expect(out?.route).toBe('/admin/calendar');
+  });
+
+  it('executeSlashCommand action routes stay scoped under admin', () => {
+    const out = executeSlashCommand('debrief', '', {
+      tasks: [],
+      events: [],
+      routeOpts: { basePath: '/admin' },
+    });
+    expect(out?.type).toBe('action');
+    expect(out?.route).toBe('/admin/dashboard');
+  });
+
   it('every definition has required fields', () => {
     for (const cmd of COMMAND_DEFINITIONS) {
       expect(cmd.id).toBeTruthy();

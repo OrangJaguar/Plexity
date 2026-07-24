@@ -4,7 +4,13 @@
   "properties": {
     "requestId": { "type": "string", "description": "PLX-YYYYMMDD-XXXX public reference" },
     "type": { "type": "string", "description": "bug | feature | general" },
-    "status": { "type": "string", "description": "new | reviewing | resolved | closed" },
+    "status": {
+      "type": "string",
+      "description": "new | reviewing | resolved | closed",
+      "rls": {
+        "write": { "user_condition": { "role": "admin" } }
+      }
+    },
     "userEmail": { "type": "string" },
     "displayName": { "type": "string" },
     "subject": { "type": "string" },
@@ -17,7 +23,12 @@
     "pageUrl": { "type": "string" },
     "userAgent": { "type": "string" },
     "createdAt": { "type": "number" },
-    "updatedAt": { "type": "number" },
+    "updatedAt": {
+      "type": "number",
+      "rls": {
+        "write": { "user_condition": { "role": "admin" } }
+      }
+    },
     "adminNotes": {
       "type": "string",
       "rls": {
@@ -36,16 +47,10 @@
       ]
     },
     "update": {
-      "$or": [
-        { "data.userEmail": "{{user.email}}" },
-        { "user_condition": { "role": "admin" } }
-      ]
+      "user_condition": { "role": "admin" }
     },
     "delete": {
-      "$or": [
-        { "data.userEmail": "{{user.email}}" },
-        { "user_condition": { "role": "admin" } }
-      ]
+      "user_condition": { "role": "admin" }
     }
   }
 }

@@ -7,10 +7,11 @@ import { useWatchlistQuotes } from '@/hooks/queries/useStocksMarket';
 import StocksFiftyTwoWeekBar from '@/components/tools/stocks/StocksFiftyTwoWeekBar';
 import StocksSparkline from '@/components/tools/stocks/StocksSparkline';
 import { StocksChange, StocksDataNotice, StocksLoader, StocksTable } from '@/components/tools/stocks/stocks-shared';
-import { stocksSymbolRoute } from '@/lib/tools/tool-routes';
+import { useScopedToolRoutes } from '@/hooks/useScopedToolRoutes';
 
 export default function StocksWatchlist({ workspace, saveWorkspace, compare }) {
   const navigate = useNavigate();
+  const { stocksSymbolRoute } = useScopedToolRoutes();
   const watchlist = workspace?.watchlist || [];
   const symbols = watchlist.map((w) => w.symbol);
   const quotes = useWatchlistQuotes(symbols);

@@ -1,0 +1,34 @@
+{
+  "name": "AdminConverterBatch",
+  "type": "object",
+  "properties": {
+    "batchId": { "type": "string" },
+    "actorEmail": { "type": "string" },
+    "actorId": { "type": "string" },
+    "kind": { "type": "string", "description": "url-list | playlist | feed | package" },
+    "discoveryId": { "type": "string" },
+    "acceptedCount": { "type": "number" },
+    "rejectedCount": { "type": "number" },
+    "deferredCount": { "type": "number" },
+    "selectedCount": { "type": "number" },
+    "readyCount": { "type": "number" },
+    "failedCount": { "type": "number" },
+    "paused": { "type": "boolean" },
+    "numberingPolicy": { "type": "string" },
+    "packageId": { "type": "string" },
+    "sourceRightsAck": { "type": "boolean" },
+    "youtubeTermsAck": { "type": "boolean" },
+    "sidecarAck": { "type": "boolean" },
+    "idempotencyKey": { "type": "string" },
+    "status": { "type": "string", "description": "created | processing | paused | completed | failed | cancelled" },
+    "createdAt": { "type": "number" },
+    "updatedAt": { "type": "number" }
+  },
+  "required": ["batchId", "actorEmail", "acceptedCount", "status", "createdAt"],
+  "rls": {
+    "create": { "user_condition": { "role": "admin" } },
+    "read": { "user_condition": { "role": "admin" } },
+    "update": { "user_condition": { "role": "admin" } },
+    "delete": { "user_condition": { "role": "admin" } }
+  }
+}

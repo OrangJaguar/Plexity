@@ -14,10 +14,11 @@ import PdfSummaryPanel from '@/components/tools/pdftools/PdfSummaryPanel';
 import PdfResultPanel from '@/components/tools/pdftools/PdfResultPanel';
 import PdfTextSearch from '@/components/tools/pdftools/PdfTextSearch';
 import PdfPrivacyNote from '@/components/tools/pdftools/PdfPrivacyNote';
+import { sanitizeDisplayNameInput } from '@/lib/tools/shared/display-filename.js';
 
 function sanitizeFilename(name) {
-  const base = (name || 'document').replace(/\.pdf$/i, '').replace(/[^\w\s.-]/g, '').trim() || 'document';
-  return `${base}.pdf`;
+  const base = sanitizeDisplayNameInput(String(name || 'document').replace(/\.pdf$/i, ''));
+  return `${base || 'document'}.pdf`;
 }
 
 export default function PdfEditor() {
@@ -131,10 +132,8 @@ export default function PdfEditor() {
 
   return (
     <div className={`pdf-editor${hasFiles ? ' pdf-editor--active' : ' pdf-editor--empty'}`}>
-      <header className="pdf-editor-header">
-        <h1 className="pdf-editor-title">PDF</h1>
-        <p className="pdf-editor-subtitle">Merge, split, rearrange, and annotate PDFs</p>
-        {hasFiles && (
+      {hasFiles && (
+        <header className="pdf-editor-header pdf-editor-header--actions-only">
           <div className="pdf-editor-header-actions">
             <button type="button" className="pdf-btn pdf-btn--ghost pdf-btn--sm" onClick={() => setSearchOpen(true)}>
               <Search size={14} /> Search
@@ -168,8 +167,8 @@ export default function PdfEditor() {
               </button>
             )}
           </div>
-        )}
-      </header>
+        </header>
+      )}
 
       {hasFiles && !ws.result && (
         <div className="pdf-editor-toolbar">

@@ -1,0 +1,25 @@
+{
+  "name": "AdminConverterDiscovery",
+  "type": "object",
+  "properties": {
+    "discoveryId": { "type": "string" },
+    "actorEmail": { "type": "string" },
+    "actorId": { "type": "string" },
+    "provider": { "type": "string", "description": "youtube-playlist | youtube-channel | rss-feed" },
+    "redactedLabel": { "type": "string" },
+    "status": { "type": "string" },
+    "itemCount": { "type": "number" },
+    "truncated": { "type": "boolean" },
+    "errorCode": { "type": "string" },
+    "idempotencyKey": { "type": "string" },
+    "createdAt": { "type": "number" },
+    "updatedAt": { "type": "number" }
+  },
+  "required": ["discoveryId", "actorEmail", "provider", "status", "createdAt"],
+  "rls": {
+    "create": { "user_condition": { "role": "admin" } },
+    "read": { "user_condition": { "role": "admin" } },
+    "update": { "user_condition": { "role": "admin" } },
+    "delete": { "user_condition": { "role": "admin" } }
+  }
+}

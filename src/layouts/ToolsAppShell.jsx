@@ -3,6 +3,7 @@ import { Link, Outlet } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useHubToggleShortcut } from '@/hooks/useHubToggleShortcut';
 import { useAuth } from '@/hooks/useAuth';
+import { useOptionalToolSurface } from '@/hooks/useToolSurface';
 import { useUiStore } from '@/store/uiStore';
 import ToolsAppSidebar from '@/components/app-shell/ToolsAppSidebar';
 import ToolsAppSidebarMobile from '@/components/app-shell/ToolsAppSidebarMobile';
@@ -13,10 +14,12 @@ import ThemeSync from '@/components/ThemeSync';
 import SyncUserDisplayName from '@/components/auth/SyncUserDisplayName';
 import { applyThemeFromStorage } from '@/lib/theme';
 import ToolsChromeToggle from '@/components/tools/chrome/ToolsChromeToggle';
+import AdminSurfaceBadge from '@/components/admin/AdminSurfaceBadge';
 
 export default function ToolsAppShell() {
   const isMobile = useIsMobile();
   const { user, isLoading: authLoading } = useAuth();
+  const { isAdminSurface } = useOptionalToolSurface();
   useHubToggleShortcut();
   const toolsChromeCollapsed = useUiStore((s) => s.toolsChromeCollapsed);
   const hideChrome = toolsChromeCollapsed;
@@ -32,6 +35,7 @@ export default function ToolsAppShell() {
     isMobile ? 'app-shell--mobile' : '',
     hideChrome ? 'app-shell--tools-immersive' : '',
     !signedIn && !authLoading ? 'app-shell--unsigned' : '',
+    isAdminSurface ? 'app-shell--admin-surface' : '',
   ].filter(Boolean).join(' ');
 
   return (
@@ -46,20 +50,19 @@ export default function ToolsAppShell() {
           </Link>
         )}
         <div className="app-shell-main">
-          {showChrome && isMobile && (
-            <header className="site-header app-shell-mobile-header">
-              <Link to="/" className="app-sidebar-logo-link" title="Plexity home">
-                <PlexityLogo size={32} />
-              </Link>
-            </header>
-          )}
           <main className="app-shell-content">
             <Outlet />
           </main>
           {showChrome && (
             <div className="app-shell-bottom-chrome">
-              <AppFooter />
-              {isMobile && <ToolsAppSidebarMobile />}
+              {isMobile ? (
+                <>
+                  {isAdminSurface && <AdminSurfaceBadge compact />}
+                  <ToolsAppSidebarMobile />
+                </>
+              ) : (
+                <AppFooter />
+              )}
             </div>
           )}
         </div>

@@ -3,9 +3,11 @@ import { Info, Star } from 'lucide-react';
 import { usePinnedTools } from '@/hooks/queries/usePinnedTools';
 import { useTogglePinnedTool } from '@/hooks/mutations/useTogglePinnedTool';
 import { isToolPinned } from '@/lib/tools/pinned-tools';
+import { useScopedToolRoutes } from '@/hooks/useScopedToolRoutes';
 
 export default function ToolCatalogCard({ tool, onPreview }) {
   const navigate = useNavigate();
+  const { toolRoute } = useScopedToolRoutes();
   const { pinnedToolIds } = usePinnedTools();
   const togglePin = useTogglePinnedTool();
   const pinned = isToolPinned(tool.id, pinnedToolIds);
@@ -13,14 +15,14 @@ export default function ToolCatalogCard({ tool, onPreview }) {
 
   const handleCardClick = (e) => {
     if (e.target.closest('button')) return;
-    navigate(tool.route);
+    navigate(toolRoute(tool.id));
   };
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
       if (e.target.closest('button')) return;
       e.preventDefault();
-      navigate(tool.route);
+      navigate(toolRoute(tool.id));
     }
   };
 
@@ -37,6 +39,11 @@ export default function ToolCatalogCard({ tool, onPreview }) {
           <Icon size={20} />
         </div>
         <h3 className="tools-catalog-card-title">{tool.label}</h3>
+        {tool.comingSoon ? (
+          <span className="tools-catalog-soon-badge">Soon</span>
+        ) : tool.desktopOnly ? (
+          <span className="tools-catalog-soon-badge tools-catalog-desktop-badge">Desktop</span>
+        ) : null}
       </div>
       <p className="tools-catalog-card-desc">{tool.description}</p>
       <div className="tools-catalog-card-actions">

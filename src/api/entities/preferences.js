@@ -52,23 +52,18 @@ export async function checkUsernameAvailable(username, { excludeEmail } = {}) {
   }
 }
 
-export async function createUserPreferencesOnSignup({ username, userEmail }) {
-  const normalized = normalizeUsername(username);
-  if (!isValidUsernameFormat(normalized)) {
-    throw new Error('Please choose a valid username.');
+export async function createUserPreferencesOnSignup({ userEmail }) {
+  const email = String(userEmail || '').trim();
+  if (!email) {
+    throw new Error('Missing account email.');
   }
 
-  const availability = await checkUsernameAvailable(normalized, { excludeEmail: userEmail });
-  if (!availability.available) {
-    throw new Error('That username is already taken. Try another.');
-  }
-
+  const displayName = email.split('@')[0]?.trim() || 'User';
   const rows = await base44.entities.UserPreferences.list();
   const now = Date.now();
   const payload = {
-    username: normalized,
-    displayName: normalized,
-    userEmail,
+    displayName,
+    userEmail: email,
     createdAt: now,
     lastActiveAt: now,
     pinnedToolIds: getDefaultPinnedToolIds(),

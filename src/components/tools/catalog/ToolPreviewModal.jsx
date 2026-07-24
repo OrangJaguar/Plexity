@@ -2,9 +2,11 @@ import { Suspense, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ToolsModal from '@/components/tools/shared/ToolsModal';
 import AppLoading from '@/components/shared/AppLoading';
+import { useScopedToolRoutes } from '@/hooks/useScopedToolRoutes';
 
 export default function ToolPreviewModal({ tool, open, onOpenChange }) {
   const navigate = useNavigate();
+  const { toolRoute } = useScopedToolRoutes();
   const [PreviewComponent, setPreviewComponent] = useState(null);
 
   useEffect(() => {
@@ -37,7 +39,7 @@ export default function ToolPreviewModal({ tool, open, onOpenChange }) {
           className="btn btn-primary"
           onClick={() => {
             onOpenChange(false);
-            navigate(tool.route);
+            navigate(toolRoute(tool.id));
           }}
         >
           Open tool

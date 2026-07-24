@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { formatDate } from '@/lib/tools/stocks/stocks-format';
 import { useStockSummary } from '@/hooks/queries/useStocksMarket';
 import { StocksDataNotice, StocksLoader } from '@/components/tools/stocks/stocks-shared';
-import { stocksSymbolRoute } from '@/lib/tools/tool-routes';
+import { useScopedToolRoutes } from '@/hooks/useScopedToolRoutes';
 
 function EarningsRow({ symbol, onOpen }) {
   const { data, isLoading } = useStockSummary(symbol);
@@ -27,6 +27,7 @@ function EarningsRow({ symbol, onOpen }) {
 
 export default function StocksEarnings({ workspace }) {
   const navigate = useNavigate();
+  const { stocksSymbolRoute } = useScopedToolRoutes();
   const [scope, setScope] = useState('watchlist');
   const symbols = useMemo(() => {
     if (scope === 'watchlist') return (workspace?.watchlist || []).map((w) => w.symbol);

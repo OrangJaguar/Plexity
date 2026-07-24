@@ -1,0 +1,24 @@
+{
+  "name": "AdminConverterAiUsage",
+  "type": "object",
+  "properties": {
+    "actorEmail": { "type": "string" },
+    "actorId": { "type": "string" },
+    "action": { "type": "string" },
+    "provider": { "type": "string" },
+    "model": { "type": "string" },
+    "outcome": { "type": "string" },
+    "inputTokenBucket": { "type": "string" },
+    "outputTokenBucket": { "type": "string" },
+    "costUsdBucket": { "type": "string" },
+    "requestId": { "type": "string" },
+    "createdAt": { "type": "number" }
+  },
+  "required": ["actorEmail", "action", "outcome", "requestId", "createdAt"],
+  "rls": {
+    "create": { "user_condition": { "role": "admin" } },
+    "read": { "user_condition": { "role": "admin" } },
+    "update": { "user_condition": { "role": "__service_only__" } },
+    "delete": { "user_condition": { "role": "__service_only__" } }
+  }
+}

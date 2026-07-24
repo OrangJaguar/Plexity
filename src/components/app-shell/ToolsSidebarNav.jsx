@@ -56,6 +56,9 @@ function ToolsSidebarNavItem({
   const Icon = item.icon;
   const isDragging = dragState?.index === index && dragState?.popped;
   const isPlaceholder = dragState?.index === index && dragState?.popped;
+  const canonical = item.canonicalRoute || item.to;
+  // Nested tools (stocks) stay active on subpaths; dashboard is exact-match only.
+  const end = canonical === '/dashboard';
 
   return (
     <div
@@ -65,7 +68,7 @@ function ToolsSidebarNavItem({
     >
       <NavLink
         to={item.to}
-        end={item.to === '/dashboard'}
+        end={end}
         data-tooltip={item.label}
         className={({ isActive }) => {
           const classes = ['app-sidebar-link', 'tools-sidebar-link'];

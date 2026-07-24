@@ -1,0 +1,224 @@
+name: converter-media
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: converter
+      POSTGRES_PASSWORD: converter
+      POSTGRES_DB: converter_media
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - backend
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U converter -d converter_media']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio:/data
+    networks:
+      - backend
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  minio-init:
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    networks:
+      - backend
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://minio:9000 minioadmin minioadmin &&
+      mc mb --ignore-existing local/converter-media &&
+      mc anonymous set none local/converter-media
+      "
+
+  egress-proxy:
+    build: .
+    environment:
+      ROLE: egress-proxy
+    networks:
+      - egress
+    restart: unless-stopped
+
+  api:
+    build: .
+    environment:
+      ROLE: api
+      PORT: 8080
+      DATABASE_URL: postgres://converter:converter@postgres:5432/converter_media
+      S3_ENDPOINT: http://minio:9000
+      S3_PUBLIC_ENDPOINT: http://localhost:9000
+      S3_BUCKET: converter-media
+      S3_ACCESS_KEY: minioadmin
+      S3_SECRET_KEY: minioadmin
+      S3_FORCE_PATH_STYLE: 'true'
+      HMAC_SECRET: ${HMAC_SECRET:-dev-hmac-secret-change-me}
+      ACCEPT_NEW_JOBS: ${ACCEPT_NEW_JOBS:-true}
+      ENABLE_YOUTUBE_CONNECTOR: ${ENABLE_YOUTUBE_CONNECTOR:-false}
+      ENABLE_FEED_CONNECTOR: ${ENABLE_FEED_CONNECTOR:-true}
+      ENABLE_AI_PROVIDER: ${ENABLE_AI_PROVIDER:-false}
+      ACCEPT_NEW_AI_JOBS: ${ACCEPT_NEW_AI_JOBS:-true}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+    ports:
+      - '8080:8080'
+    networks:
+      - backend
+    restart: unless-stopped
+
+  fetch-worker:
+    build: .
+    environment:
+      ROLE: fetch-worker
+      WORKER_ID: fetch-1
+      DATABASE_URL: postgres://converter:converter@postgres:5432/converter_media
+      S3_ENDPOINT: http://minio:9000
+      S3_BUCKET: converter-media
+      S3_ACCESS_KEY: minioadmin
+      S3_SECRET_KEY: minioadmin
+      S3_FORCE_PATH_STYLE: 'true'
+      EGRESS_PROXY_URL: http://egress-proxy:3128
+      HTTP_PROXY: http://egress-proxy:3128
+      HTTPS_PROXY: http://egress-proxy:3128
+      ENABLE_YOUTUBE_CONNECTOR: ${ENABLE_YOUTUBE_CONNECTOR:-false}
+    depends_on:
+      - api
+      - egress-proxy
+    networks:
+      - backend
+      - egress
+    restart: unless-stopped
+
+  media-worker:
+    build: .
+    environment:
+      ROLE: media-worker
+      WORKER_ID: media-1
+      DATABASE_URL: postgres://converter:converter@postgres:5432/converter_media
+      S3_ENDPOINT: http://minio:9000
+      S3_BUCKET: converter-media
+      S3_ACCESS_KEY: minioadmin
+      S3_SECRET_KEY: minioadmin
+      S3_FORCE_PATH_STYLE: 'true'
+    depends_on:
+      - api
+    networks:
+      - backend
+    restart: unless-stopped
+
+  cleanup-worker:
+    build: .
+    environment:
+      ROLE: cleanup-worker
+      WORKER_ID: cleanup-1
+      DATABASE_URL: postgres://converter:converter@postgres:5432/converter_media
+      S3_ENDPOINT: http://minio:9000
+      S3_BUCKET: converter-media
+      S3_ACCESS_KEY: minioadmin
+      S3_SECRET_KEY: minioadmin
+      S3_FORCE_PATH_STYLE: 'true'
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-}
+    depends_on:
+      - api
+    networks:
+      - backend
+    restart: unless-stopped
+
+  discovery-worker:
+    build: .
+    environment:
+      ROLE: discovery-worker
+      WORKER_ID: discovery-1
+      DATABASE_URL: postgres://converter:converter@postgres:5432/converter_media
+      WORKER_POLL_MS: 2000
+      ENABLE_YOUTUBE_CONNECTOR: ${ENABLE_YOUTUBE_CONNECTOR:-false}
+      ENABLE_FEED_CONNECTOR: ${ENABLE_FEED_CONNECTOR:-true}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-}
+      EGRESS_PROXY_URL: http://egress-proxy:3128
+      HTTP_PROXY: http://egress-proxy:3128
+      HTTPS_PROXY: http://egress-proxy:3128
+    depends_on:
+      - api
+      - egress-proxy
+    networks:
+      - backend
+      - egress
+    restart: unless-stopped
+
+  package-worker:
+    build: .
+    environment:
+      ROLE: package-worker
+      WORKER_ID: package-1
+      DATABASE_URL: postgres://converter:converter@postgres:5432/converter_media
+      S3_ENDPOINT: http://minio:9000
+      S3_BUCKET: converter-media
+      S3_ACCESS_KEY: minioadmin
+      S3_SECRET_KEY: minioadmin
+      S3_FORCE_PATH_STYLE: 'true'
+      PACKAGE_TTL_MS: 86400000
+    depends_on:
+      - api
+    networks:
+      - backend
+    restart: unless-stopped
+
+  ai-worker:
+    build: .
+    environment:
+      ROLE: ai-worker
+      WORKER_ID: ai-1
+      DATABASE_URL: postgres://converter:converter@postgres:5432/converter_media
+      S3_ENDPOINT: http://minio:9000
+      S3_BUCKET: converter-media
+      S3_ACCESS_KEY: minioadmin
+      S3_SECRET_KEY: minioadmin
+      S3_FORCE_PATH_STYLE: 'true'
+      ENABLE_AI_PROVIDER: ${ENABLE_AI_PROVIDER:-false}
+      ACCEPT_NEW_AI_JOBS: ${ACCEPT_NEW_AI_JOBS:-true}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      AI_PRIMARY_MODEL: ${AI_PRIMARY_MODEL:-gpt-4o-mini}
+      AI_FALLBACK_MODEL: ${AI_FALLBACK_MODEL:-gpt-4o-mini}
+      EGRESS_PROXY_URL: http://egress-proxy:3128
+      HTTP_PROXY: http://egress-proxy:3128
+      HTTPS_PROXY: http://egress-proxy:3128
+    depends_on:
+      - api
+      - egress-proxy
+    networks:
+      - backend
+      - egress
+    restart: unless-stopped
+
+networks:
+  backend:
+    internal: true
+  egress:
+    driver: bridge
+
+volumes:
+  pgdata:
+  minio:

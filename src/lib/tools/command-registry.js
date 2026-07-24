@@ -164,7 +164,7 @@ export function parseSlashPrefix(text) {
   return { commandId: token, remainder, command };
 }
 
-function resolveGotoRoute(remainder) {
+function resolveGotoRoute(remainder, routeOpts = {}) {
   const q = (remainder || '').toLowerCase().trim();
   if (!q) return null;
   const tool = TOOL_REGISTRY.find(
@@ -173,7 +173,8 @@ function resolveGotoRoute(remainder) {
       || t.id.includes(q)
       || t.label.toLowerCase().includes(q),
   );
-  return tool?.route || null;
+  if (!tool) return null;
+  return getToolRoute(tool.id, routeOpts);
 }
 
 function matchTaskByName(tasks, name) {
@@ -191,6 +192,9 @@ function matchTaskByName(tasks, name) {
 export function executeSlashCommand(commandId, remainder, ctx) {
   const cmd = getCommandById(commandId);
   if (!cmd) return null;
+  const routeOpts = ctx?.routeOpts || {};
+  const toolRoute = (id) => getToolRoute(id, routeOpts);
+  const catalogRoute = () => (routeOpts.basePath ? `${routeOpts.basePath}${TOOL_CATALOG_ROUTE}` : TOOL_CATALOG_ROUTE);
 
   switch (commandId) {
     case 'task': {
@@ -235,7 +239,7 @@ export function executeSlashCommand(commandId, remainder, ctx) {
       return { type: 'answer', answer, source: 'slash', commandId };
     }
     case 'goto': {
-      const route = resolveGotoRoute(remainder);
+      const route = resolveGotoRoute(remainder, routeOpts);
       if (!route) {
         return {
           type: 'answer',
@@ -276,7 +280,7 @@ export function executeSlashCommand(commandId, remainder, ctx) {
         type: 'action',
         actionId: 'completeTask',
         payload: { taskId: task.taskId, title: task.title },
-        route: getToolRoute('tasks'),
+        route: toolRoute('tasks'),
         source: 'slash',
         commandId,
       };
@@ -293,7 +297,7 @@ export function executeSlashCommand(commandId, remainder, ctx) {
         type: 'action',
         actionId: 'filterTasks',
         payload,
-        route: getToolRoute('tasks'),
+        route: toolRoute('tasks'),
         source: 'slash',
         commandId,
       };
@@ -304,7 +308,7 @@ export function executeSlashCommand(commandId, remainder, ctx) {
         type: 'action',
         actionId: 'startFocus',
         payload: { minutes: mins, mode: 'focus' },
-        route: getToolRoute('focus'),
+        route: toolRoute('focus'),
         source: 'slash',
         commandId,
       };
@@ -317,7 +321,7 @@ export function executeSlashCommand(commandId, remainder, ctx) {
         payload: { minutes: mins, mode: 'break' },
         source: 'slash',
         commandId,
-        route: getToolRoute('focus'),
+        route: toolRoute('focus'),
       };
     }
     case 'focus': {
@@ -326,7 +330,7 @@ export function executeSlashCommand(commandId, remainder, ctx) {
         type: 'action',
         actionId: 'startFocus',
         payload: { taskId: task?.taskId, taskTitle: remainder || task?.title, mode: 'focus' },
-        route: getToolRoute('focus'),
+        route: toolRoute('focus'),
         source: 'slash',
         commandId,
       };
@@ -336,7 +340,7 @@ export function executeSlashCommand(commandId, remainder, ctx) {
         type: 'action',
         actionId: 'openDebrief',
         payload: {},
-        route: getToolRoute('dashboard'),
+        route: toolRoute('dashboard'),
         source: 'slash',
         commandId,
       };
@@ -346,7 +350,7 @@ export function executeSlashCommand(commandId, remainder, ctx) {
         type: 'action',
         actionId: 'addGoal',
         payload: { title: remainder || '' },
-        route: getToolRoute('goals'),
+        route: toolRoute('goals'),
         source: 'slash',
         commandId,
       };
@@ -356,7 +360,7 @@ export function executeSlashCommand(commandId, remainder, ctx) {
         type: 'action',
         actionId: 'logGoal',
         payload: { text: remainder || '' },
-        route: getToolRoute('goals'),
+        route: toolRoute('goals'),
         source: 'slash',
         commandId,
       };
@@ -366,7 +370,7 @@ export function executeSlashCommand(commandId, remainder, ctx) {
         type: 'action',
         actionId: 'weeklyReview',
         payload: {},
-        route: getToolRoute('goals'),
+        route: toolRoute('goals'),
         source: 'slash',
         commandId,
       };
@@ -376,7 +380,7 @@ export function executeSlashCommand(commandId, remainder, ctx) {
         type: 'action',
         actionId: 'journalEntry',
         payload: { text: remainder || '' },
-        route: getToolRoute('journal'),
+        route: toolRoute('journal'),
         source: 'slash',
         commandId,
       };
@@ -388,7 +392,7 @@ export function executeSlashCommand(commandId, remainder, ctx) {
           type: 'action',
           actionId: 'searchVault',
           payload: { query: remainder || '' },
-          route: getToolRoute('passwords'),
+          route: toolRoute('passwords'),
           source: 'slash',
           commandId,
         };
@@ -397,7 +401,7 @@ export function executeSlashCommand(commandId, remainder, ctx) {
         type: 'action',
         actionId: 'searchJournal',
         payload: { query: remainder || '' },
-        route: getToolRoute('journal'),
+        route: toolRoute('journal'),
         source: 'slash',
         commandId,
       };
@@ -407,7 +411,7 @@ export function executeSlashCommand(commandId, remainder, ctx) {
         type: 'action',
         actionId: 'addListItem',
         payload: { text: remainder || '' },
-        route: getToolRoute('lists'),
+        route: toolRoute('lists'),
         source: 'slash',
         commandId,
       };
@@ -417,7 +421,7 @@ export function executeSlashCommand(commandId, remainder, ctx) {
         type: 'action',
         actionId: 'createList',
         payload: { name: remainder || '' },
-        route: getToolRoute('lists'),
+        route: toolRoute('lists'),
         source: 'slash',
         commandId,
       };
@@ -427,7 +431,7 @@ export function executeSlashCommand(commandId, remainder, ctx) {
         type: 'action',
         actionId: 'calculatorExpr',
         payload: { raw: remainder || '' },
-        route: getToolRoute('calculator'),
+        route: toolRoute('calculator'),
         source: 'slash',
         commandId,
       };
@@ -437,7 +441,7 @@ export function executeSlashCommand(commandId, remainder, ctx) {
         type: 'action',
         actionId: 'calculatorTable',
         payload: {},
-        route: getToolRoute('calculator'),
+        route: toolRoute('calculator'),
         source: 'slash',
         commandId,
       };
@@ -447,7 +451,7 @@ export function executeSlashCommand(commandId, remainder, ctx) {
         type: 'action',
         actionId: 'addCredential',
         payload: { label: remainder || '' },
-        route: getToolRoute('passwords'),
+        route: toolRoute('passwords'),
         source: 'slash',
         commandId,
       };
@@ -457,7 +461,7 @@ export function executeSlashCommand(commandId, remainder, ctx) {
         type: 'action',
         actionId: 'pinTool',
         payload: { toolName: remainder || '' },
-        route: TOOL_CATALOG_ROUTE,
+        route: catalogRoute(),
         source: 'slash',
         commandId,
       };

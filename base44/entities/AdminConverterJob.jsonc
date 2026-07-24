@@ -1,0 +1,30 @@
+{
+  "name": "AdminConverterJob",
+  "type": "object",
+  "properties": {
+    "jobId": { "type": "string" },
+    "batchId": { "type": "string" },
+    "actorEmail": { "type": "string" },
+    "actorId": { "type": "string" },
+    "provider": { "type": "string", "description": "direct-https | youtube-single" },
+    "redactedSourceLabel": { "type": "string" },
+    "status": { "type": "string" },
+    "progressPhase": { "type": "string" },
+    "progressFraction": { "type": "number" },
+    "operationId": { "type": "string" },
+    "errorCode": { "type": "string" },
+    "attemptId": { "type": "string" },
+    "stateVersion": { "type": "number" },
+    "expiresAt": { "type": "number" },
+    "createdAt": { "type": "number" },
+    "updatedAt": { "type": "number" },
+    "completedAt": { "type": "number" }
+  },
+  "required": ["jobId", "batchId", "actorEmail", "provider", "status", "createdAt"],
+  "rls": {
+    "create": { "user_condition": { "role": "admin" } },
+    "read": { "user_condition": { "role": "admin" } },
+    "update": { "user_condition": { "role": "admin" } },
+    "delete": { "user_condition": { "role": "admin" } }
+  }
+}

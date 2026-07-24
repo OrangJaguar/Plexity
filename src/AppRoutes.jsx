@@ -9,30 +9,15 @@ import ResetPasswordPage from '@/pages/auth/ResetPasswordPage';
 import TermsPage from '@/pages/legal/TermsPage';
 import PrivacyPage from '@/pages/legal/PrivacyPage';
 import NotFoundPage from '@/pages/NotFoundPage';
-import ToolsDashboardPage from '@/pages/tools/ToolsDashboardPage';
-import ToolsTasksPage from '@/pages/tools/ToolsTasksPage';
-import ToolsCalendarPage from '@/pages/tools/ToolsCalendarPage';
-import ToolsFocusPage from '@/pages/tools/ToolsFocusPage';
-import ToolsGradesPage from '@/pages/tools/ToolsGradesPage';
-import ToolsPdfToolsPage from '@/pages/tools/ToolsPdfToolsPage';
-import ToolsStocksPage from '@/pages/tools/ToolsStocksPage';
-import ToolsTypingPage from '@/pages/tools/ToolsTypingPage';
-import ToolsCollegePage from '@/pages/tools/ToolsCollegePage';
-import ToolsUnitsPage from '@/pages/tools/ToolsUnitsPage';
-import ToolsJournalPage from '@/pages/tools/ToolsJournalPage';
-import ToolsGoalsPage from '@/pages/tools/ToolsGoalsPage';
-import ToolsProfileToolPage from '@/pages/tools/ToolsProfileToolPage';
-import ToolsListsPage from '@/pages/tools/ToolsListsPage';
-import ToolsPasswordsPage from '@/pages/tools/ToolsPasswordsPage';
-import ToolsCalculatorPage from '@/pages/tools/ToolsCalculatorPage';
-import ToolsCatalogPage from '@/pages/tools/ToolsCatalogPage';
-import ToolsSettingsPage from '@/pages/tools/ToolsSettingsPage';
 import LegacyToolsRedirect from '@/components/routing/LegacyToolsRedirect';
 import RequireAdmin from '@/components/routing/RequireAdmin';
 import RequireAuth from '@/components/routing/RequireAuth';
 import AdminLayout from '@/layouts/AdminLayout';
 import FeedbackPage from '@/pages/feedback/FeedbackPage';
 import AdminFeedbackPage from '@/pages/admin/AdminFeedbackPage';
+import ToolSurfaceProvider from '@/providers/ToolSurfaceProvider';
+import { buildAdminHomeRedirect, buildToolRoutes } from '@/components/routing/buildToolRoutes';
+import { ADMIN_BASE_PATH } from '@/lib/tools/tool-surface';
 
 export default function AppRoutes() {
   return (
@@ -48,37 +33,31 @@ export default function AppRoutes() {
         <Route path="/feedback" element={<FeedbackPage />} />
       </Route>
 
+      {/* Admin management (Feedback) — dedicated admin chrome */}
       <Route element={<RequireAdmin />}>
         <Route element={<AdminLayout />}>
-          <Route path="/admin" element={<Navigate to="/admin/feedback" replace />} />
           <Route path="/admin/feedback" element={<AdminFeedbackPage />} />
         </Route>
       </Route>
 
-      <Route element={<ToolsAppShell />}>
-        <Route element={<RequireAuth />}>
-          <Route path="/dashboard" element={<ToolsDashboardPage />} />
-          <Route path="/tasks" element={<ToolsTasksPage />} />
-          <Route path="/calendar" element={<ToolsCalendarPage />} />
-          <Route path="/focus" element={<ToolsFocusPage />} />
-          <Route path="/grades" element={<ToolsGradesPage />} />
-          <Route path="/pdf/*" element={<ToolsPdfToolsPage />} />
-          <Route path="/stocks/*" element={<ToolsStocksPage />} />
-          <Route path="/typing" element={<ToolsTypingPage />} />
-          <Route path="/college" element={<ToolsCollegePage />} />
-          <Route path="/units" element={<ToolsUnitsPage />} />
-          <Route path="/journal" element={<ToolsJournalPage />} />
-          <Route path="/goals" element={<ToolsGoalsPage />} />
-          <Route path="/profile" element={<ToolsProfileToolPage />} />
-          <Route path="/lists" element={<ToolsListsPage />} />
-          <Route path="/passwords" element={<ToolsPasswordsPage />} />
-          <Route path="/calculator" element={<ToolsCalculatorPage />} />
-          <Route path="/catalog" element={<ToolsCatalogPage />} />
-          <Route path="/settings" element={<ToolsSettingsPage />} />
+      {/* Admin mirrored tools — same ToolsAppShell + same page modules */}
+      <Route element={<RequireAdmin />}>
+        <Route element={<ToolSurfaceProvider surface="admin" />}>
+          <Route element={<ToolsAppShell />}>
+            {buildAdminHomeRedirect({ basePath: ADMIN_BASE_PATH, to: '/admin/dashboard' })}
+            {buildToolRoutes({ basePath: ADMIN_BASE_PATH })}
+          </Route>
+        </Route>
+      </Route>
 
-          {/* Legacy /tools/* redirects — keeps old links working */}
-          <Route path="/tools" element={<Navigate to="/dashboard" replace />} />
-          <Route path="/tools/*" element={<LegacyToolsRedirect />} />
+      {/* Public tools */}
+      <Route element={<ToolSurfaceProvider surface="public" />}>
+        <Route element={<ToolsAppShell />}>
+          <Route element={<RequireAuth />}>
+            {buildToolRoutes({ basePath: '' })}
+            <Route path="/tools" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/tools/*" element={<LegacyToolsRedirect />} />
+          </Route>
         </Route>
       </Route>
 
