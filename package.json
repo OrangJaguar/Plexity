@@ -21,12 +21,17 @@
     "preview": "vite preview"
   },
   "dependencies": {
+<<<<<<< HEAD
     "@base44/sdk": "^0.8.35",
     "@base44/vite-plugin": "^1.0.24",
     "@ffmpeg/core": "^0.12.10",
     "@ffmpeg/ffmpeg": "^0.12.15",
     "@ffmpeg/util": "^0.12.2",
     "@imgly/background-removal": "^1.7.0",
+=======
+    "@base44/sdk": "^0.8.40",
+    "@base44/vite-plugin": "^1.0.30",
+>>>>>>> 61510f68a15d280f74d0c0ff3800d0a189003daa
     "@radix-ui/react-dialog": "^1.1.6",
     "@tanstack/react-query": "^5.101.0",
     "chrono-node": "^2.9.1",
