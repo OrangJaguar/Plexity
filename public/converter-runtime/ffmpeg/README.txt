@@ -10,12 +10,3 @@ the frontend build that references it, so the first FFmpeg-only conversion never
 404s while the deploy is still propagating. Re-run
 `npm run runtime:converter` (scripts/copy-converter-runtime-assets.mjs) after
 bumping @ffmpeg/core to refresh these files before shipping.
-
-Converter V2 local formats (not runtime assets; documented here for operators):
-- Recipes: JSON schema id `converter-recipe.v1` (see converter-recipes.js). User
-  import/export only — never persisted to Base44 entities.
-- Reports: JSON/Markdown schema `converter-report.v1` (see conversion-report.js).
-  Redacted summaries only; no filenames, GPS, or exact content.
-- Session history: in-memory / session OPFS summaries wiped on reset/unmount.
-- Advanced FFmpeg builders (convertVideoAdvanced, convertAudioAdvanced, concatMedia,
-  splitMediaSegment) remain allowlisted argv only — no arbitrary shell.
