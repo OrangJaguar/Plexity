@@ -145,11 +145,9 @@ export default function AuthForm({
       const displayName = displayNameFromEmail(user.email || email);
       try {
         await createUserPreferencesOnSignup({ userEmail: user.email });
-      } catch (prefErr) {
-        const prefMsg = prefErr?.message || 'Could not finish setting up your account. Try again or contact support.';
-        setError(prefMsg);
-        setLoading(false);
-        return;
+      } catch {
+        // Non-fatal — the account is verified and the token is set.
+        // Preferences self-heal on first tool access via updatePreferences().
       }
       try {
         await syncAuthUserFullName(displayName);

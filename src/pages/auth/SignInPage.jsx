@@ -1,4 +1,4 @@
-import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
+import { useSearchParams, useLocation } from 'react-router-dom';
 import PublicOnly from '@/components/routing/PublicOnly';
 import AuthForm from '@/components/auth/AuthForm';
 import { useAuth } from '@/hooks/useAuth';
@@ -6,7 +6,6 @@ import { touchLastActive } from '@/api/entities/preferences';
 import { onAuthSuccess } from '@/lib/auth/post-auth-success';
 
 export default function SignInPage() {
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const { setUser } = useAuth();
@@ -17,7 +16,10 @@ export default function SignInPage() {
     setUser(user);
     touchLastActive().catch(() => {});
     const redirect = searchParams.get('redirect');
-    navigate(redirect && redirect.startsWith('/') ? redirect : '/dashboard', { replace: true });
+    // Hard redirect — the auth provider must fully re-initialize from the new token.
+    // Client-side navigate() leaves the session half-established and breaks on refresh.
+    const dest = redirect && redirect.startsWith('/') ? redirect : '/dashboard';
+    window.location.href = dest;
   }
 
   return (

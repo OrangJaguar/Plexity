@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router-dom';
 import PublicOnly from '@/components/routing/PublicOnly';
 import AuthForm from '@/components/auth/AuthForm';
 import { useAuth } from '@/hooks/useAuth';
@@ -6,14 +5,14 @@ import { touchLastActive } from '@/api/entities/preferences';
 import { onAuthSuccess } from '@/lib/auth/post-auth-success';
 
 export default function SignUpPage() {
-  const navigate = useNavigate();
   const { setUser } = useAuth();
 
   async function handleSuccess(user) {
     await onAuthSuccess();
     setUser(user);
     touchLastActive().catch(() => {});
-    navigate('/dashboard', { replace: true });
+    // Hard redirect — the auth provider must fully re-initialize from the new token.
+    window.location.href = '/dashboard';
   }
 
   return (
