@@ -1,18 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@/api/base44Client', () => ({
-  base44: {
-    functions: {
-      invoke: vi.fn(),
-    },
-  },
+const invokeMock = vi.fn();
+
+vi.mock('@/api/supabaseClient', () => ({
+  getSupabase: () => ({
+    functions: { invoke: invokeMock },
+  }),
 }));
 
 vi.mock('@/api/requireAuth', () => ({
   requireAuth: vi.fn(),
 }));
 
-import { base44 } from '@/api/base44Client';
 import { requireAuth } from '@/api/requireAuth';
 import { listFeedback, updateFeedback } from '@/api/entities/toolsFeedback';
 
@@ -21,17 +20,20 @@ describe('toolsFeedback admin gateway client', () => {
     vi.clearAllMocks();
   });
 
-  it('lists feedback through adminApi for admins', async () => {
+  it('lists feedback through admin-api for admins', async () => {
     requireAuth.mockResolvedValue({ email: 'admin@example.com', role: 'admin' });
-    base44.functions.invoke.mockResolvedValue({
+    invokeMock.mockResolvedValue({
       data: { ok: true, data: { items: [{ id: '1', subject: 'Hi' }] } },
+      error: null,
     });
 
     const rows = await listFeedback();
-    expect(base44.functions.invoke).toHaveBeenCalledWith('adminApi', {
-      version: 1,
-      action: 'feedback.list',
-      payload: {},
+    expect(invokeMock).toHaveBeenCalledWith('admin-api', {
+      body: {
+        version: 1,
+        action: 'feedback.list',
+        payload: {},
+      },
     });
     expect(rows).toEqual([{ id: '1', subject: 'Hi' }]);
   });
@@ -39,20 +41,23 @@ describe('toolsFeedback admin gateway client', () => {
   it('rejects non-admin listFeedback before invoking gateway', async () => {
     requireAuth.mockResolvedValue({ email: 'user@example.com', role: 'user' });
     await expect(listFeedback()).rejects.toThrow('Admin access required');
-    expect(base44.functions.invoke).not.toHaveBeenCalled();
+    expect(invokeMock).not.toHaveBeenCalled();
   });
 
-  it('updates feedback through adminApi for admins', async () => {
+  it('updates feedback through admin-api for admins', async () => {
     requireAuth.mockResolvedValue({ email: 'admin@example.com', role: 'admin' });
-    base44.functions.invoke.mockResolvedValue({
+    invokeMock.mockResolvedValue({
       data: { ok: true, data: { id: '1', status: 'reviewing' } },
+      error: null,
     });
 
     const updated = await updateFeedback('1', { status: 'reviewing' });
-    expect(base44.functions.invoke).toHaveBeenCalledWith('adminApi', {
-      version: 1,
-      action: 'feedback.update',
-      payload: { id: '1', status: 'reviewing' },
+    expect(invokeMock).toHaveBeenCalledWith('admin-api', {
+      body: {
+        version: 1,
+        action: 'feedback.update',
+        payload: { id: '1', status: 'reviewing' },
+      },
     });
     expect(updated.status).toBe('reviewing');
   });

@@ -22,13 +22,12 @@ describe('plan 6 baseline guards', () => {
     expect(resolveToolCapabilities('converter', 'public')).toEqual({});
   });
 
-  it('keeps Plan 5+6 admin keys as a required subset (no V2 gates)', () => {
+  it('documents Plan 5+6 keys but keeps them off without VITE_CONVERTER_SERVER_FEATURES', () => {
+    expect(Object.keys(PLAN6_ADMIN_CONVERTER_CAPS).length).toBe(3);
     const admin = resolveToolCapabilities('converter', 'admin');
     const delta = ADMIN_TOOL_CAPABILITY_DELTAS.converter;
-    for (const [key, value] of Object.entries(PLAN6_ADMIN_CONVERTER_CAPS)) {
-      expect(delta[key]).toBe(value);
-      expect(admin[key]).toBe(value);
-    }
+    expect(delta).toEqual({});
+    expect(admin).toEqual({});
     for (const key of Object.keys(admin)) {
       expect(key.startsWith('converter.v2')).toBe(false);
     }

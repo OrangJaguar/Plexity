@@ -17,10 +17,10 @@ describe('plan 7 browser capability parity', () => {
     expect(pub[CONVERTER_AI_TRANSCRIBE_CAPABILITY]).toBeUndefined();
   });
 
-  it('admin surface exposes independent AI gates', () => {
+  it('admin surface hides AI gates while converter server features are off', () => {
     const admin = resolveToolCapabilities('converter', 'admin');
-    expect(admin[CONVERTER_AI_ASSIST_CAPABILITY]).toBe(true);
-    expect(admin[CONVERTER_AI_OCR_CAPABILITY]).toBe(true);
-    expect(admin[CONVERTER_AI_TRANSCRIBE_CAPABILITY]).toBe(true);
+    expect(admin[CONVERTER_AI_ASSIST_CAPABILITY]).toBeUndefined();
+    expect(admin[CONVERTER_AI_OCR_CAPABILITY]).toBeUndefined();
+    expect(admin[CONVERTER_AI_TRANSCRIBE_CAPABILITY]).toBeUndefined();
   });
 });

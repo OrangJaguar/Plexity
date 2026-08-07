@@ -34,24 +34,10 @@ describe('converter v1 parity', () => {
     expect(getToolRoute('converter', { surface: 'admin' })).toBe('/admin/convert');
   });
 
-  it('keeps public converter empty and admin additive Plan 5–7 keys', () => {
+  it('keeps public and admin converter caps empty while server features are off', () => {
     expect(PUBLIC_TOOL_CAPABILITIES.converter).toEqual({});
     expect(resolveToolCapabilities('converter', 'public')).toEqual({});
-    expect(ADMIN_TOOL_CAPABILITY_DELTAS.converter).toEqual({
-      'converter.url.import': true,
-      'converter.playlist.import': true,
-      'converter.package.create': true,
-      'converter.ai.assist': true,
-      'converter.ai.ocr': true,
-      'converter.ai.transcribe': true,
-    });
-    expect(resolveToolCapabilities('converter', 'admin')).toEqual({
-      'converter.url.import': true,
-      'converter.playlist.import': true,
-      'converter.package.create': true,
-      'converter.ai.assist': true,
-      'converter.ai.ocr': true,
-      'converter.ai.transcribe': true,
-    });
+    expect(ADMIN_TOOL_CAPABILITY_DELTAS.converter).toEqual({});
+    expect(resolveToolCapabilities('converter', 'admin')).toEqual({});
   });
 });

@@ -1,7 +1,8 @@
-import { useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import PublicOnly from '@/components/routing/PublicOnly';
 import { completePasswordReset } from '@/api/auth/password';
+import { getSupabase, isSupabaseConfigured } from '@/api/supabaseClient';
 import { isValidSignupPassword, passwordsMatch } from '@/utils/schemas/password';
 import {
   AuthFieldRules,
@@ -12,9 +13,8 @@ import {
 
 export default function ResetPasswordPage() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const resetToken = searchParams.get('reset_token') || searchParams.get('token') || '';
 
+  const [readySession, setReadySession] = useState(false);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordFocused, setPasswordFocused] = useState(false);
@@ -22,9 +22,33 @@ export default function ResetPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    if (!isSupabaseConfigured()) {
+      setReadySession(false);
+      return undefined;
+    }
+
+    let cancelled = false;
+    (async () => {
+      const { data } = await getSupabase().auth.getSession();
+      if (!cancelled && data.session) setReadySession(true);
+    })();
+
+    const { data: sub } = getSupabase().auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') {
+        setReadySession(true);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
+
   const passwordRules = buildPasswordRules(password, passwordFocused);
   const confirmRules = buildConfirmPasswordRules(password, confirmPassword, confirmFocused);
-  const ready = resetToken
+  const ready = readySession
     && allRulesPass(passwordRules)
     && isValidSignupPassword(password)
     && allRulesPass(confirmRules)
@@ -36,23 +60,23 @@ export default function ResetPasswordPage() {
     setError('');
     setLoading(true);
     try {
-      await completePasswordReset({ resetToken, newPassword: password });
+      await completePasswordReset({ newPassword: password });
       navigate('/signin', { replace: true, state: { message: 'Password updated. Sign in with your new password.' } });
     } catch (err) {
-      const msg = err?.response?.data?.message || err?.data?.message || err?.message;
+      const msg = err?.message;
       setError(typeof msg === 'string' ? msg : 'Could not reset password. The link may have expired.');
     } finally {
       setLoading(false);
     }
   }
 
-  if (!resetToken) {
+  if (!readySession) {
     return (
       <PublicOnly>
         <div className="reset-password-page">
-          <h1 className="reset-password-title">Invalid reset link</h1>
+          <h1 className="reset-password-title">Opening reset link…</h1>
           <p className="reset-password-lead">
-            This password reset link is missing or invalid. Request a new one.
+            If nothing happens, request a new password reset email.
           </p>
           <Link to="/forgot-password" className="btn btn-primary">Request new link</Link>
         </div>
@@ -105,9 +129,6 @@ export default function ResetPasswordPage() {
             {loading ? 'Saving…' : 'Update password'}
           </button>
         </form>
-        <p className="reset-password-back">
-          <Link to="/signin">← Back to sign in</Link>
-        </p>
       </div>
     </PublicOnly>
   );

@@ -1,0 +1,11 @@
+# Minimal Supabase config for Edge Functions deploy.
+# Project is linked via `supabase link` (MANUAL D).
+
+[functions.tools-market-data]
+verify_jwt = true
+
+[functions.submit-feedback]
+verify_jwt = true
+
+[functions.admin-api]
+verify_jwt = true

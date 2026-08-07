@@ -16,18 +16,11 @@ function getAnonymousId() {
   }
 }
 
+/** Soft-fail product analytics (no remote sink after Base44 removal). */
 export async function trackProductEvent(event, metadata = {}) {
   if (typeof window === 'undefined') return;
-  try {
-    const { base44 } = await import('@/api/base44Client');
-    await base44.functions.invoke('logProductEvent', {
-      event,
-      anonymousId: getAnonymousId(),
-      path: window.location.pathname,
-      metadata,
-    });
-  } catch {
-    // analytics must never block UX
+  if (import.meta.env.DEV) {
+    console.debug('[analytics]', event, { anonymousId: getAnonymousId(), ...metadata });
   }
 }
 

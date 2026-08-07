@@ -23,10 +23,11 @@ describe('plan 7 baseline guards', () => {
     expect(resolveToolCapabilities('converter', 'public')).toEqual({});
   });
 
-  it('expects admin converter additive Plan 5–7 keys only', () => {
-    expect(ADMIN_TOOL_CAPABILITY_DELTAS.converter).toEqual(PLAN7_ADMIN_CONVERTER_CAPS);
+  it('documents Plan 5–7 keys but keeps admin converter empty while server features are off', () => {
+    expect(Object.keys(PLAN7_ADMIN_CONVERTER_CAPS).length).toBe(6);
+    expect(ADMIN_TOOL_CAPABILITY_DELTAS.converter).toEqual({});
     const admin = resolveToolCapabilities('converter', 'admin');
-    expect(admin).toEqual(PLAN7_ADMIN_CONVERTER_CAPS);
+    expect(admin).toEqual({});
     for (const key of Object.keys(admin)) {
       expect(key.startsWith('converter.v2')).toBe(false);
     }

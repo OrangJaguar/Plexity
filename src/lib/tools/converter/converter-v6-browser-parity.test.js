@@ -18,10 +18,10 @@ describe('plan 6 browser capability parity', () => {
     expect(pub[CONVERTER_PACKAGE_CREATE_CAPABILITY]).toBeUndefined();
   });
 
-  it('admin surface exposes independent playlist and package gates', () => {
+  it('admin surface hides server gates while converter server features are off', () => {
     const admin = resolveToolCapabilities('converter', 'admin');
-    expect(admin[CONVERTER_URL_IMPORT_CAPABILITY]).toBe(true);
-    expect(admin[CONVERTER_PLAYLIST_IMPORT_CAPABILITY]).toBe(true);
-    expect(admin[CONVERTER_PACKAGE_CREATE_CAPABILITY]).toBe(true);
+    expect(admin[CONVERTER_URL_IMPORT_CAPABILITY]).toBeUndefined();
+    expect(admin[CONVERTER_PLAYLIST_IMPORT_CAPABILITY]).toBeUndefined();
+    expect(admin[CONVERTER_PACKAGE_CREATE_CAPABILITY]).toBeUndefined();
   });
 });

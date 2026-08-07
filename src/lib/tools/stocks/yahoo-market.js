@@ -1,10 +1,8 @@
 /**
  * Yahoo Finance market data (unofficial).
- * Always routes through the toolsMarketData Base44 function (dev and production).
- * No Vite-proxy fallback — a broken function must fail visibly in every environment.
+ * Routes through toolsMarketData / tools-market-data (Base44 or Supabase).
  */
-import { base44 } from '@/api/base44Client';
-import { unwrapFunctionInvoke } from '@/api/tools/invoke-response';
+import { invokeBackendFunction } from '@/api/functions/invoke';
 
 const SUMMARY_MODULES = [
   'price', 'summaryDetail', 'defaultKeyStatistics', 'assetProfile',
@@ -32,13 +30,12 @@ function yahooNum(value) {
 
 async function yahooFetchRemote(path, { method = 'GET', body } = {}) {
   try {
-    const res = await base44.functions.invoke('toolsMarketData', {
+    const payload = await invokeBackendFunction('toolsMarketData', {
       action: 'yahoo',
       path,
       method,
       body,
     });
-    const payload = unwrapFunctionInvoke(res);
     if (payload?.data == null) throw new Error('Market data unavailable');
     return payload.data;
   } catch (err) {
@@ -63,6 +60,9 @@ function metaStatsFromChart(meta) {
     volume: meta.regularMarketVolume,
     dayHigh: meta.regularMarketDayHigh,
     dayLow: meta.regularMarketDayLow,
+    open: meta.regularMarketOpen,
+    previousClose: meta.chartPreviousClose ?? meta.previousClose ?? meta.regularMarketPreviousClose,
+    avgVolume: meta.averageDailyVolume10Day ?? meta.averageDailyVolume3Month,
   };
 }
 
@@ -214,15 +214,29 @@ function parseSparkRow(row) {
   const opens = quotes.open || [];
   const dayOpen = quote.dayOpen ?? opens.find((o) => o != null);
 
+  // Prefer last two daily closes when spark is multi-day — avoids mislabeling
+  // a multi-day move as "today" when Yahoo meta previousClose is stale/wrong.
+  let { price, change, changeAmount, previousClose } = quote;
+  if (closes.length >= 2) {
+    const last = closes[closes.length - 1];
+    const prev = closes[closes.length - 2];
+    if (last != null && prev != null && prev !== 0) {
+      price = last;
+      previousClose = prev;
+      change = ((last - prev) / prev) * 100;
+      changeAmount = last - prev;
+    }
+  }
+
   return {
     symbol: (row.symbol || meta.symbol || '').toUpperCase(),
     name: meta.shortName || meta.longName || row.symbol,
-    price: quote.price,
-    change: quote.change,
-    changeAmount: quote.changeAmount,
+    price,
+    change,
+    changeAmount,
     volume: meta.regularMarketVolume,
     dayOpen,
-    previousClose: quote.previousClose,
+    previousClose,
     fiftyTwoWeekHigh: meta.fiftyTwoWeekHigh,
     fiftyTwoWeekLow: meta.fiftyTwoWeekLow,
     dayHigh: meta.regularMarketDayHigh,
@@ -269,7 +283,9 @@ export async function fetchQuote(symbol) {
 export async function fetchQuotes(symbols = []) {
   if (symbols.length > 1) {
     try {
-      return await fetchSparkQuotes(symbols);
+      // 5d / 1d bars → daily % from last two closes (see parseSparkRow).
+      // Avoid 15m/5d spark where meta previousClose can mis-state the day move.
+      return await fetchSparkQuotes(symbols, '5d', '1d');
     } catch {
       /* fall through */
     }
@@ -500,12 +516,18 @@ function buildEnrichedSummary(chartQuote, sym) {
     profile: chartQuote.profile || {},
     stats: {
       ...chartQuote.stats,
-      volume: chartQuote.volume,
-      fiftyTwoWeekHigh: chartQuote.fiftyTwoWeekHigh,
-      fiftyTwoWeekLow: chartQuote.fiftyTwoWeekLow,
+      volume: chartQuote.volume ?? chartQuote.stats?.volume,
+      open: chartQuote.dayOpen ?? chartQuote.stats?.open,
+      previousClose: chartQuote.previousClose ?? chartQuote.stats?.previousClose,
+      dayHigh: chartQuote.dayHigh ?? chartQuote.stats?.dayHigh,
+      dayLow: chartQuote.dayLow ?? chartQuote.stats?.dayLow,
+      fiftyTwoWeekHigh: chartQuote.fiftyTwoWeekHigh ?? chartQuote.stats?.fiftyTwoWeekHigh,
+      fiftyTwoWeekLow: chartQuote.fiftyTwoWeekLow ?? chartQuote.stats?.fiftyTwoWeekLow,
     },
     earnings: { history: [] },
     financials: { annual: [], quarterly: [] },
+    // Signals UI that Yahoo quoteSummary (fundamentals/analyst) was unavailable.
+    fundamentalsDegraded: true,
   };
 }
 

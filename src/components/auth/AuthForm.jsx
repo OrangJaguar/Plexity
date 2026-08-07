@@ -1,11 +1,15 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { base44 } from '@/api/base44Client';
 import { createUserPreferencesOnSignup } from '@/api/entities/preferences';
 import { queryClient } from '@/lib/query-client';
 import { clearInMemoryUserQueries, clearLegacyPersistedCache } from '@/lib/query-persist';
 import { trackProductEvent } from '@/lib/analytics';
 import { syncAuthUserFullName, refreshAuthUser } from '@/api/auth/userProfile';
+import {
+  loginWithEmailPassword,
+  registerWithEmailPassword,
+  resendSignupVerification,
+} from '@/api/auth/session';
 import { isValidSignupPassword, passwordsMatch } from '@/utils/schemas/password';
 import {
   AuthFieldRules,
@@ -29,6 +33,32 @@ function displayNameFromEmail(value) {
   return local || 'User';
 }
 
+function authErrorMessage(err, fallback) {
+  const msg = err?.response?.data?.message || err?.data?.message || err?.message || fallback;
+  return typeof msg === 'string' ? msg : fallback;
+}
+
+async function finishSignupSession(user, email, activeTab, onSuccess) {
+  const displayName = displayNameFromEmail(user?.email || email);
+  try {
+    await createUserPreferencesOnSignup({ userEmail: user.email || email });
+  } catch (prefErr) {
+    throw new Error(prefErr?.message || 'Could not finish setting up your account. Try again or contact support.');
+  }
+  try {
+    await syncAuthUserFullName(displayName);
+  } catch {
+    // Preferences still saved; display name sync can retry later
+  }
+  clearInMemoryUserQueries(queryClient);
+  clearLegacyPersistedCache();
+  const refreshedUser = await refreshAuthUser();
+  if (activeTab === 'signup') {
+    trackProductEvent('signup_complete');
+  }
+  onSuccess(refreshedUser ?? user);
+}
+
 export default function AuthForm({
   defaultTab = 'login',
   allowTabSwitch = false,
@@ -44,11 +74,9 @@ export default function AuthForm({
   const [passwordFocused, setPasswordFocused] = useState(false);
   const [confirmPasswordFocused, setConfirmPasswordFocused] = useState(false);
   const [legalAgreed, setLegalAgreed] = useState(false);
-  const [digits, setDigits] = useState(['', '', '', '', '', '']);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [info, setInfo] = useState('');
-  const inputRefs = useRef([]);
 
   const activeTab = allowTabSwitch ? tab : defaultTab;
   const isSignup = activeTab === 'signup';
@@ -59,36 +87,6 @@ export default function AuthForm({
   const showConfirmRules = isSignup && (confirmPasswordFocused || confirmPassword.length > 0);
 
   function resetMessages() { setError(''); setInfo(''); }
-
-  function handleDigitChange(idx, val) {
-    const char = val.replace(/\D/g, '').slice(-1);
-    const next = [...digits];
-    next[idx] = char;
-    setDigits(next);
-    if (char && idx < 5) inputRefs.current[idx + 1]?.focus();
-  }
-
-  function handleDigitKeyDown(idx, e) {
-    if (e.key === 'Backspace') {
-      if (digits[idx]) {
-        const next = [...digits]; next[idx] = ''; setDigits(next);
-      } else if (idx > 0) {
-        inputRefs.current[idx - 1]?.focus();
-      }
-    }
-  }
-
-  function handleDigitPaste(e) {
-    e.preventDefault();
-    const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
-    const next = ['', '', '', '', '', ''];
-    pasted.split('').forEach((c, i) => { next[i] = c; });
-    setDigits(next);
-    const focusIdx = Math.min(pasted.length, 5);
-    inputRefs.current[focusIdx]?.focus();
-  }
-
-  const otpCode = digits.join('');
 
   const signupReady = isSignup
     && allRulesPass(passwordRules)
@@ -104,8 +102,13 @@ export default function AuthForm({
     setLoading(true);
     try {
       if (activeTab === 'login') {
-        await base44.auth.loginViaEmailPassword(email, password);
-        const user = await base44.auth.me();
+        const user = await loginWithEmailPassword(email, password);
+        // Email-confirm signups finish prefs on first login (no OTP session).
+        try {
+          await createUserPreferencesOnSignup({ userEmail: user.email });
+        } catch {
+          // Non-blocking — tools can still create prefs later
+        }
         onSuccess(user);
       } else {
         if (!signupReady) {
@@ -114,24 +117,13 @@ export default function AuthForm({
           return;
         }
         const displayName = displayNameFromEmail(email);
-        await base44.auth.register({ email, password, full_name: displayName });
-        setInfo('Code sent! Check your email.');
-        setStep('verify');
-      }
-    } catch (err) {
-      const msg = err?.response?.data?.message || err?.data?.message || err?.message || 'Something went wrong.';
-      const msgStr = typeof msg === 'string' ? msg : 'Something went wrong.';
-      if (/verif|otp|code/i.test(msgStr)) {
-        setInfo('Check your email for a verification code.');
-        setStep('verify');
-      } else {
-        setError(msgStr);
-      }
-    } finally {
-      setLoading(false);
-    }
-  }
+        const { needsEmailConfirmation, user } = await registerWithEmailPassword({
+          email,
+          password,
+          full_name: displayName,
+        });
 
+<<<<<<< Updated upstream
   async function handleVerify(e) {
     e.preventDefault();
     if (otpCode.length < 6) { setError('Please enter all 6 digits.'); return; }
@@ -148,22 +140,19 @@ export default function AuthForm({
       } catch {
         // Non-fatal — the account is verified and the token is set.
         // Preferences self-heal on first tool access via updatePreferences().
+=======
+        if (needsEmailConfirmation) {
+          setInfo('Check your email for a confirmation link, then sign in.');
+          setStep('check-email');
+        } else if (user) {
+          await finishSignupSession(user, email, activeTab, onSuccess);
+        } else {
+          setError('Account created but session is missing. Try signing in.');
+        }
+>>>>>>> Stashed changes
       }
-      try {
-        await syncAuthUserFullName(displayName);
-      } catch {
-        // Preferences still saved; display name sync can retry later
-      }
-      clearInMemoryUserQueries(queryClient);
-      clearLegacyPersistedCache();
-      const refreshedUser = await refreshAuthUser();
-      if (activeTab === 'signup') {
-        trackProductEvent('signup_complete');
-      }
-      onSuccess(refreshedUser ?? user);
     } catch (err) {
-      const msg = err?.response?.data?.message || err?.data?.message || err?.message || 'Invalid code. Try again.';
-      setError(typeof msg === 'string' ? msg : 'Invalid code. Try again.');
+      setError(authErrorMessage(err, 'Something went wrong.'));
     } finally {
       setLoading(false);
     }
@@ -173,11 +162,10 @@ export default function AuthForm({
     resetMessages();
     setLoading(true);
     try {
-      await base44.auth.resendOtp(email);
-      setInfo('New code sent!');
+      await resendSignupVerification(email);
+      setInfo('Confirmation email resent.');
     } catch (err) {
-      const msg = err?.response?.data?.message || err?.data?.message || err?.message || 'Could not resend code.';
-      setError(typeof msg === 'string' ? msg : 'Could not resend code.');
+      setError(authErrorMessage(err, 'Could not resend.'));
     } finally {
       setLoading(false);
     }
@@ -202,46 +190,23 @@ export default function AuthForm({
         <div className="auth-banner auth-banner-error">{error}</div>
       )}
 
-      {step === 'verify' ? (
+      {step === 'check-email' ? (
         <>
           <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '1.25rem', lineHeight: 1.5 }}>
-            A 6-digit code was sent to <strong style={{ color: 'var(--text-main)' }}>{email}</strong>.
+            We sent a confirmation link to <strong style={{ color: 'var(--text-main)' }}>{email}</strong>.
+            Open it, then come back and sign in.
           </p>
-          <form onSubmit={handleVerify} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
-              {digits.map((d, i) => (
-                <input
-                  key={i}
-                  ref={(el) => { inputRefs.current[i] = el; }}
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={1}
-                  value={d}
-                  onChange={(e) => handleDigitChange(i, e.target.value)}
-                  onKeyDown={(e) => handleDigitKeyDown(i, e)}
-                  onPaste={i === 0 ? handleDigitPaste : undefined}
-                  autoFocus={i === 0}
-                  style={{
-                    width: 44, height: 52, textAlign: 'center', fontSize: '1.4rem', fontWeight: 700,
-                    fontFamily: 'var(--font-mono)', background: 'var(--surface)',
-                    border: `1px solid ${d ? 'var(--text-main)' : 'var(--border)'}`,
-                    borderRadius: 'var(--radius)', color: 'var(--text-main)', outline: 'none',
-                    caretColor: 'transparent',
-                  }}
-                />
-              ))}
-            </div>
-            <button type="submit" className="btn btn-primary" disabled={loading || otpCode.length < 6} style={{ width: '100%', justifyContent: 'center' }}>
-              {loading ? 'Verifying…' : 'Verify & Sign In'}
-            </button>
-          </form>
-          <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem', justifyContent: 'center', flexWrap: 'wrap' }}>
             <button type="button" onClick={handleResend} disabled={loading} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.78rem', textDecoration: 'underline' }}>
-              Resend code
+              Resend email
             </button>
             <span style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>·</span>
-            <button type="button" onClick={() => { setStep('form'); resetMessages(); setDigits(['', '', '', '', '', '']); }} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.78rem', textDecoration: 'underline' }}>
-              Back
+            <button
+              type="button"
+              onClick={() => { setStep('form'); setTab('login'); resetMessages(); resetSignupFields(); }}
+              style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.78rem', textDecoration: 'underline' }}
+            >
+              Back to sign in
             </button>
           </div>
         </>

@@ -299,10 +299,16 @@ export default function TasksContent({
   };
 
   const handleSave = async (data) => {
-    if (editing) {
-      await updateTask(editing.taskId, data);
-    } else {
-      await createTask({ ...data, type: 'task' });
+    try {
+      if (editing) {
+        await updateTask(editing.taskId, data);
+      } else {
+        await createTask({ ...data, type: 'task' });
+      }
+    } catch (err) {
+      console.error('[tasks] save failed', err);
+      toast.error(err?.message || 'Could not save task');
+      throw err;
     }
   };
 

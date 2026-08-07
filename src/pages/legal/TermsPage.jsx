@@ -18,7 +18,7 @@ export default function TermsPage() {
       <h2>Your content</h2>
       <p>
         You retain ownership of the data you enter. You grant us the limited rights needed to host,
-        sync, and display that data back to you through Base44 infrastructure. We do not sell your
+        sync, and display that data back to you through our cloud infrastructure (Supabase). We do not sell your
         personal content.
       </p>
 

@@ -1,4 +1,3 @@
-import { base44 } from '@/api/base44Client';
 import { fingerprintError } from '@/utils/errors/fingerprintError';
 import { getEnvironment } from '@/utils/errors/getEnvironment';
 import { collectClientInfo } from '@/utils/errors/collectClientInfo';
@@ -16,6 +15,7 @@ function shouldSend(groupId) {
 
 /**
  * Fire-and-forget client error logging. Never throws to callers.
+ * Remote sink removed with Base44 — logs in development only.
  */
 export function logClientError({
   message,
@@ -30,17 +30,16 @@ export function logClientError({
   const groupId = fingerprintError(message, stackStr);
   if (!shouldSend(groupId)) return;
 
-  const payload = {
-    message: String(message).slice(0, 2000),
-    stack: stackStr.slice(0, 8000),
-    route: route ?? (typeof window !== 'undefined' ? window.location.pathname : ''),
-    source,
-    environment: getEnvironment(),
-    clientInfo: collectClientInfo(),
-    context: context ?? {},
-  };
-
-  base44.functions.invoke('logAppError', payload).catch(() => {
-    // Silently ignore logging failures
-  });
+  if (import.meta.env.DEV) {
+    console.warn('[client-error]', {
+      message: String(message).slice(0, 2000),
+      stack: stackStr.slice(0, 8000),
+      route: route ?? (typeof window !== 'undefined' ? window.location.pathname : ''),
+      source,
+      environment: getEnvironment(),
+      clientInfo: collectClientInfo(),
+      context: context ?? {},
+      groupId,
+    });
+  }
 }

@@ -1,5 +1,6 @@
-import { base44 } from '@/api/base44Client';
 import { requireAuth } from '@/api/requireAuth';
+import { getSupabase } from '@/api/supabaseClient';
+import { fromSqlRow, toSqlRow } from '@/api/entities/supabaseMap';
 import { normalizeUsername, isValidUsernameFormat } from '@/utils/schemas/preferences';
 import { getDefaultPinnedToolIds } from '@/lib/tools/pinned-tools';
 
@@ -13,19 +14,61 @@ function pickBestPreferencesRow(rows) {
   });
 }
 
+async function listPreferencesRows() {
+  const user = await requireAuth();
+  const { data, error } = await getSupabase()
+    .from('user_preferences')
+    .select('*')
+    .eq('user_id', user.id);
+  if (error) throw error;
+  return (data ?? []).map((row) => fromSqlRow(row));
+}
+
+async function createPreferencesRow(payload) {
+  const user = await requireAuth();
+  const row = {
+    ...toSqlRow(payload, { stripId: true }),
+    user_id: user.id,
+    user_email: payload.userEmail ?? user.email,
+  };
+  const { data, error } = await getSupabase()
+    .from('user_preferences')
+    .insert(row)
+    .select('*')
+    .single();
+  if (error) throw error;
+  return fromSqlRow(data);
+}
+
+async function updatePreferencesRow(id, patch) {
+  const user = await requireAuth();
+  const sqlPatch = toSqlRow(patch, { stripId: true });
+  delete sqlPatch.user_id;
+  if (patch.userEmail != null) sqlPatch.user_email = patch.userEmail;
+  const { data, error } = await getSupabase()
+    .from('user_preferences')
+    .update(sqlPatch)
+    .eq('id', id)
+    .eq('user_id', user.id)
+    .select('*')
+    .single();
+  if (error) throw error;
+  return fromSqlRow(data);
+}
+
 export async function getPreferences() {
   await requireAuth();
-  const rows = await base44.entities.UserPreferences.list();
+  const rows = await listPreferencesRows();
   return pickBestPreferencesRow(rows);
 }
 
 export async function updatePreferences(patch) {
   const user = await requireAuth();
-  const rows = await base44.entities.UserPreferences.list();
+  const rows = await listPreferencesRows();
   if (rows.length > 0) {
-    return base44.entities.UserPreferences.update(rows[0].id, patch);
+    return updatePreferencesRow(rows[0].id, patch);
   }
-  return base44.entities.UserPreferences.create({
+  return createPreferencesRow({
     ...patch,
     userEmail: user.email,
     pinnedToolIds: patch.pinnedToolIds ?? ['dashboard', 'tasks', 'calendar', 'focus', 'journal'],
@@ -33,10 +76,6 @@ export async function updatePreferences(patch) {
   });
 }
 
-/**
- * Best-effort username availability check. RLS may limit cross-user reads on Base44;
- * format validation is always enforced client-side before signup.
- */
 export async function checkUsernameAvailable(username, { excludeEmail } = {}) {
   const normalized = normalizeUsername(username);
   if (!isValidUsernameFormat(normalized)) {
@@ -44,9 +83,22 @@ export async function checkUsernameAvailable(username, { excludeEmail } = {}) {
   }
 
   try {
-    const rows = await base44.entities.UserPreferences.filter({ username: normalized });
-    const taken = rows.some((row) => row.username === normalized && row.userEmail !== excludeEmail);
-    return { available: !taken, reason: taken ? 'taken' : null };
+    const { data, error } = await getSupabase().rpc('is_username_available', {
+      desired: normalized,
+    });
+    if (error) throw error;
+    if (data === true) return { available: true, reason: null };
+    if (excludeEmail) {
+      const { data: mine } = await getSupabase()
+        .from('user_preferences')
+        .select('username, user_email')
+        .eq('user_email', excludeEmail)
+        .maybeSingle();
+      if (mine && String(mine.username || '').toLowerCase() === normalized) {
+        return { available: true, reason: null };
+      }
+    }
+    return { available: false, reason: 'taken' };
   } catch {
     return { available: true, reason: null };
   }
@@ -59,7 +111,7 @@ export async function createUserPreferencesOnSignup({ userEmail }) {
   }
 
   const displayName = email.split('@')[0]?.trim() || 'User';
-  const rows = await base44.entities.UserPreferences.list();
+  const rows = await listPreferencesRows();
   const now = Date.now();
   const payload = {
     displayName,
@@ -70,18 +122,18 @@ export async function createUserPreferencesOnSignup({ userEmail }) {
   };
 
   if (rows.length > 0) {
-    return base44.entities.UserPreferences.update(rows[0].id, payload);
+    return updatePreferencesRow(rows[0].id, payload);
   }
-  return base44.entities.UserPreferences.create(payload);
+  return createPreferencesRow(payload);
 }
 
 export async function touchLastActive() {
   await requireAuth();
-  const rows = await base44.entities.UserPreferences.list();
+  const rows = await listPreferencesRows();
   const now = Date.now();
   const pref = pickBestPreferencesRow(rows);
   if (pref) {
-    return base44.entities.UserPreferences.update(pref.id, { lastActiveAt: now });
+    return updatePreferencesRow(pref.id, { lastActiveAt: now });
   }
   return null;
 }

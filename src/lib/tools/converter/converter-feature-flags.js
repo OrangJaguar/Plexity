@@ -35,4 +35,18 @@ export const CONVERTER_FEATURE_FLAGS = Object.freeze({
   ENABLE_V2_ADVANCED_FFMPEG: resolveFlag(env.VITE_CONVERTER_ENABLE_V2_ADVANCED_FFMPEG, true),
   ENABLE_V2_TARGET_SIZE: resolveFlag(env.VITE_CONVERTER_ENABLE_V2_TARGET_SIZE, true),
   ENABLE_V2_RECIPES: resolveFlag(env.VITE_CONVERTER_ENABLE_V2_RECIPES, true),
+  /** Server URL-import / AI OCR-transcribe (Base44 converter backends). Off after Supabase migration. */
+  ENABLE_SERVER_FEATURES: resolveFlag(env.VITE_CONVERTER_SERVER_FEATURES, false),
 });
+
+export function converterServerFeaturesEnabled() {
+  return CONVERTER_FEATURE_FLAGS.ENABLE_SERVER_FEATURES === true;
+}
+
+export function converterServerUnavailableError(feature = 'Converter server feature') {
+  const err = new Error(
+    `${feature} is unavailable after the Supabase migration. Browser-local conversion still works.`,
+  );
+  err.code = 'CONVERTER_SERVER_DISABLED';
+  return err;
+}

@@ -1,7 +1,7 @@
 import { createContext, useCallback, useEffect, useMemo } from 'react';
-import { base44 } from '@/api/base44Client';
 import { queryClient } from '@/lib/query-client';
-import { clearAuthCache } from '@/api/requireAuth';
+import { clearAuthCache, loadCurrentAppUser, signOutAuth } from '@/api/auth/session';
+import { getSupabase, isSupabaseConfigured } from '@/api/supabaseClient';
 import { touchLastActive } from '@/api/entities/preferences';
 import { useCurrentUser } from '@/hooks/queries/useCurrentUser';
 import {
@@ -29,6 +29,25 @@ export default function AuthProvider({ children }) {
   }, []);
 
   useEffect(() => {
+    if (!isSupabaseConfigured()) return undefined;
+    const { data: sub } = getSupabase().auth.onAuthStateChange(async (event) => {
+      if (event === 'SIGNED_OUT') {
+        clearAuthCache();
+        queryClient.setQueryData(['auth', 'me'], null);
+        return;
+      }
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+        clearAuthCache();
+        const next = await loadCurrentAppUser();
+        queryClient.setQueryData(['auth', 'me'], next ?? null);
+      }
+    });
+    return () => {
+      sub.subscription.unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
     if (user?.email) {
       touchLastActive().catch(() => {});
     }
@@ -42,7 +61,7 @@ export default function AuthProvider({ children }) {
 
   const signOut = useCallback(async () => {
     stopActivePersistSubscription();
-    await base44.auth.logout();
+    await signOutAuth();
     clearAuthCache();
     clearInMemoryUserQueries(queryClient);
     clearLegacyPersistedCache();

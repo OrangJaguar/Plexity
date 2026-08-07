@@ -67,8 +67,9 @@ export function useToolsTasks() {
       queryClient.setQueryData(queryKeys.tools.tasks, (old) => [...(old || []), optimistic]);
       return { prev };
     },
-    onError: (_err, _vars, ctx) => {
+    onError: (err, _vars, ctx) => {
       if (ctx?.prev) queryClient.setQueryData(queryKeys.tools.tasks, ctx.prev);
+      console.error('[tools] createTask failed', err);
     },
     onSettled: invalidate,
   });

@@ -1,197 +1,92 @@
-import { base44 } from '@/api/base44Client';
-import { unwrapFunctionInvoke } from '@/api/tools/invoke-response';
-
-const API_VERSION = 1;
-
 /**
- * Invoke the allowlisted Base44 adminConverterApi gateway.
- * @param {string} action
- * @param {Record<string, unknown>} [payload]
+ * Converter URL / job / discovery admin API.
+ * Server backends were Base44-only and are disabled after the Supabase migration
+ * unless VITE_CONVERTER_SERVER_FEATURES=true (not supported yet).
  */
-export async function invokeAdminConverterApi(action, payload = {}) {
-  const res = await base44.functions.invoke('adminConverterApi', {
-    version: API_VERSION,
-    action,
-    payload,
-  });
-  const body = unwrapFunctionInvoke(res);
-  if (body?.ok === false || body?.error) {
-    const msg = body?.error?.message ?? body?.error ?? 'Converter admin request failed';
-    const err = new Error(typeof msg === 'string' ? msg : 'Converter admin request failed');
-    if (typeof body?.error?.code === 'string') {
-      err.code = body.error.code;
-    }
-    throw err;
+import {
+  converterServerFeaturesEnabled,
+  converterServerUnavailableError,
+} from '@/lib/tools/converter/converter-feature-flags';
+
+async function invokeAdminConverterApi() {
+  if (!converterServerFeaturesEnabled()) {
+    throw converterServerUnavailableError('Authorized URL import');
   }
-  return body;
+  throw converterServerUnavailableError('Authorized URL import');
 }
 
 export async function converterUrlSession() {
-  const body = await invokeAdminConverterApi('session');
-  return body.data;
+  return invokeAdminConverterApi();
 }
 
-/**
- * @param {string[]} urls
- */
-export async function converterUrlValidate(urls) {
-  const body = await invokeAdminConverterApi('converter.url.validate', { urls });
-  return body.data;
+export async function converterUrlValidate() {
+  return invokeAdminConverterApi();
 }
 
-/**
- * @param {{
- *   urls: string[],
- *   plan: Record<string, unknown>,
- *   idempotencyKey: string,
- *   sourceRightsAck: boolean,
- *   youtubeTermsAck?: boolean,
- * }} input
- */
-export async function converterJobCreate(input) {
-  const body = await invokeAdminConverterApi('converter.job.create', input);
-  return body.data;
+export async function converterJobCreate() {
+  return invokeAdminConverterApi();
 }
 
-/**
- * @param {{ limit?: number }} [opts]
- */
-export async function converterJobList(opts = {}) {
-  const body = await invokeAdminConverterApi('converter.job.list', opts);
-  return body.data?.items ?? [];
+export async function converterJobList() {
+  return invokeAdminConverterApi();
 }
 
-/**
- * @param {string} jobId
- */
-export async function converterJobGet(jobId) {
-  const body = await invokeAdminConverterApi('converter.job.get', { jobId });
-  return body.data;
+export async function converterJobGet() {
+  return invokeAdminConverterApi();
 }
 
-/**
- * @param {string} jobId
- */
-export async function converterJobCancel(jobId) {
-  const body = await invokeAdminConverterApi('converter.job.cancel', { jobId });
-  return body.data;
+export async function converterJobCancel() {
+  return invokeAdminConverterApi();
 }
 
-/**
- * @param {string} jobId
- */
-export async function converterJobRetry(jobId) {
-  const body = await invokeAdminConverterApi('converter.job.retry', { jobId });
-  return body.data;
+export async function converterJobRetry() {
+  return invokeAdminConverterApi();
 }
 
-/**
- * @param {string} jobId
- * @returns {Promise<{ jobId: string, downloadUrl: string, expiresInMs: number }>}
- */
-export async function converterJobDownload(jobId) {
-  const body = await invokeAdminConverterApi('converter.job.download', { jobId });
-  return body.data;
+export async function converterJobDownload() {
+  return invokeAdminConverterApi();
 }
 
-/**
- * @param {{
- *   url: string,
- *   idempotencyKey: string,
- *   sourceRightsAck: boolean,
- *   youtubeTermsAck?: boolean,
- * }} input
- */
-export async function converterDiscoveryCreate(input) {
-  const body = await invokeAdminConverterApi('converter.discovery.create', input);
-  return body.data;
+export async function converterDiscoveryCreate() {
+  return invokeAdminConverterApi();
 }
 
-/** @param {string} discoveryId */
-export async function converterDiscoveryGet(discoveryId) {
-  const body = await invokeAdminConverterApi('converter.discovery.get', { discoveryId });
-  return body.data;
+export async function converterDiscoveryGet() {
+  return invokeAdminConverterApi();
 }
 
-/** @param {string} discoveryId */
-export async function converterDiscoveryCancel(discoveryId) {
-  const body = await invokeAdminConverterApi('converter.discovery.cancel', { discoveryId });
-  return body.data;
+export async function converterDiscoveryCancel() {
+  return invokeAdminConverterApi();
 }
 
-/**
- * @param {string} discoveryId
- * @param {{ limit?: number, offset?: number }} [opts]
- */
-export async function converterDiscoveryItems(discoveryId, opts = {}) {
-  const body = await invokeAdminConverterApi('converter.discovery.items', {
-    discoveryId,
-    ...opts,
-  });
-  return body.data;
+export async function converterDiscoveryItems() {
+  return invokeAdminConverterApi();
 }
 
-/**
- * @param {{
- *   discoveryId: string,
- *   itemIds: string[],
- *   plan: Record<string, unknown>,
- *   idempotencyKey?: string,
- *   sourceRightsAck: boolean,
- *   youtubeTermsAck?: boolean,
- *   sidecarAck?: boolean,
- *   numberingPolicy?: string,
- *   mode?: 'audio' | 'video',
- *   includeThumbnails?: boolean,
- *   includeSubtitles?: boolean,
- *   includeMetadata?: boolean,
- * }} input
- */
-export async function converterBatchConfirm(input) {
-  const body = await invokeAdminConverterApi('converter.batch.confirm', input);
-  return body.data;
+export async function converterBatchConfirm() {
+  return invokeAdminConverterApi();
 }
 
-/** @param {string} batchId */
-export async function converterBatchPause(batchId) {
-  const body = await invokeAdminConverterApi('converter.batch.pause', { batchId });
-  return body.data;
+export async function converterBatchPause() {
+  return invokeAdminConverterApi();
 }
 
-/** @param {string} batchId */
-export async function converterBatchResume(batchId) {
-  const body = await invokeAdminConverterApi('converter.batch.resume', { batchId });
-  return body.data;
+export async function converterBatchResume() {
+  return invokeAdminConverterApi();
 }
 
-/** @param {string} batchId */
-export async function converterBatchRetryFailed(batchId) {
-  const body = await invokeAdminConverterApi('converter.batch.retryFailed', { batchId });
-  return body.data;
+export async function converterBatchRetryFailed() {
+  return invokeAdminConverterApi();
 }
 
-/**
- * @param {{
- *   batchId: string,
- *   includeThumbnails?: boolean,
- *   includeSubtitles?: boolean,
- *   includeMetadata?: boolean,
- *   readySubsetOnly?: boolean,
- * }} input
- */
-export async function converterPackageCreate(input) {
-  const body = await invokeAdminConverterApi('converter.package.create', input);
-  return body.data;
+export async function converterPackageCreate() {
+  return invokeAdminConverterApi();
 }
 
-/** @param {string} packageId */
-export async function converterPackageGet(packageId) {
-  const body = await invokeAdminConverterApi('converter.package.get', { packageId });
-  return body.data;
+export async function converterPackageGet() {
+  return invokeAdminConverterApi();
 }
 
-/** @param {string} packageId */
-export async function converterPackageDownload(packageId) {
-  const body = await invokeAdminConverterApi('converter.package.download', { packageId });
-  return body.data;
+export async function converterPackageDownload() {
+  return invokeAdminConverterApi();
 }

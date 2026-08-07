@@ -30,40 +30,18 @@ describe('tool capabilities', () => {
     expect(admin).toEqual(pub);
   });
 
-  it('adds Plan 5–7 converter capabilities only on the admin surface', () => {
+  it('keeps converter server capabilities off by default (migration)', () => {
     expect(PUBLIC_TOOL_CAPABILITIES.converter).toEqual({});
-    expect(ADMIN_TOOL_CAPABILITY_DELTAS.converter).toEqual({
-      'converter.url.import': true,
-      'converter.playlist.import': true,
-      'converter.package.create': true,
-      'converter.ai.assist': true,
-      'converter.ai.ocr': true,
-      'converter.ai.transcribe': true,
-    });
+    expect(ADMIN_TOOL_CAPABILITY_DELTAS.converter).toEqual({});
     expect(resolveToolCapabilities('converter', 'public')).toEqual({});
-    expect(resolveToolCapabilities('converter', 'admin')).toEqual({
-      'converter.url.import': true,
-      'converter.playlist.import': true,
-      'converter.package.create': true,
-      'converter.ai.assist': true,
-      'converter.ai.ocr': true,
-      'converter.ai.transcribe': true,
-    });
+    expect(resolveToolCapabilities('converter', 'admin')).toEqual({});
     expect(hasToolCapability(
       resolveToolCapabilities('converter', 'admin'),
       'converter.playlist.import',
-    )).toBe(true);
+    )).toBe(false);
     expect(hasToolCapability(
       resolveToolCapabilities('converter', 'admin'),
       'converter.ai.assist',
-    )).toBe(true);
-    expect(hasToolCapability(
-      resolveToolCapabilities('converter', 'public'),
-      'converter.package.create',
-    )).toBe(false);
-    expect(hasToolCapability(
-      resolveToolCapabilities('converter', 'public'),
-      'converter.ai.ocr',
     )).toBe(false);
   });
 

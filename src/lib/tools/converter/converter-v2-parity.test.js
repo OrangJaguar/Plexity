@@ -10,27 +10,13 @@ import { CONVERTER_PRESETS } from '@/lib/tools/converter/converter-presets.js';
 import { TOOL_PAGE_META } from '@/lib/tools/tool-page-meta';
 
 describe('converter v2 parity', () => {
-  it('keeps shared converter routes with admin-only Plan 5–7 capabilities', () => {
+  it('keeps shared converter routes with server capabilities gated off', () => {
     expect(getToolRoute('converter')).toBe('/convert');
     expect(getToolRoute('converter', { surface: 'admin' })).toBe('/admin/convert');
     expect(PUBLIC_TOOL_CAPABILITIES.converter).toEqual({});
-    expect(ADMIN_TOOL_CAPABILITY_DELTAS.converter).toEqual({
-      'converter.url.import': true,
-      'converter.playlist.import': true,
-      'converter.package.create': true,
-      'converter.ai.assist': true,
-      'converter.ai.ocr': true,
-      'converter.ai.transcribe': true,
-    });
+    expect(ADMIN_TOOL_CAPABILITY_DELTAS.converter).toEqual({});
     expect(resolveToolCapabilities('converter', 'public')).toEqual({});
-    expect(resolveToolCapabilities('converter', 'admin')).toEqual({
-      'converter.url.import': true,
-      'converter.playlist.import': true,
-      'converter.package.create': true,
-      'converter.ai.assist': true,
-      'converter.ai.ocr': true,
-      'converter.ai.transcribe': true,
-    });
+    expect(resolveToolCapabilities('converter', 'admin')).toEqual({});
   });
 
   it('does not introduce admin-only V2 capability gates', () => {
@@ -39,8 +25,8 @@ describe('converter v2 parity', () => {
     for (const key of Object.keys({ ...publicCaps, ...adminCaps })) {
       expect(key.startsWith('converter.v2')).toBe(false);
     }
-    expect(adminCaps['converter.playlist.import']).toBe(true);
-    expect(adminCaps['converter.package.create']).toBe(true);
+    expect(adminCaps['converter.playlist.import']).toBeUndefined();
+    expect(adminCaps['converter.package.create']).toBeUndefined();
   });
 
   it('shares the same converter page meta for both surfaces', () => {

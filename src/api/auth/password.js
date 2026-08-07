@@ -1,13 +1,29 @@
-import { base44 } from '@/api/base44Client';
+import { getSupabase } from '@/api/supabaseClient';
+import { clearAuthCache, passwordResetRedirectTo } from '@/api/auth/session';
 
 export async function requestPasswordReset(email) {
-  return base44.auth.resetPasswordRequest(email.trim());
+  const { error } = await getSupabase().auth.resetPasswordForEmail(email.trim(), {
+    redirectTo: passwordResetRedirectTo(),
+  });
+  if (error) throw error;
 }
 
-export async function completePasswordReset({ resetToken, newPassword }) {
-  return base44.auth.resetPassword({ resetToken, newPassword });
+export async function completePasswordReset({ newPassword }) {
+  const { error } = await getSupabase().auth.updateUser({ password: newPassword });
+  if (error) throw error;
+  clearAuthCache();
 }
 
-export async function changePassword({ userId, currentPassword, newPassword }) {
-  return base44.auth.changePassword({ userId, currentPassword, newPassword });
+export async function changePassword({ currentPassword, newPassword }) {
+  const { data: sessionData } = await getSupabase().auth.getSession();
+  const email = sessionData.session?.user?.email;
+  if (!email) throw new Error('Not signed in.');
+  const { error: reauthError } = await getSupabase().auth.signInWithPassword({
+    email,
+    password: currentPassword,
+  });
+  if (reauthError) throw reauthError;
+  const { error } = await getSupabase().auth.updateUser({ password: newPassword });
+  if (error) throw error;
+  clearAuthCache();
 }

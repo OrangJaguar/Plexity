@@ -1,20 +1,18 @@
-import { base44 } from '@/api/base44Client';
-import { unwrapFunctionInvoke } from '@/api/tools/invoke-response';
+import { invokeBackendFunction } from '@/api/functions/invoke';
 
 const API_VERSION = 1;
 
 /**
- * Invoke the allowlisted Base44 adminApi gateway.
+ * Invoke the allowlisted admin API gateway (Base44 adminApi or Supabase admin-api).
  * @param {string} action
  * @param {Record<string, unknown>} [payload]
  */
 export async function invokeAdminApi(action, payload = {}) {
-  const res = await base44.functions.invoke('adminApi', {
+  const body = await invokeBackendFunction('adminApi', {
     version: API_VERSION,
     action,
     payload,
   });
-  const body = unwrapFunctionInvoke(res);
   if (body?.ok === false || body?.error) {
     const msg = body?.error?.message ?? body?.error ?? 'Admin request failed';
     throw new Error(typeof msg === 'string' ? msg : 'Admin request failed');

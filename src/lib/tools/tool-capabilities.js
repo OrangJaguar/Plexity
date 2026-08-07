@@ -1,4 +1,5 @@
 import { TOOL_REGISTRY } from '@/lib/tools/registry';
+import { converterServerFeaturesEnabled } from '@/lib/tools/converter/converter-feature-flags';
 
 /**
  * Capability keys are namespaced, action-oriented strings.
@@ -23,9 +24,19 @@ export const PUBLIC_TOOL_CAPABILITIES = Object.freeze(
   ]),
 );
 
+/** Admin-only converter server capabilities (URL/AI). Off after Supabase migration. */
+const CONVERTER_SERVER_ADMIN_CAPS = Object.freeze({
+  'converter.url.import': true,
+  'converter.playlist.import': true,
+  'converter.package.create': true,
+  'converter.ai.assist': true,
+  'converter.ai.ocr': true,
+  'converter.ai.transcribe': true,
+});
+
 /**
  * Admin deltas keyed by tool ID.
- * Converter Plans 5–7: URL import, playlists, packages, and AI capabilities.
+ * Converter server features require VITE_CONVERTER_SERVER_FEATURES=true.
  * @type {Readonly<Record<string, Readonly<ToolCapabilityMap>>>}
  */
 export const ADMIN_TOOL_CAPABILITY_DELTAS = Object.freeze(
@@ -33,15 +44,8 @@ export const ADMIN_TOOL_CAPABILITY_DELTAS = Object.freeze(
     ...TOOL_REGISTRY.map((t) => [
       t.id,
       Object.freeze(
-        t.id === 'converter'
-          ? {
-            'converter.url.import': true,
-            'converter.playlist.import': true,
-            'converter.package.create': true,
-            'converter.ai.assist': true,
-            'converter.ai.ocr': true,
-            'converter.ai.transcribe': true,
-          }
+        t.id === 'converter' && converterServerFeaturesEnabled()
+          ? { ...CONVERTER_SERVER_ADMIN_CAPS }
           : {},
       ),
     ]),
