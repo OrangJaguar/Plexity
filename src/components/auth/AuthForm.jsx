@@ -123,24 +123,6 @@ export default function AuthForm({
           full_name: displayName,
         });
 
-<<<<<<< Updated upstream
-  async function handleVerify(e) {
-    e.preventDefault();
-    if (otpCode.length < 6) { setError('Please enter all 6 digits.'); return; }
-    resetMessages();
-    setLoading(true);
-    try {
-      const response = await base44.auth.verifyOtp({ email, otpCode });
-      const token = response?.access_token || response?.token || response?.data?.access_token;
-      if (token) base44.auth.setToken(token);
-      const user = await base44.auth.me();
-      const displayName = displayNameFromEmail(user.email || email);
-      try {
-        await createUserPreferencesOnSignup({ userEmail: user.email });
-      } catch {
-        // Non-fatal — the account is verified and the token is set.
-        // Preferences self-heal on first tool access via updatePreferences().
-=======
         if (needsEmailConfirmation) {
           setInfo('Check your email for a confirmation link, then sign in.');
           setStep('check-email');
@@ -149,7 +131,6 @@ export default function AuthForm({
         } else {
           setError('Account created but session is missing. Try signing in.');
         }
->>>>>>> Stashed changes
       }
     } catch (err) {
       setError(authErrorMessage(err, 'Something went wrong.'));
