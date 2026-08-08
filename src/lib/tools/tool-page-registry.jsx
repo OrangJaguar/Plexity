@@ -17,6 +17,7 @@ import ToolsProfileToolPage from '@/pages/tools/ToolsProfileToolPage';
 import ToolsListsPage from '@/pages/tools/ToolsListsPage';
 import ToolsPasswordsPage from '@/pages/tools/ToolsPasswordsPage';
 import ToolsCalculatorPage from '@/pages/tools/ToolsCalculatorPage';
+import ToolsBrawlPage from '@/pages/tools/ToolsBrawlPage';
 import {
   TOOL_PAGE_META,
   assertToolPageManifestParity,
@@ -46,6 +47,7 @@ const PAGE_BY_ID = {
   converter: ToolsConverterPage,
   video: ToolsVideoPage,
   image: ToolsImagePage,
+  brawl: ToolsBrawlPage,
 };
 
 /**

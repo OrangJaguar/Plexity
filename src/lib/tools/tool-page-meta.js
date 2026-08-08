@@ -31,9 +31,10 @@ export const TOOL_PAGE_META = [
   { id: 'converter', route: '/convert', wildcard: false },
   { id: 'video', route: '/video', wildcard: false },
   { id: 'image', route: '/image', wildcard: false },
+  { id: 'brawl', route: '/brawl', wildcard: false },
 ];
 
-export const EXPECTED_TOOL_COUNT = 19;
+export const EXPECTED_TOOL_COUNT = 20;
 export const WILDCARD_TOOL_IDS = Object.freeze(['pdftools', 'stocks']);
 
 /**

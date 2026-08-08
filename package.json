@@ -14,6 +14,7 @@
     "typecheck": "tsc -p ./jsconfig.json",
     "test": "vitest run",
     "test:market-data": "node scripts/test-tools-market-data.mjs",
+    "brawl:proxy": "node scripts/brawl-api-local-proxy.mjs",
     "test:browser": "playwright test -c playwright.converter.config.mjs",
     "test:converter-browser": "playwright test -c playwright.converter.config.mjs",
     "fixtures:converter": "node scripts/generate-converter-fixtures.mjs",

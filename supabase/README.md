@@ -89,3 +89,33 @@ where email = 'YOUR_EMAIL@example.com';
 
 - Browser: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`
 - Server / Edge only: `SUPABASE_SERVICE_ROLE_KEY` (never `VITE_`)
+
+## ★ Brawl MANUAL — trio roster read (Plan 13 ready swaps)
+
+After `0003_brawl.sql`, run [`migrations/0004_brawl_trio_roster_read.sql`](./migrations/0004_brawl_trio_roster_read.sql) so trio members can read each other’s P11 roster for legal ready-phase swaps.
+
+## ★ Brawl MANUAL B — API token + proxy (Plan 03)
+
+Official docs: https://developer.brawlstars.com/#/documentation
+
+1. Create/copy an API token; **whitelist** the IP that will call Supercell
+   - Local smoke: whitelist your home public IP and run `npm run brawl:proxy`
+   - Edge Function: whitelist is harder (dynamic egress) — use local proxy for prototype, or a static-IP host later
+2. Put the token in **server** env only (never `VITE_`):
+   ```bash
+   # local .env
+   BRAWL_STARS_API_TOKEN=your_token_here
+   # optional while using local proxy
+   VITE_BRAWL_PROXY_URL=http://127.0.0.1:8788
+   ```
+   ```bash
+   supabase secrets set BRAWL_STARS_API_TOKEN=your_token_here
+   supabase functions deploy brawl-api
+   ```
+3. Smoke (with proxy running + token set):
+   ```bash
+   curl -s -X POST http://127.0.0.1:8788/brawl-api \
+     -H "Content-Type: application/json" \
+     -d "{\"action\":\"getPlayer\",\"playerTag\":\"YOURTAG\"}"
+   ```
+4. Reply to the agent: **Brawl MANUAL B done**

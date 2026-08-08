@@ -7,6 +7,7 @@ const FUNCTION_NAMES = {
   toolsMarketData: 'tools-market-data',
   submitFeedback: 'submit-feedback',
   adminApi: 'admin-api',
+  brawlApi: 'brawl-api',
 };
 
 function throwIfFunctionErrorBody(body) {
@@ -16,7 +17,7 @@ function throwIfFunctionErrorBody(body) {
 }
 
 /**
- * @param {'toolsMarketData' | 'submitFeedback' | 'adminApi'} name
+ * @param {'toolsMarketData' | 'submitFeedback' | 'adminApi' | 'brawlApi'} name
  * @param {Record<string, unknown>} [body]
  */
 export async function invokeBackendFunction(name, body = {}) {

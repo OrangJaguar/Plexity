@@ -18,9 +18,10 @@ import {
   ArrowLeftRight,
   Clapperboard,
   Image,
+  Swords,
 } from 'lucide-react';
 
-/** @typedef {'dashboard'|'tasks'|'calendar'|'focus'|'goals'|'grades'|'journal'|'profile'|'lists'|'passwords'|'calculator'|'pdftools'|'stocks'|'typing'|'college'|'units'|'converter'|'video'|'image'} ToolId */
+/** @typedef {'dashboard'|'tasks'|'calendar'|'focus'|'goals'|'grades'|'journal'|'profile'|'lists'|'passwords'|'calculator'|'pdftools'|'stocks'|'typing'|'college'|'units'|'converter'|'video'|'image'|'brawl'} ToolId */
 
 /**
  * @typedef {Object} ToolDefinition
@@ -292,6 +293,19 @@ export const TOOL_REGISTRY = [
     comingSoon: false,
     desktopOnly: true,
     loadPreview: () => import('@/components/tools/catalog/previews/ImagePreview'),
+  },
+  {
+    id: 'brawl',
+    route: '/brawl',
+    label: 'Brawl',
+    icon: Swords,
+    description: 'Mythic+ Ranked draft and trio roster tools for Brawl Stars.',
+    longDescription:
+      'Solo or trio Ranked draft board, shared workspace for your stack, and team tools for Power 11 gaps and upgrade priority. Sync your player tag in Settings — catalogs stay live from the API.',
+    createdAt: '2026-08-07',
+    popularityRank: 15,
+    defaultPinned: false,
+    loadPreview: () => import('@/components/tools/catalog/previews/BrawlPreview'),
   },
 ];
 

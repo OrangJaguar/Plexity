@@ -19,7 +19,7 @@ describe('converter v1 parity', () => {
   });
 
   it('keeps expected tool inventory at 21', () => {
-    expect(EXPECTED_TOOL_COUNT).toBe(19);
+    expect(EXPECTED_TOOL_COUNT).toBe(20);
     expect(TOOL_PAGE_META).toHaveLength(EXPECTED_TOOL_COUNT);
     expect(TOOL_REGISTRY).toHaveLength(EXPECTED_TOOL_COUNT);
   });

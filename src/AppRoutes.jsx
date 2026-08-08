@@ -15,6 +15,7 @@ import RequireAuth from '@/components/routing/RequireAuth';
 import AdminLayout from '@/layouts/AdminLayout';
 import FeedbackPage from '@/pages/feedback/FeedbackPage';
 import AdminFeedbackPage from '@/pages/admin/AdminFeedbackPage';
+import AdminBrawlPage from '@/pages/admin/AdminBrawlPage';
 import ToolSurfaceProvider from '@/providers/ToolSurfaceProvider';
 import { buildAdminHomeRedirect, buildToolRoutes } from '@/components/routing/buildToolRoutes';
 import { ADMIN_BASE_PATH } from '@/lib/tools/tool-surface';
@@ -37,6 +38,7 @@ export default function AppRoutes() {
       <Route element={<RequireAdmin />}>
         <Route element={<AdminLayout />}>
           <Route path="/admin/feedback" element={<AdminFeedbackPage />} />
+          <Route path="/admin/brawledit" element={<AdminBrawlPage />} />
         </Route>
       </Route>
 

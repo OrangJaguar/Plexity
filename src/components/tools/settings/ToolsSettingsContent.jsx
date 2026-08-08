@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { LogOut, Search } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import ScheduleEditor from '@/components/tools/settings/ScheduleEditor';
 import DashboardWidgetsEditor from '@/components/tools/settings/DashboardWidgetsEditor';
+import BrawlSettingsPanel from '@/components/tools/settings/BrawlSettingsPanel';
 import { useToolsSettings } from '@/hooks/queries/useToolsSettings';
 import { usePreferences } from '@/hooks/queries/usePreferences';
 import { useUpdatePreferences } from '@/hooks/mutations/usePreferencesMutations';
@@ -19,7 +20,6 @@ import {
   MAX_DASHBOARD_WIDGETS,
   HABIT_LABEL_MAX,
 } from '@/lib/tools/widget-layout';
-
 /** @typedef {{ id: string, title: string, keywords: string[], render: () => import('react').ReactNode }} SettingsToolSection */
 
 function SettingsTitleBox({ id, title, badge = null }) {
@@ -35,6 +35,7 @@ function SettingsTitleBox({ id, title, badge = null }) {
 
 export default function ToolsSettingsContent() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user, signOut } = useAuth();
   const { settings } = useToolsSettings();
   const { data: preferences } = usePreferences();
@@ -42,7 +43,7 @@ export default function ToolsSettingsContent() {
   const [newTag, setNewTag] = useState('');
   const [newHabit, setNewHabit] = useState('');
   const [newCategory, setNewCategory] = useState('');
-  const [toolQuery, setToolQuery] = useState('');
+  const [toolQuery, setToolQuery] = useState(() => searchParams.get('q') || '');
 
   const themeDark = preferences?.themeDark !== false;
   const widgetLayout = useMemo(() => mergeWidgetLayout(preferences), [preferences]);
@@ -298,6 +299,32 @@ export default function ToolsSettingsContent() {
                 <button type="button" className="btn btn-sm" onClick={addCategory}>Add</button>
               </div>
             </div>
+          </div>
+        </section>
+      ),
+    },
+    {
+      id: 'brawl',
+      title: 'Brawl',
+      keywords: [
+        'brawl',
+        'brawl stars',
+        'ranked',
+        'mythic',
+        'trio',
+        'player tag',
+        'draft',
+        'pocket',
+        'avoid',
+      ],
+      render: () => (
+        <section className="tools-settings-block" aria-labelledby="settings-brawl-heading" id="settings-brawl">
+          <SettingsTitleBox
+            id="settings-brawl-heading"
+            title="Brawl"
+          />
+          <div className="tools-settings-section tools-settings-body-box">
+            <BrawlSettingsPanel />
           </div>
         </section>
       ),
